@@ -47,27 +47,53 @@ You should already have `custom.loyalty_points`. Also add:
 - Variable: **Metaobject → formSubmittedBy → id**
 - Operator: **is not empty**
 
-### Step 3 — Log output (register metafields)
+### Step 3 — Register metafields (required — fixes GraphQL errors)
 
-Flow cannot read customer metafields in Run code until they are added to the workflow environment. This is the same reason your **award/cancel** flows work when imported (they ship with metafield mappings baked in).
+If Run code shows:
 
-On the **Yes** branch, **before** Run code:
+> Field `loyaltyPoints` doesn't exist on type `Customer`  
+> Field `loyaltyRedeemCode` doesn't exist on type `Customer`
+
+That is **expected** until Flow knows those aliases. `loyaltyPoints` is not a built-in customer field — it is Flow's name for **`custom.loyalty_points`**, which you must register first (same idea as mapping `loyaltyPoints` in your award flow).
+
+Pick **one** method:
+
+#### Method A — Log output (recommended)
+
+On the **Yes** branch from step 2, **before** Run code:
 
 1. **Then → Log output**
-2. **Add variable** → **Metaobject → formSubmittedBy** → choose metafield **`custom.loyalty_points`**
-   - When prompted for an alias, use **`loyaltyPoints`**
-3. **Add variable** again → **Metaobject → formSubmittedBy** → **`custom.loyalty_redeem_code`**
-   - Alias: **`loyaltyRedeemCode`**
-4. Log message: `{{ metaobject.formSubmittedBy.id }}` (content does not matter)
+2. Click **Add variable** (do not type metafield paths in the message box)
+3. Path: **Metaobject → formSubmittedBy → Metafields → loyalty_points**
+4. When Flow asks for an alias, enter exactly: **`loyaltyPoints`**
+5. **Add variable** again → same path → **loyalty_redeem_code** → alias **`loyaltyRedeemCode`**
+6. Log message: `{{ metaobject.formSubmittedBy.id }}`
+7. **Save** the workflow
 
-You can delete this Log step later once Run code saves successfully.
+#### Method B — Run code mapper (like award flow)
+
+1. Add **Run code** and paste the GraphQL query from step 4 below (errors are OK)
+2. Scroll **below** the Input query — Flow lists unmapped fields
+3. Map **`loyaltyPoints`** → **Metaobject → formSubmittedBy → `custom.loyalty_points`**
+4. Map **`loyaltyRedeemCode`** → **Metaobject → formSubmittedBy → `custom.loyalty_redeem_code`**
+5. Errors should clear once both mappings are set
+
+**Common mistakes**
+
+- Log output on the **No** branch instead of **Yes**
+- Log output **after** Run code instead of before
+- Typing `loyalty_points` in the log message instead of using **Add variable**
+- Mapping to **`custom_loyalty_points`** (wrong key — use **`loyalty_points`** only)
+- Alias typo: `LoyaltyPoints` or `loyalty_points` instead of **`loyaltyPoints`**
+
+You can delete the Log output step after Run code saves successfully.
 
 ### Step 4 — Run code
 
-- **Then → Run code**
+- **Then → Run code** (after step 3)
 - Paste the full contents of `shopify-flow/redeem-loyalty-points.js` (from `const REDEEM_POINTS` through the closing `}`)
 
-**Input (GraphQL)** — only after Step 3. No `email`, no root `customer`, no `metafield()` in the query:
+**Input (GraphQL)** — no `email`, no root `customer`, no `metafield()` aliases in the query:
 
 ```graphql
 query {
@@ -85,7 +111,7 @@ query {
 }
 ```
 
-If you still see *Cannot query field "loyaltyPoints"*, the Log output step is missing or the metafields were not added with aliases `loyaltyPoints` / `loyaltyRedeemCode`.
+If errors persist, step 3 is incomplete — save the workflow after Log output, then reopen Run code.
 
 **Outputs** — Flow should detect these from the script; if prompted, define:
 
@@ -182,7 +208,7 @@ Check **Flow → Run history** if anything fails.
 |-------|-----|
 | `.flow` import fails | Expected — build manually (section 3). Forms workflows are store-specific. |
 | Flow never runs | Wrong form on trigger; workflow not turned on; customer not signed in |
-| `loyaltyPoints` / `loyaltyRedeemCode` not on Customer | Add **Log output** before Run code; register both metafields with those alias names |
+| `loyaltyPoints` / `loyaltyRedeemCode` not on Customer | **Expected until step 3 is done.** Add Log output before Run code, or map both fields below the Run code query. Save workflow, then reopen Run code. |
 | Run code GraphQL errors | No root `customer`, no `email`, no `metafield()` aliases in the query |
 | Run code shows 0 points | Confirm Log output aliases; metafield key is `loyalty_points` not `custom_loyalty_points` |
 | `newLoyaltyPoints` not in metafield step | Pick it from **Run code** outputs in the variable picker — do not type it |

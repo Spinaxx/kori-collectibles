@@ -2,15 +2,27 @@
 //
 // Trigger: Metaobject entry created (your "Redeem loyalty points" Shopify Form)
 //
-// BEFORE Run code: add a Log output step and register metafields (Flow requirement).
-//   1. Add action → Log output (on the same Yes branch, before Run code)
-//   2. Add variable → Metaobject → formSubmittedBy → metafield custom.loyalty_points
-//      (alias name: loyaltyPoints)
-//   3. Add variable → Metaobject → formSubmittedBy → metafield custom.loyalty_redeem_code
-//      (alias name: loyaltyRedeemCode)
-//   4. Log message can be anything, e.g. {{ metaobject.formSubmittedBy.id }}
+// ⚠️  If you see: Field 'loyaltyPoints' doesn't exist on type 'Customer'
+//     Flow has not registered your metafield aliases yet. Do ONE of the two options
+//     below BEFORE the query will save. The error is normal until you do this.
 //
-// Input (GraphQL) — only AFTER metafields are registered via Log output:
+// OPTION A — Log output (recommended for Forms workflows)
+//   1. On the Yes branch, add Log output BEFORE Run code
+//   2. Click "Add variable" → Metaobject → formSubmittedBy → Metafields → loyalty_points
+//      Alias MUST be exactly: loyaltyPoints
+//   3. Add variable again → same path → loyalty_redeem_code
+//      Alias MUST be exactly: loyaltyRedeemCode
+//   4. Log message: {{ metaobject.formSubmittedBy.id }}
+//   5. Save the workflow, then open Run code — the GraphQL errors should clear
+//
+// OPTION B — Run code input mapper (same as award flow)
+//   1. Paste the GraphQL query below (errors are OK for now)
+//   2. Scroll BELOW the query — Flow shows mapping rows for loyaltyPoints / loyaltyRedeemCode
+//   3. Map loyaltyPoints → Metaobject → formSubmittedBy → custom.loyalty_points
+//   4. Map loyaltyRedeemCode → Metaobject → formSubmittedBy → custom.loyalty_redeem_code
+//   5. Do NOT map to custom_loyalty_points — that is a different metafield
+//
+// Input (GraphQL) — only AFTER metafields are registered (Option A or B):
 // query {
 //   metaobject {
 //     formSubmittedBy {
