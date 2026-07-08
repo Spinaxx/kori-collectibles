@@ -73,26 +73,32 @@
     {%- endif -%}
 
     {%- if settings.show_announcement -%}
-      <div class="announcement" aria-label="Announcements">
-        <div class="announcement__track">
-          <div class="announcement__inner">
-            <span>Free UK delivery over <b>GBP 40</b></span>
+      {%- liquid
+        assign announcement_raw = settings.announcement_text | default: 'Free UK delivery over GBP 40|Singles condition-checked under lamp|New sealed drops weekly'
+        assign announcement_normalized = announcement_raw | newline_to_br | strip_newlines | replace: '<br />', '|' | replace: '<br/>', '|' | replace: '<br>', '|'
+        assign announcement_messages = announcement_normalized | split: '|'
+      -%}
+      {%- capture announcement_items -%}
+        {%- for message in announcement_messages -%}
+          {%- assign message_text = message | strip -%}
+          {%- if message_text != blank -%}
+            <span>{{ message_text | escape }}</span>
             <span aria-hidden="true">·</span>
-            <span>Singles condition-checked under lamp</span>
-            <span aria-hidden="true">·</span>
-            <span>New sealed drops weekly</span>
-            <span aria-hidden="true">·</span>
-          </div>
-          <div class="announcement__inner" aria-hidden="true">
-            <span>Free UK delivery over <b>GBP 40</b></span>
-            <span aria-hidden="true">·</span>
-            <span>Singles condition-checked under lamp</span>
-            <span aria-hidden="true">·</span>
-            <span>New sealed drops weekly</span>
-            <span aria-hidden="true">·</span>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+      {%- if announcement_items != blank -%}
+        <div class="announcement" aria-label="Announcements">
+          <div class="announcement__track">
+            <div class="announcement__inner">
+              {{ announcement_items }}
+            </div>
+            <div class="announcement__inner" aria-hidden="true">
+              {{ announcement_items }}
+            </div>
           </div>
         </div>
-      </div>
+      {%- endif -%}
     {%- endif -%}
 
     <header class="header" data-header>

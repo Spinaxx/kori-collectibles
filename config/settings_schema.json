@@ -107,6 +107,13 @@
         "default": true
       },
       {
+        "type": "textarea",
+        "id": "announcement_text",
+        "label": "Announcement messages",
+        "default": "Free UK delivery over GBP 40\nSingles condition-checked under lamp\nNew sealed drops weekly",
+        "info": "One message per line. These scroll continuously in the announcement bar."
+      },
+      {
         "type": "text",
         "id": "logo_text",
         "label": "Logo text (when no logo image)",
