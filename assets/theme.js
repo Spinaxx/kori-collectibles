@@ -63,35 +63,12 @@
     });
   };
 
-  const initHeroCard = () => {
+  const initHeroTilt = () => {
     const card = qs('[data-hero-card]');
-    const dataEl = qs('[data-hero-candidates]');
-    if (!card || !dataEl) return;
+    const shine = qs('[data-hero-shine]', card || document);
+    if (!card || !shine) return;
+    if (window.matchMedia('(hover: none)').matches) return;
 
-    let candidates = [];
-    try {
-      candidates = JSON.parse(dataEl.textContent.trim());
-    } catch (e) {
-      return;
-    }
-    if (!candidates.length) return;
-
-    const pick = candidates[Math.floor(Math.random() * candidates.length)];
-    const img = qs('[data-hero-image]', card);
-    if (pick.url) {
-      card.href = pick.url;
-      card.setAttribute('aria-label', pick.title);
-    }
-    if (img && pick.image) {
-      img.src = pick.image;
-      img.alt = pick.title;
-      img.hidden = false;
-      const placeholder = qs('[data-hero-placeholder]', card);
-      if (placeholder) placeholder.hidden = true;
-    }
-
-    const shine = qs('[data-hero-shine]', card);
-    if (!shine || window.matchMedia('(hover: none)').matches) return;
     card.addEventListener('mousemove', (e) => {
       const r = card.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width;
@@ -107,6 +84,6 @@
   document.addEventListener('DOMContentLoaded', () => {
     initDrawers();
     initNavDropdowns();
-    initHeroCard();
+    initHeroTilt();
   });
 })();

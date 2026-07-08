@@ -53,13 +53,13 @@
   <body>
     <a class="skip-link" href="#MainContent">{{ 'general.accessibility.skip_to_content' | t }}</a>
 
-    {% sections 'header-group' %}
+    {% section 'header' %}
 
     <main id="MainContent" class="main-content" role="main">
       {{ content_for_layout }}
     </main>
 
-    {% sections 'footer-group' %}
+    {% section 'footer' %}
 
     <script src="{{ 'theme.js' | asset_url }}" defer></script>
   </body>
