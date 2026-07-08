@@ -5,12 +5,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
-import time
 import uuid
 from pathlib import Path
 
+# Shopify Forms app id + form instance id from the Forms admin URL.
 FORM_ID = "1063387"
+FORM_TYPE = f"app--6171699--shopify-forms{FORM_ID}"
 
 SCRIPT = """const REDEEM_POINTS = 100;
 const REDEEM_VALUE_GBP = 5;
@@ -89,23 +89,9 @@ OUTPUT_SCHEMA = (
     "}"
 )
 
-ULID_ENCODING = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
-
 
 def new_step_id() -> str:
     return str(uuid.uuid4())
-
-
-def new_ulid() -> str:
-    timestamp_ms = int(time.time() * 1000)
-    randomness = int.from_bytes(os.urandom(10), "big")
-
-    value = (timestamp_ms << 80) | randomness
-    chars = []
-    for _ in range(26):
-        chars.append(ULID_ENCODING[value & 31])
-        value >>= 5
-    return "".join(reversed(chars))
 
 
 def single_condition(
@@ -115,10 +101,10 @@ def single_condition(
     operator: str,
     rhs_value: str = "",
 ) -> dict:
-    root_uuid = new_ulid()
-    comp_uuid = new_ulid()
-    lhs_uuid = new_ulid()
-    rhs_uuid = new_ulid()
+    root_uuid = str(uuid.uuid4())
+    comp_uuid = str(uuid.uuid4())
+    lhs_uuid = str(uuid.uuid4())
+    rhs_uuid = str(uuid.uuid4())
     return {
         "uuid": root_uuid,
         "lhs": {
@@ -178,13 +164,7 @@ def customer_metafield_step(
         "config_field_values": [
             {
                 "config_field_id": "customer_id",
-                "value": json.dumps(
-                    {
-                        "value": "{{ metaobject.formSubmittedBy.id }}",
-                        "default_value": "metaobject.formSubmittedBy.id",
-                    },
-                    separators=(",", ":"),
-                ),
+                "value": "metaobject.formSubmittedBy.id",
             },
             {
                 "config_field_id": "metafield",
@@ -211,10 +191,58 @@ def customer_metafield_step(
     }
 
 
+def patched_fields() -> list[dict]:
+    """Match Shopify Forms export shape (see ecommercepot form templates)."""
+    meta_type = f"metaobject_{FORM_ID}"
+    form_fields = [
+        ("formSubmittedBy", "formSubmittedBy", "form_submitted_by"),
+        ("formSubmittedAt", "formSubmittedAt", "form_submitted_at"),
+        ("formDisplayName", "formDisplayName", "form_display_name"),
+    ]
+    patches = [
+        {
+            "id": str(uuid.uuid4()),
+            "handle": handle,
+            "field": field,
+            "patched_type": meta_type,
+            "arguments": json.dumps({"key": key}, separators=(",", ":")),
+            "merchant_configured": False,
+        }
+        for handle, field, key in form_fields
+    ]
+    patches.extend(
+        [
+            {
+                "id": str(uuid.uuid4()),
+                "handle": "loyaltyPoints",
+                "field": "metafield",
+                "patched_type": "Customer",
+                "arguments": json.dumps(
+                    {"key": "loyalty_points", "namespace": "custom"},
+                    separators=(",", ":"),
+                ),
+                "merchant_configured": True,
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "handle": "loyaltyRedeemCode",
+                "field": "metafield",
+                "patched_type": "Customer",
+                "arguments": json.dumps(
+                    {"key": "loyalty_redeem_code", "namespace": "custom"},
+                    separators=(",", ":"),
+                ),
+                "merchant_configured": True,
+            },
+        ]
+    )
+    return patches
+
+
 def build_workflow(*, variant: str) -> dict:
-    """variant: core (import-safe), full (includes discount + metafields)."""
     include_discount_create = variant == "full"
     include_metafields = variant == "full"
+
     trigger_id = new_step_id()
     cond_customer_id = new_step_id()
     run_code_id = new_step_id()
@@ -253,7 +281,9 @@ def build_workflow(*, variant: str) -> dict:
         {
             "step_id": trigger_id,
             "step_position": [0, 0],
-            "config_field_values": [],
+            "config_field_values": [
+                {"config_field_id": "type", "value": FORM_TYPE},
+            ],
             "task_id": "shopify::admin::metaobject_created",
             "task_version": "0.1",
             "task_type": "TRIGGER",
@@ -386,33 +416,7 @@ def build_workflow(*, variant: str) -> dict:
                 }
                 for from_id, from_port, to_id, to_port in links
             ],
-            "patched_fields": [
-                {
-                    "id": str(uuid.uuid4()),
-                    "handle": "loyaltyPoints",
-                    "field": "metafield",
-                    "patched_type": "Customer",
-                    "arguments": json.dumps(
-                        {"key": "loyalty_points", "namespace": "custom"},
-                        separators=(",", ":"),
-                    ),
-                    "merchant_configured": True,
-                },
-                {
-                    "id": str(uuid.uuid4()),
-                    "handle": "loyaltyRedeemCode",
-                    "field": "metafield",
-                    "patched_type": "Customer",
-                    "arguments": json.dumps(
-                        {"key": "loyalty_redeem_code", "namespace": "custom"},
-                        separators=(",", ":"),
-                    ),
-                    "merchant_configured": True,
-                },
-            ],
-            "variables": [],
-            "note": None,
-            "vertical_layout_enabled": True,
+            "patched_fields": patched_fields(),
             "workflow_name": "Redeem loyalty points",
         },
     }
@@ -432,5 +436,5 @@ if __name__ == "__main__":
     base = Path(__file__).parent
     export_flow(base / "Redeem loyalty points.flow", variant="core")
     export_flow(base / "Redeem loyalty points (full).flow", variant="full")
-    print("Wrote Redeem loyalty points.flow (core — add discount + metafields after import)")
+    print(f"Wrote Redeem loyalty points.flow (form type {FORM_TYPE})")
     print("Wrote Redeem loyalty points (full).flow")

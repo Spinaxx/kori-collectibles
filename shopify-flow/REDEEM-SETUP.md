@@ -34,9 +34,11 @@ The theme includes a `#loyalty-redeem-form` anchor — point the form block ther
 **Fast path:** **Apps → Flow → Import** → choose  
 `shopify-flow/Redeem loyalty points.flow`
 
+The export is wired to form type `app--6171699--shopify-forms1063387` (Shopify Forms ID **1063387**).
+
 After import:
 
-1. Open the **Metaobject entry created** trigger and select your **Redeem loyalty points** form (Shopify Forms ID **1063387**).
+1. Open the **Metaobject entry created** trigger and confirm it shows **Redeem loyalty points** (re-select the form if needed).
 2. Open **Run code** and confirm `loyaltyPoints` maps to `custom.loyalty_points` and `loyaltyRedeemCode` maps to `custom.loyalty_redeem_code`.
 3. Add these steps on the **Yes** branch after the last condition (in order):
    - **Send Admin API request** → `discountCodeBasicCreate` (mutation JSON below)
@@ -44,9 +46,9 @@ After import:
    - **Update customer metafield** → `custom.loyalty_redeem_code` = Run code → `discountCode`
 4. Turn the workflow **on** only after those steps are in place.
 
-**Optional:** try `shopify-flow/Redeem loyalty points (full).flow` if you want the discount step pre-wired (may fail import on some stores).
+**Optional:** try `shopify-flow/Redeem loyalty points (full).flow` if you want the discount + metafield steps pre-wired (may fail import on some stores).
 
-**Import tip:** Shopify `.flow` files include a SHA256 checksum prefix. Do not edit them by hand. If import fails, pull the latest file from the repo or run `python3 shopify-flow/build-redeem-flow.py` to regenerate.
+**Import tip:** Shopify `.flow` files include a SHA256 checksum prefix. Do not edit them by hand. If import fails, pull the latest file from the repo or run `python3 shopify-flow/build-redeem-flow.py` to regenerate. Do not import a macOS duplicate like `Redeem loyalty points (1).flow`.
 
 **Manual path:** **Apps → Flow → Create workflow**
 
