@@ -532,10 +532,20 @@ ul {
   position: fixed;
   inset: 0;
   z-index: 140;
+  display: none;
+}
+
+.cart-drawer.is-open,
+.cart-drawer:not([hidden]) {
+  display: block;
 }
 
 .cart-drawer[hidden] {
-  display: none;
+  display: none !important;
+}
+
+.cart-drawer.is-open {
+  display: block !important;
 }
 
 .cart-drawer__backdrop {

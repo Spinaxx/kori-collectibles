@@ -58,8 +58,6 @@
       });
     }
 
-    initCartDrawer();
-
     const sort = qs('[data-sort-by]');
     if (sort) {
       sort.addEventListener('change', () => {
@@ -125,11 +123,11 @@
     const cartUrl = drawer.getAttribute('data-cart-url') || '/cart';
     const contents = qs('[data-cart-contents]', drawer);
     const footer = qs('[data-cart-footer]', drawer);
-    const openers = qsa('[data-open-cart]');
 
     const setOpen = (open) => {
       drawer.hidden = !open;
-      openers.forEach((btn) => btn.setAttribute('aria-expanded', String(open)));
+      drawer.classList.toggle('is-open', open);
+      qsa('[data-open-cart]').forEach((btn) => btn.setAttribute('aria-expanded', String(open)));
       document.documentElement.style.overflow = open ? 'hidden' : '';
     };
 
@@ -245,19 +243,29 @@
       return cart;
     };
 
-    openers.forEach((btn) => {
-      btn.addEventListener('click', (e) => {
+    const openCart = () => {
+      const menu = qs('[data-drawer="menu"]');
+      if (menu && !menu.hidden) {
+        menu.hidden = true;
+        const menuBtn = qs('[data-open-menu]');
+        if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+      }
+      setOpen(true);
+      refresh().catch(() => {});
+    };
+
+    // Capture-phase delegation so the cart always opens even if other listeners fail.
+    document.addEventListener(
+      'click',
+      (e) => {
+        const opener = e.target.closest('[data-open-cart]');
+        if (!opener) return;
         e.preventDefault();
-        const menu = qs('[data-drawer="menu"]');
-        if (menu && !menu.hidden) {
-          menu.hidden = true;
-          const menuBtn = qs('[data-open-menu]');
-          if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
-        }
-        setOpen(true);
-        refresh().catch(() => {});
-      });
-    });
+        e.stopPropagation();
+        openCart();
+      },
+      true
+    );
 
     drawer.addEventListener('click', (e) => {
       if (e.target.closest('[data-close-cart]')) {
@@ -275,8 +283,9 @@
       if (qtyBtn) {
         const key = qtyBtn.getAttribute('data-key');
         const delta = Number(qtyBtn.getAttribute('data-cart-qty'));
-        const input = qs(`[data-cart-qty-input][data-key="${CSS.escape(key)}"]`, drawer);
-        const next = Math.max(0, Number(input?.value || 0) + delta);
+        const safeKey = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(key) : key.replace(/"/g, '\\"');
+        const input = qs(`[data-cart-qty-input][data-key="${safeKey}"]`, drawer);
+        const next = Math.max(0, Number((input && input.value) || 0) + delta);
         changeLine(key, next).catch(() => {});
       }
     });
@@ -315,7 +324,7 @@
       });
     });
 
-    window.KoriCart = { open: () => setOpen(true), refresh, setOpen };
+    window.KoriCart = { open: openCart, refresh, setOpen };
   };
 
   const initNavDropdowns = () => {
@@ -643,6 +652,7 @@
 
   const boot = () => {
     initDrawers();
+    initCartDrawer();
     initNavDropdowns();
     initHeroTilt();
     initPredictiveSearch();

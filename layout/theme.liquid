@@ -178,8 +178,8 @@
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.5 13.5a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM14.5 14.5 12 12"/>
             </svg>
           </button>
-          <a
-            href="{{ routes.cart_url }}"
+          <button
+            type="button"
             class="icon-btn"
             data-open-cart
             aria-label="Cart"
@@ -191,7 +191,7 @@
                 d="M3.4 6.9h13.2v8c0 .57-.22 1.11-.62 1.51-.4.4-.94.63-1.51.63H5.53c-.57 0-1.11-.23-1.51-.63a2.14 2.14 0 0 1-.62-1.51zM8.8 3h2.4c.62 0 1.21.25 1.65.68.43.44.68 1.03.68 1.66v1.56H6.5V5.34c0-.63.24-1.22.68-1.66A2.3 2.3 0 0 1 8.8 3z"/>
             </svg>
             <span class="cart-count" data-cart-count {% if cart.item_count == 0 %}hidden{% endif %}>{{ cart.item_count }}</span>
-          </a>
+          </button>
         </div>
       </div>
     </header>
