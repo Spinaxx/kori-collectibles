@@ -198,8 +198,18 @@ ul {
 
 .announcement__track {
   display: flex;
+  align-items: center;
   width: max-content;
-  animation: announcement-scroll 32s linear infinite;
+  will-change: transform;
+}
+
+.announcement__gap {
+  flex: 0 0 auto;
+  align-self: stretch;
+}
+
+.announcement__track.is-ready {
+  animation: announcement-scroll var(--announcement-duration, 32s) linear infinite;
 }
 
 .announcement:hover .announcement__track {
@@ -227,10 +237,10 @@ ul {
 
 @keyframes announcement-scroll {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translate3d(var(--announcement-distance, -50%), 0, 0);
   }
 }
 

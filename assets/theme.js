@@ -752,7 +752,68 @@
     if (checked) updateVariant(checked.value);
   };
 
+  const initAnnouncementMarquee = () => {
+    const tracks = qsa('.announcement__track');
+    if (!tracks.length) return;
+
+    const buildUnit = (template) => {
+      const unit = document.createDocumentFragment();
+      const inner = template.cloneNode(true);
+      unit.appendChild(inner);
+
+      const gap = document.createElement('div');
+      gap.className = 'announcement__gap';
+      gap.setAttribute('aria-hidden', 'true');
+      unit.appendChild(gap);
+
+      return { unit, inner, gap };
+    };
+
+    const setup = (track) => {
+      const seed = track.querySelector('.announcement__inner');
+      if (!seed) return;
+
+      const template = seed.cloneNode(true);
+      track.replaceChildren();
+
+      const first = buildUnit(template);
+      track.appendChild(first.unit);
+      const gapWidth = Math.max(0, window.innerWidth - first.inner.offsetWidth);
+      first.gap.style.width = `${gapWidth}px`;
+      const unitWidth = track.scrollWidth;
+
+      const second = buildUnit(template);
+      track.appendChild(second.unit);
+      second.gap.style.width = `${gapWidth}px`;
+
+      const duration = Math.max(24, unitWidth / 45);
+      track.style.setProperty('--announcement-distance', `-${unitWidth}px`);
+      track.style.setProperty('--announcement-duration', `${duration}s`);
+      track.classList.add('is-ready');
+    };
+
+    tracks.forEach(setup);
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        tracks.forEach((track) => {
+          track.classList.remove('is-ready');
+          track.style.removeProperty('--announcement-distance');
+          track.style.removeProperty('--announcement-duration');
+          setup(track);
+        });
+      }, 200);
+    });
+  };
+
   const boot = () => {
+    try {
+      initAnnouncementMarquee();
+    } catch (err) {
+      console.error('initAnnouncementMarquee failed', err);
+    }
     try {
       initDrawers();
     } catch (err) {
