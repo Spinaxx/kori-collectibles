@@ -165,11 +165,11 @@
         "type": "range",
         "id": "page_width",
         "min": 1000,
-        "max": 1400,
+        "max": 1600,
         "step": 20,
         "unit": "px",
         "label": "Page width",
-        "default": 1240
+        "default": 1360
       },
       {
         "type": "checkbox",
