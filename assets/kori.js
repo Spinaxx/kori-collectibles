@@ -1,4 +1,43 @@
 (() => {
+  const initHeroCard = () => {
+    const card = document.querySelector('[data-hero-card]');
+    const dataEl = document.querySelector('[data-hero-candidates]');
+    if (!card || !dataEl) return;
+
+    let candidates = [];
+    try {
+      candidates = JSON.parse(dataEl.textContent.trim());
+    } catch (e) {
+      return;
+    }
+
+    if (!Array.isArray(candidates) || candidates.length === 0) return;
+
+    const pick = candidates[Math.floor(Math.random() * candidates.length)];
+    const nameEl = card.querySelector('[data-hero-name]');
+    const priceEl = card.querySelector('[data-hero-price]');
+    const descEl = card.querySelector('[data-hero-desc]');
+    const setEl = card.querySelector('[data-hero-set]');
+    const imageEl = card.querySelector('[data-hero-image]');
+    const fallbackEl = card.querySelector('[data-hero-fallback]');
+
+    if (nameEl) nameEl.textContent = pick.title;
+    if (priceEl) priceEl.textContent = pick.price;
+    if (descEl) descEl.textContent = pick.desc;
+    if (setEl) setEl.textContent = pick.set || '';
+    if (pick.url) {
+      card.href = pick.url;
+      card.setAttribute('aria-label', `${pick.title} — ${pick.price}`);
+    }
+
+    if (imageEl && pick.image) {
+      imageEl.src = pick.image;
+      imageEl.alt = pick.title;
+      imageEl.hidden = false;
+      if (fallbackEl) fallbackEl.hidden = true;
+    }
+  };
+
   const initTilt = () => {
     const tiltCard = document.getElementById('tiltCard');
     const tiltShine = document.getElementById('tiltShine');
@@ -44,6 +83,7 @@
   };
 
   document.addEventListener('DOMContentLoaded', () => {
+    initHeroCard();
     initTilt();
     initFilters();
   });

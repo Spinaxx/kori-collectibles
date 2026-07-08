@@ -13,10 +13,12 @@
         "primary_link": "#grid",
         "secondary_label": "Shop sealed product",
         "secondary_link": "#grid",
-        "card_name": "Duskwing",
-        "card_hp": "HP 120",
-        "card_desc": "Ability — Nightfall Veil: once per turn, hide this card behind your active card.",
-        "card_set": "HR·07 · 083/165"
+        "min_price": 5,
+        "pool_size": 50,
+        "fallback_name": "Duskwing",
+        "fallback_price": "£—",
+        "fallback_desc": "Add in-stock products over £5 to power the hero card.",
+        "fallback_set": "Kori Collectibles"
       }
     },
     "binder": {

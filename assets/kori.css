@@ -378,6 +378,9 @@ a {
   box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
   overflow: hidden;
   cursor: pointer;
+  display: block;
+  color: inherit;
+  text-decoration: none;
 }
 
 .tilt-shine {
@@ -424,6 +427,7 @@ a {
   font-size: 11px;
   color: var(--fire);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .tilt-art {
@@ -438,15 +442,20 @@ a {
   overflow: hidden;
 }
 
-.tilt-art svg {
+.tilt-art svg,
+.tilt-art__fallback {
   width: 64%;
   height: 64%;
 }
 
-.tilt-art img {
+.tilt-art img,
+.tilt-art__img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  z-index: 0;
 }
 
 .holo-sweep {

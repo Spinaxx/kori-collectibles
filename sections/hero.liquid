@@ -1,3 +1,17 @@
+{%- liquid
+  assign min_price_pounds = section.settings.min_price | default: 5
+  assign min_price_cents = min_price_pounds | times: 100
+  assign source = section.settings.source_collection
+  assign pool_limit = section.settings.pool_size | default: 50
+  assign candidate_count = 0
+
+  if source != blank
+    assign product_list = source.products
+  else
+    assign product_list = collections.all.products
+  endif
+-%}
+
 <section class="hero wrap" {{ section.shopify_attributes }}>
   <div>
     {% if section.settings.eyebrow != blank %}
@@ -28,39 +42,78 @@
   </div>
 
   <div class="tilt-stage">
-    <div class="tilt-card" id="tiltCard">
+    <a
+      class="tilt-card"
+      id="tiltCard"
+      href="{{ routes.all_products_collection_url }}"
+      data-hero-card
+      aria-label="Featured card"
+    >
       <div class="tilt-shine" id="tiltShine"></div>
       <div class="tilt-inner">
         <div class="tilt-top">
-          <span class="tilt-name">{{ section.settings.card_name }}</span>
-          <span class="tilt-hp">{{ section.settings.card_hp }}</span>
+          <span class="tilt-name" data-hero-name>{{ section.settings.fallback_name }}</span>
+          <span class="tilt-hp" data-hero-price>{{ section.settings.fallback_price }}</span>
         </div>
         <div class="tilt-art">
           <div class="holo-sweep"></div>
-          {% if section.settings.card_image != blank %}
-            {{
-              section.settings.card_image
-              | image_url: width: 600
-              | image_tag: loading: 'eager', alt: section.settings.card_name
-            }}
-          {% else %}
-            <svg viewBox="0 0 100 100" aria-hidden="true">
-              <ellipse cx="50" cy="58" rx="26" ry="22" fill="#3c2a52"/>
-              <path d="M24 45 L10 20 L34 34 Z" fill="#5a3d78"/>
-              <path d="M76 45 L90 20 L66 34 Z" fill="#5a3d78"/>
-              <circle cx="40" cy="55" r="5" fill="#f4f1ff"/>
-              <circle cx="60" cy="55" r="5" fill="#f4f1ff"/>
-              <path d="M38 70 Q50 78 62 70" stroke="#f4f1ff" stroke-width="3" fill="none" stroke-linecap="round"/>
-            </svg>
-          {% endif %}
+          <img
+            data-hero-image
+            class="tilt-art__img"
+            src=""
+            alt=""
+            width="252"
+            height="280"
+            hidden
+          >
+          <svg data-hero-fallback class="tilt-art__fallback" viewBox="0 0 100 100" aria-hidden="true">
+            <ellipse cx="50" cy="58" rx="26" ry="22" fill="#3c2a52"/>
+            <path d="M24 45 L10 20 L34 34 Z" fill="#5a3d78"/>
+            <path d="M76 45 L90 20 L66 34 Z" fill="#5a3d78"/>
+            <circle cx="40" cy="55" r="5" fill="#f4f1ff"/>
+            <circle cx="60" cy="55" r="5" fill="#f4f1ff"/>
+            <path d="M38 70 Q50 78 62 70" stroke="#f4f1ff" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>
         </div>
         <div class="tilt-bottom">
-          <div class="tilt-desc">{{ section.settings.card_desc }}</div>
-          <div class="tilt-set">{{ section.settings.card_set }}</div>
+          <div class="tilt-desc" data-hero-desc>{{ section.settings.fallback_desc }}</div>
+          <div class="tilt-set" data-hero-set>{{ section.settings.fallback_set }}</div>
         </div>
       </div>
-    </div>
+    </a>
   </div>
+
+  <script type="application/json" data-hero-candidates>
+    [
+      {%- for product in product_list -%}
+        {%- if candidate_count >= pool_limit -%}
+          {%- break -%}
+        {%- endif -%}
+        {%- if product.available and product.price > min_price_cents and product.featured_image -%}
+          {%- liquid
+            assign set_code = product.metafields.custom.set_code
+            if set_code == blank
+              assign set_code = product.vendor
+            endif
+            assign desc = product.description | strip_html | truncate: 120
+            if desc == blank
+              assign desc = product.type | default: 'In stock at Kori Collectibles'
+            endif
+            assign candidate_count = candidate_count | plus: 1
+          -%}
+          {%- unless candidate_count == 1 -%},{%- endunless -%}
+          {
+            "title": {{ product.title | json }},
+            "url": {{ product.url | json }},
+            "image": {{ product.featured_image | image_url: width: 600 | json }},
+            "price": {{ product.price | money | json }},
+            "set": {{ set_code | json }},
+            "desc": {{ desc | json }}
+          }
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+  </script>
 </section>
 
 {% schema %}
@@ -130,33 +183,60 @@
       "content": "Featured card"
     },
     {
-      "type": "text",
-      "id": "card_name",
-      "label": "Card name",
-      "default": "Duskwing"
+      "type": "collection",
+      "id": "source_collection",
+      "label": "Product source",
+      "info": "Leave blank to use all products. Only in-stock items above the minimum price are eligible."
+    },
+    {
+      "type": "range",
+      "id": "min_price",
+      "min": 1,
+      "max": 50,
+      "step": 1,
+      "unit": "£",
+      "label": "Minimum price",
+      "default": 5,
+      "info": "Hero card is picked at random from available inventory above this price."
+    },
+    {
+      "type": "range",
+      "id": "pool_size",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "label": "Candidate pool size",
+      "default": 50,
+      "info": "Shopify only exposes the first page of a collection here — keep this at 50 or less."
+    },
+    {
+      "type": "header",
+      "content": "Fallback card"
     },
     {
       "type": "text",
-      "id": "card_hp",
-      "label": "Card HP",
-      "default": "HP 120"
+      "id": "fallback_name",
+      "label": "Fallback name",
+      "default": "Duskwing",
+      "info": "Shown only when no products meet the criteria."
     },
     {
-      "type": "image_picker",
-      "id": "card_image",
-      "label": "Card art (optional)"
+      "type": "text",
+      "id": "fallback_price",
+      "label": "Fallback price label",
+      "default": "£—"
     },
     {
       "type": "textarea",
-      "id": "card_desc",
-      "label": "Card description",
-      "default": "Ability — Nightfall Veil: once per turn, hide this card behind your active card."
+      "id": "fallback_desc",
+      "label": "Fallback description",
+      "default": "Add in-stock products over £5 to power the hero card."
     },
     {
       "type": "text",
-      "id": "card_set",
-      "label": "Card set code",
-      "default": "HR·07 · 083/165"
+      "id": "fallback_set",
+      "label": "Fallback set code",
+      "default": "Kori Collectibles"
     }
   ],
   "presets": [
