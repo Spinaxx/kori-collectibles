@@ -41,13 +41,6 @@
     -%}
     <div class="collection-layout{% if show_filters %} collection-layout--with-filters{% endif %}">
       <div class="collection-toolbar">
-        <div class="collection-toolbar__count">
-          {{ product_count }}
-          {% if product_count == 1 %}product{% else %}products{% endif %}
-          {%- if active_values_count > 0 -%}
-            <span class="collection-toolbar__filtered">· filtered</span>
-          {%- endif -%}
-        </div>
         <div class="collection-toolbar__actions">
           {%- if show_filters -%}
             <button
@@ -78,6 +71,13 @@
                 </option>
               {%- endfor -%}
             </select>
+          {%- endif -%}
+        </div>
+        <div class="collection-toolbar__count">
+          {{ product_count }}
+          {% if product_count == 1 %}product{% else %}products{% endif %}
+          {%- if active_values_count > 0 -%}
+            <span class="collection-toolbar__filtered">· filtered</span>
           {%- endif -%}
         </div>
       </div>
