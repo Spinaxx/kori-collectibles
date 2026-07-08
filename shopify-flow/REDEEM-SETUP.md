@@ -142,7 +142,6 @@ If errors persist, step 3 is incomplete — save the workflow after Log output, 
     "title": "Loyalty reward {{ runCode.discountCode }}",
     "code": "{{ runCode.discountCode }}",
     "startsAt": "{{ 'now' | date: '%Y-%m-%dT%H:%M:%SZ' }}",
-    "endsAt": "{{ 'now' | date: '%s' | plus: 172800 | date: '%Y-%m-%dT%H:%M:%SZ' }}",
     "customerSelection": {
       "customers": {
         "add": ["{{ metaobject.formSubmittedBy.id }}"]
@@ -163,7 +162,7 @@ If errors persist, step 3 is incomplete — save the workflow after Log output, 
 }
 ```
 
-Use the variable picker for Liquid fields if typing `{{ }}` is awkward. Hardcode `"5.00"` to match theme settings (`loyalty_redeem_value_gbp`).
+Use the variable picker for Liquid fields if typing `{{ }}` is awkward. Hardcode `"5.00"` to match theme settings (`loyalty_redeem_value_gbp`). **Do not add `endsAt`** — omit it so the discount never expires.
 
 ### Step 8 — Deduct points
 
@@ -172,12 +171,16 @@ Use the variable picker for Liquid fields if typing `{{ }}` is awkward. Hardcode
 - Metafield: `custom.loyalty_points`
 - Value: **Run code → newLoyaltyPoints**
 
-### Step 9 — Save code for storefront
+### Step 9 — Save code for storefront (required)
+
+The rewards page reads `custom.loyalty_redeem_code` to display the code. **Without this step, the discount exists in admin but customers never see it on the storefront.**
 
 - **Then → Update customer metafield**
 - Customer: **Metaobject → formSubmittedBy → id**
-- Metafield: `custom.loyalty_redeem_code`
-- Value: **Run code → discountCode**
+- Metafield: `custom.loyalty_redeem_code` (namespace `custom`, key `loyalty_redeem_code`)
+- Value: **Run code → discountCode** (pick from variable picker — do not type it)
+
+In **Settings → Custom data → Customers → Loyalty redeem code**, enable **Storefront API access** (read).
 
 ### Turn on
 
@@ -213,7 +216,9 @@ Check **Flow → Run history** if anything fails.
 | Run code shows 0 points | Confirm Log output aliases; metafield key is `loyalty_points` not `custom_loyalty_points` |
 | `newLoyaltyPoints` not in metafield step | Pick it from **Run code** outputs in the variable picker — do not type it |
 | Discount create fails | Store needs discount permissions; try hardcoded `"amount": "5.00"` |
-| No code on storefront | Add `loyalty_redeem_code` metafield with storefront read access |
+| No code on storefront | Add **step 9** (save `loyalty_redeem_code` metafield). Enable **Storefront API read** on that metafield. Check customer record in admin has the code value. |
+| Code created in admin but not on site | Step 9 missing or failed — check Flow run history for the metafield update step |
+| Discount expires too soon | Remove `endsAt` from the discount mutation (see step 7) |
 | Customer not signed in | `formSubmittedBy` is empty — form must be submitted while logged in |
 
 ---

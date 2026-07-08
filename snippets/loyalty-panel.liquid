@@ -19,8 +19,13 @@
   endif
 
   assign can_redeem = false
+  assign active_redeem_code = blank
   if customer and balance >= redeem_points
     assign can_redeem = true
+  endif
+
+  if customer
+    assign active_redeem_code = customer.metafields.custom.loyalty_redeem_code.value | strip
   endif
 
   assign rewards_url = pages.rewards.url | default: '/pages/rewards'
@@ -75,7 +80,9 @@
           <span class="loyalty-panel__balance-value" data-loyalty-balance>{{ balance | default: 0 }}</span>
           <span class="loyalty-panel__balance-label">points</span>
         </div>
-        {%- if can_redeem -%}
+        {%- if active_redeem_code != blank -%}
+          <p class="loyalty-panel__status">Your discount code is ready — use it at checkout.</p>
+        {%- elsif can_redeem -%}
           <p class="loyalty-panel__status">You have enough points to redeem a reward.</p>
         {%- else -%}
           <p class="loyalty-panel__status">{{ points_needed }} more points until your next reward.</p>

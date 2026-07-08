@@ -992,12 +992,114 @@
       if (success) success.hidden = false;
       if (codeEl) codeEl.textContent = payload.code;
       if (applyBtn) applyBtn.href = payload.applyUrl || `/discount/${encodeURIComponent(payload.code)}`;
+      root.dataset.activeCode = payload.code;
 
       if (payload.balance !== undefined) {
         qsa('[data-loyalty-balance]').forEach((el) => {
           el.textContent = String(payload.balance);
         });
         document.body.dataset.loyaltyBalance = String(payload.balance);
+      }
+    };
+
+    const pollForRedeemCode = (root) => {
+      const ready = qs('[data-loyalty-redeem-ready]', root);
+      const errorEl = qs('[data-loyalty-redeem-error]', root);
+      const loadingEl = qs('[data-loyalty-redeem-loading]', root);
+
+      if (loadingEl) loadingEl.hidden = false;
+      if (errorEl) errorEl.hidden = true;
+      if (ready) ready.hidden = true;
+
+      let attempts = 0;
+      const maxAttempts = 20;
+
+      const finishWaiting = (message) => {
+        if (loadingEl) loadingEl.hidden = true;
+        if (ready) ready.hidden = false;
+        if (errorEl && message) {
+          errorEl.textContent = message;
+          errorEl.hidden = false;
+        }
+      };
+
+      const check = async () => {
+        attempts += 1;
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.set('loyalty_poll', String(Date.now()));
+          const response = await fetch(url.toString(), {
+            credentials: 'same-origin',
+            headers: { Accept: 'text/html' },
+          });
+          if (!response.ok) throw new Error('poll failed');
+          const html = await response.text();
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const redeemEl = doc.querySelector('[data-loyalty-redeem]');
+          const code = redeemEl?.dataset?.activeCode?.trim();
+          if (code) {
+            showCode(root, {
+              code,
+              applyUrl: `/discount/${encodeURIComponent(code)}`,
+            });
+            return;
+          }
+        } catch {
+          // keep polling
+        }
+
+        if (attempts < maxAttempts) {
+          window.setTimeout(check, 3000);
+          return;
+        }
+
+        finishWaiting('Your code is still being created. Refresh this page in a moment.');
+      };
+
+      window.setTimeout(check, 3000);
+    };
+
+    const watchShopifyFormSubmit = (root, onSubmit) => {
+      const slot = document.getElementById('loyalty-redeem-form');
+      if (!slot) return;
+
+      let watching = false;
+
+      const bindEmbed = (embed) => {
+        if (!embed?.shadowRoot || watching) return false;
+        const appEmbed = embed.shadowRoot.querySelector('#app-embed');
+        const form = embed.shadowRoot.querySelector('form');
+        if (!appEmbed && !form) return false;
+
+        watching = true;
+        let triggered = false;
+        const fire = () => {
+          if (triggered) return;
+          triggered = true;
+          onSubmit();
+        };
+
+        if (form) {
+          form.addEventListener('submit', () => window.setTimeout(fire, 400), { once: true });
+        }
+
+        if (appEmbed) {
+          const observer = new MutationObserver(() => {
+            const step = appEmbed.getAttribute('data-current-step');
+            if (!step || step === 'form' || step === 'idle') return;
+            fire();
+          });
+          observer.observe(appEmbed, { attributes: true, attributeFilter: ['data-current-step'] });
+        }
+
+        return true;
+      };
+
+      if (!bindEmbed(slot.querySelector('form-embed'))) {
+        const slotObserver = new MutationObserver(() => {
+          if (bindEmbed(slot.querySelector('form-embed'))) slotObserver.disconnect();
+        });
+        slotObserver.observe(slot, { childList: true, subtree: true });
       }
     };
 
@@ -1030,6 +1132,10 @@
             setTimeout(() => target.classList.remove('loyalty-redeem__form-slot--highlight'), 2000);
           }
         });
+      }
+
+      if (method === 'flow' && !activeCode) {
+        watchShopifyFormSubmit(root, () => pollForRedeemCode(root));
       }
 
       if (trigger && proxyUrl && method === 'proxy') {

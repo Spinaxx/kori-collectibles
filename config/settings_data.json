@@ -33,6 +33,7 @@
     "loyalty_program_name": "Kori Collectors Club",
     "loyalty_page": "rewards",
     "loyalty_points_metafield": "custom.loyalty_points",
+    "loyalty_redeem_code_metafield": "custom.loyalty_redeem_code",
     "loyalty_redeem_points": 100,
     "loyalty_redeem_value_gbp": 5,
     "loyalty_redeem_method": "flow",

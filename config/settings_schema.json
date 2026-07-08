@@ -238,6 +238,13 @@
         "info": "Integer customer metafield updated by Shopify Flow."
       },
       {
+        "type": "text",
+        "id": "loyalty_redeem_code_metafield",
+        "label": "Customer redeem code metafield",
+        "default": "custom.loyalty_redeem_code",
+        "info": "Single line text metafield written by the redeem Flow. Must have storefront read access."
+      },
+      {
         "type": "range",
         "id": "loyalty_points_per_gbp",
         "min": 1,

@@ -8,9 +8,20 @@
   assign points_needed = redeem_points
   assign can_redeem = false
   assign active_code = blank
+  assign redeem_code_key = settings.loyalty_redeem_code_metafield | default: 'custom.loyalty_redeem_code' | strip
+  assign redeem_code_parts = redeem_code_key | split: '.'
+  assign redeem_code_ns = redeem_code_parts[0] | strip
+  assign redeem_code_id = redeem_code_parts[1] | strip
 
   if customer
-    assign active_code = customer.metafields.custom.loyalty_redeem_code.value
+    if redeem_code_ns != blank and redeem_code_id != blank
+      assign active_code = customer.metafields[redeem_code_ns][redeem_code_id].value
+    endif
+    if active_code == blank
+      assign active_code = customer.metafields.custom.loyalty_redeem_code.value
+    endif
+    assign active_code = active_code | strip
+
     if balance < redeem_points
       assign points_needed = redeem_points | minus: balance
     endif
@@ -40,7 +51,7 @@
       <div class="loyalty-redeem__success" data-loyalty-redeem-success>
         <p class="loyalty-redeem__success-label">Your discount code</p>
         <p class="loyalty-redeem__code" data-loyalty-redeem-code>{{ active_code | escape }}</p>
-        <p class="loyalty-redeem__hint">Single use. Apply at checkout or copy the code below.</p>
+        <p class="loyalty-redeem__hint">Single use at checkout. This code does not expire.</p>
         <div class="loyalty-redeem__actions">
           <a class="button button--full" href="/discount/{{ active_code | url_encode }}" data-loyalty-redeem-apply>Apply to cart</a>
           <button type="button" class="button button--secondary button--full" data-loyalty-redeem-copy>Copy code</button>
@@ -54,7 +65,7 @@
             Redeem {{ redeem_points }} points
           </button>
         {%- else -%}
-          <p class="loyalty-redeem__hint">Submit the form below to get your code. Refresh this page after a few seconds once Flow has run.</p>
+          <p class="loyalty-redeem__hint">Tap below to confirm your redemption. Your code will appear here once Flow finishes.</p>
           <button type="button" class="button button--full" data-loyalty-redeem-form-trigger>
             Get my discount code
           </button>
@@ -64,7 +75,7 @@
       <div class="loyalty-redeem__success" data-loyalty-redeem-success hidden>
         <p class="loyalty-redeem__success-label">Your discount code</p>
         <p class="loyalty-redeem__code" data-loyalty-redeem-code></p>
-        <p class="loyalty-redeem__hint">Single use. Apply at checkout or tap below to add it to your cart.</p>
+        <p class="loyalty-redeem__hint">Single use at checkout. This code does not expire.</p>
         <div class="loyalty-redeem__actions">
           <a class="button button--full" href="#" data-loyalty-redeem-apply>Apply to cart</a>
           <button type="button" class="button button--secondary button--full" data-loyalty-redeem-copy>Copy code</button>
