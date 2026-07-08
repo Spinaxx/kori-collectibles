@@ -170,6 +170,7 @@
 {% schema %}
 {
   "name": "Header",
+  "class": "section-header",
   "settings": [
     {
       "type": "checkbox",
@@ -205,7 +206,7 @@
           "type": "text",
           "id": "highlight",
           "label": "Highlight",
-          "default": "£40"
+          "default": "GBP 40"
         },
         {
           "type": "text",
@@ -215,6 +216,9 @@
         }
       ]
     }
-  ]
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  }
 }
 {% endschema %}
