@@ -34,7 +34,7 @@ Native rewards with a Smile-style floating button and panel. Points live on each
 
 You can uninstall Smile.io and disable its app embed in the theme editor.
 
-### 1. Customer metafield
+### 1. Customer metafields
 
 Admin → **Settings → Custom data → Customers → Add definition**
 
@@ -42,22 +42,47 @@ Admin → **Settings → Custom data → Customers → Add definition**
 - Namespace and key: `custom.loyalty_points`
 - Type: **Integer**
 
-### 2. Shopify Flow workflow
+Admin → **Settings → Custom data → Orders → Add definition**
+
+- Name: `Loyalty points awarded`
+- Namespace and key: `custom.loyalty_points_awarded`
+- Type: **Integer**
+- Info: Set by Flow when points are awarded so cancellations can deduct the exact amount.
+
+### 2. Award points (order paid)
 
 Apps → **Flow** → Create workflow:
 
 1. **Trigger:** Order paid
 2. **Condition:** Customer is not null
-3. **Action:** Update customer metafield → `custom.loyalty_points`
-4. **Value** (use Flow's variable editor):
+3. **Action:** Run code — paste `shopify-flow/award-loyalty-on-order-paid.js`
+   - Input `order` → from trigger
+   - Input `currentPoints` → `order.customer.metafields.custom.loyalty_points.value`
+4. **Condition:** `shouldUpdate` is true
+5. **Action:** Update customer metafield → `custom.loyalty_points` = `newBalance`
+6. **Action:** Update order metafield → `custom.loyalty_points_awarded` = `pointsAwarded`
 
-```
-{{ order.customer.metafields.custom.loyalty_points.value | default: 0 | plus: order.subtotalPriceSet.shopMoney.amount | divided_by: 100 | floor }}
-```
+Awards **1 point per £1** of subtotal (`Math.round(subtotal)`). Match the rate in **Theme settings → Loyalty rewards → Points earned per £1**.
 
-That awards **1 point per £1** of subtotal. Match the rate in **Theme settings → Loyalty rewards → Points earned per £1**.
+### 3. Deduct points (order cancelled)
 
-### 3. Theme settings
+Create a second workflow:
+
+1. **Trigger:** Order cancelled
+2. **Condition:** Customer is not null
+3. **Action:** Run code — paste `shopify-flow/deduct-loyalty-on-order-cancelled.js`
+   - Input `order` → from trigger
+   - Input `currentPoints` → `order.customer.metafields.custom.loyalty_points.value`
+   - Input `pointsAwarded` → `order.metafields.custom.loyalty_points_awarded.value`
+4. **Condition:** `shouldUpdate` is true
+5. **Action:** Update customer metafield → `custom.loyalty_points` = `newBalance`
+6. **Action:** Update order metafield → `custom.loyalty_points_awarded` = `clearAwarded` (0)
+
+This deducts the points that were awarded for that order. Unpaid cancelled orders are skipped automatically (no `loyalty_points_awarded` stored). The balance never goes below zero.
+
+If you already have a working award workflow, update it to also write `custom.loyalty_points_awarded` on the order. The deduct workflow includes a fallback for older orders that only checks paid/refunded statuses and uses the subtotal formula.
+
+### 4. Theme settings
 
 **Theme settings → Loyalty rewards**
 
@@ -66,7 +91,7 @@ That awards **1 point per £1** of subtotal. Match the rate in **Theme settings 
 - Set redeem threshold (default 100 points = £5 off)
 - Redemption email (where customers claim rewards)
 
-### 4. Optional rewards page
+### 5. Optional rewards page
 
 Create a page with the **rewards** template for full program details.
 
@@ -78,5 +103,6 @@ When a customer has enough points, the panel shows **Email to redeem**. Send the
 
 1. Create a test customer account
 2. Place an order while signed in
-3. After payment, check the customer metafield in admin
-4. Sign in on the storefront — balance should show in the header and rewards panel
+3. After payment, check the customer metafield and `loyalty_points_awarded` on the order in admin
+4. Cancel the order — customer points should drop by the awarded amount
+5. Sign in on the storefront — balance should show in the account drawer and rewards panel

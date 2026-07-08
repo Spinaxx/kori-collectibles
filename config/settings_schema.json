@@ -266,7 +266,7 @@
       },
       {
         "type": "paragraph",
-        "content": "Points are awarded by Shopify Flow on paid orders. See README for setup steps."
+        "content": "Points are awarded and reversed by Shopify Flow on paid/cancelled orders. See README for setup steps."
       }
     ]
   },
