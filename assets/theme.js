@@ -978,7 +978,75 @@
   };
 
   const initLoyaltyRedeem = () => {
+    const revealActiveCode = (code) => {
+      const applyUrl = `/discount/${encodeURIComponent(code)}`;
+      let section = qs('[data-loyalty-active-codes]');
+
+      if (!section) {
+        const panel = qs('.rewards__redeem-panel');
+        if (panel) {
+          section = document.createElement('section');
+          section.className = 'rewards__codes';
+          section.dataset.loyaltyActiveCodes = '';
+          section.innerHTML = `
+            <h2 class="rewards__codes-title">Your active rewards</h2>
+            <div class="rewards__codes-list">
+              <article class="rewards__code-card" data-loyalty-code-card>
+                <div class="rewards__code-card-main">
+                  <p class="rewards__code-label">Discount code</p>
+                  <p class="rewards__code-value" data-loyalty-active-code></p>
+                  <p class="rewards__code-meta">Single use · does not expire</p>
+                </div>
+                <div class="rewards__code-actions">
+                  <a class="button button--full" href="#" data-loyalty-active-apply>Apply to cart</a>
+                  <button type="button" class="button button--secondary button--full" data-loyalty-active-copy>Copy code</button>
+                </div>
+                <p class="rewards__code-invalid" data-loyalty-code-invalid hidden role="status">
+                  This code has already been used or is no longer valid.
+                </p>
+              </article>
+            </div>`;
+          panel.insertAdjacentElement('afterend', section);
+        }
+      }
+
+      if (section) {
+        section.hidden = false;
+        const codeEl = qs('[data-loyalty-active-code]', section);
+        const applyBtn = qs('[data-loyalty-active-apply]', section);
+        if (codeEl) codeEl.textContent = code;
+        if (applyBtn) applyBtn.href = applyUrl;
+      }
+
+      qsa('[data-loyalty-redeem]').forEach((root) => {
+        root.dataset.activeCode = code;
+        if (root.dataset.activeCodeDisplay === 'below') {
+          const ready = qs('[data-loyalty-redeem-ready]', root);
+          const hasCode = qs('[data-loyalty-redeem-has-code]', root);
+          if (ready) ready.hidden = true;
+          if (!hasCode) {
+            const hint = document.createElement('p');
+            hint.className = 'loyalty-redeem__hint';
+            hint.dataset.loyaltyRedeemHasCode = '';
+            hint.textContent = 'Your active discount code is shown below.';
+            root.appendChild(hint);
+          }
+        }
+      });
+    };
+
     const showCode = (root, payload) => {
+      const displayMode = root.dataset.activeCodeDisplay || 'inline';
+
+      if (displayMode === 'below') {
+        revealActiveCode(payload.code);
+        const loadingEl = qs('[data-loyalty-redeem-loading]', root);
+        const errorEl = qs('[data-loyalty-redeem-error]', root);
+        if (loadingEl) loadingEl.hidden = true;
+        if (errorEl) errorEl.hidden = true;
+        return;
+      }
+
       const ready = qs('[data-loyalty-redeem-ready]', root);
       const success = qs('[data-loyalty-redeem-success]', root);
       const codeEl = qs('[data-loyalty-redeem-code]', root);
@@ -999,6 +1067,50 @@
           el.textContent = String(payload.balance);
         });
         document.body.dataset.loyaltyBalance = String(payload.balance);
+      }
+    };
+
+    const isDiscountCodeValid = async (code) => {
+      try {
+        const response = await fetch(`/discount/${encodeURIComponent(code)}`, {
+          credentials: 'same-origin',
+          redirect: 'manual',
+        });
+        return response.type === 'opaqueredirect' || response.status === 302 || response.status === 303;
+      } catch {
+        return true;
+      }
+    };
+
+    const validateActiveCodes = async () => {
+      await Promise.all(
+        qsa('[data-loyalty-code-card]').map(async (card) => {
+          const codeEl = qs('[data-loyalty-active-code]', card);
+          const invalidEl = qs('[data-loyalty-code-invalid]', card);
+          const actions = qs('.rewards__code-actions', card);
+          const code = codeEl?.textContent?.trim();
+          if (!code) return;
+
+          const valid = await isDiscountCodeValid(code);
+          if (valid) return;
+
+          if (actions) actions.hidden = true;
+          if (invalidEl) invalidEl.hidden = false;
+          card.classList.add('rewards__code-card--invalid');
+        })
+      );
+    };
+
+    const setRedeemModalOpen = (modal, open, formTrigger) => {
+      if (!modal) return;
+      modal.hidden = !open;
+      modal.classList.toggle('is-open', open);
+      document.documentElement.style.overflow = open ? 'hidden' : '';
+      if (open) {
+        const closeBtn = qs('[data-loyalty-redeem-modal-close]', modal);
+        if (closeBtn instanceof HTMLElement) closeBtn.focus();
+      } else if (formTrigger instanceof HTMLElement) {
+        formTrigger.focus();
       }
     };
 
@@ -1035,13 +1147,15 @@
           if (!response.ok) throw new Error('poll failed');
           const html = await response.text();
           const doc = new DOMParser().parseFromString(html, 'text/html');
-          const redeemEl = doc.querySelector('[data-loyalty-redeem]');
-          const code = redeemEl?.dataset?.activeCode?.trim();
+          const codeFromSection = doc.querySelector('[data-loyalty-active-code]')?.textContent?.trim();
+          const codeFromCard = doc.querySelector('[data-loyalty-redeem]')?.dataset?.activeCode?.trim();
+          const code = codeFromSection || codeFromCard;
           if (code) {
-            showCode(root, {
-              code,
-              applyUrl: `/discount/${encodeURIComponent(code)}`,
-            });
+            revealActiveCode(code);
+            const modal = qs('[data-loyalty-redeem-modal]', root);
+            setRedeemModalOpen(modal, false, qs('[data-loyalty-redeem-form-trigger]', root));
+            const loadingEl = qs('[data-loyalty-redeem-loading]', root);
+            if (loadingEl) loadingEl.hidden = true;
             return;
           }
         } catch {
@@ -1124,14 +1238,18 @@
       const loadingEl = qs('[data-loyalty-redeem-loading]', root);
 
       if (formTrigger) {
-        formTrigger.addEventListener('click', () => {
-          const target = document.getElementById('loyalty-redeem-form');
-          if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            target.classList.add('loyalty-redeem__form-slot--highlight');
-            setTimeout(() => target.classList.remove('loyalty-redeem__form-slot--highlight'), 2000);
-          }
-        });
+        const modal = qs('[data-loyalty-redeem-modal]', root);
+        formTrigger.addEventListener('click', () => setRedeemModalOpen(modal, true, formTrigger));
+
+        if (modal) {
+          qsa('[data-loyalty-redeem-modal-close]', modal).forEach((btn) => {
+            btn.addEventListener('click', () => setRedeemModalOpen(modal, false, formTrigger));
+          });
+
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.hidden) setRedeemModalOpen(modal, false, formTrigger);
+          });
+        }
       }
 
       if (method === 'flow' && !activeCode) {
@@ -1192,6 +1310,26 @@
         });
       }
     });
+
+    qsa('[data-loyalty-active-copy]').forEach((copyBtn) => {
+      copyBtn.addEventListener('click', async () => {
+        const card = copyBtn.closest('[data-loyalty-code-card]');
+        const codeEl = card ? qs('[data-loyalty-active-code]', card) : null;
+        const code = codeEl ? codeEl.textContent.trim() : '';
+        if (!code) return;
+        try {
+          await navigator.clipboard.writeText(code);
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            copyBtn.textContent = 'Copy code';
+          }, 2000);
+        } catch {
+          copyBtn.textContent = 'Copy failed';
+        }
+      });
+    });
+
+    validateActiveCodes();
   };
 
   const initLoyaltyBalanceSync = () => {

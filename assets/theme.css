@@ -700,6 +700,163 @@ ul {
   margin: 0 0 1rem;
 }
 
+.rewards__codes {
+  margin-bottom: 2rem;
+}
+
+.rewards__codes-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin: 0 0 0.85rem;
+}
+
+.rewards__codes-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.rewards__code-card {
+  padding: 1.1rem;
+  border: 1px solid rgba(45, 212, 191, 0.45);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(165deg, rgba(45, 212, 191, 0.08), transparent 42%),
+    var(--surface);
+}
+
+.rewards__code-card--invalid {
+  border-color: var(--border);
+  opacity: 0.85;
+}
+
+.rewards__code-label {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rewards__code-value {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.rewards__code-meta {
+  margin: 0 0 0.85rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.rewards__code-actions {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rewards__code-invalid {
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.loyalty-redeem-modal[hidden] {
+  display: none !important;
+}
+
+.loyalty-redeem-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  pointer-events: none;
+}
+
+.loyalty-redeem-modal.is-open {
+  pointer-events: auto;
+}
+
+.loyalty-redeem-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 10, 14, 0.72);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.loyalty-redeem-modal.is-open .loyalty-redeem-modal__backdrop {
+  opacity: 1;
+}
+
+.loyalty-redeem-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(28rem, 100%);
+  max-height: min(34rem, calc(100vh - 3rem));
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 2px);
+  background:
+    linear-gradient(165deg, rgba(45, 212, 191, 0.1), transparent 42%),
+    var(--surface);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  transform: translateY(0.75rem) scale(0.98);
+  opacity: 0;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.loyalty-redeem-modal.is-open .loyalty-redeem-modal__panel {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.loyalty-redeem-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.loyalty-redeem-modal__eyebrow {
+  margin: 0 0 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.loyalty-redeem-modal__title {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+
+.loyalty-redeem-modal__body {
+  padding: 1rem;
+  overflow: auto;
+}
+
+.loyalty-redeem-modal__hint {
+  margin: 0;
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
 .loyalty-redeem {
   padding: 1rem;
   border: 1px dashed var(--border);

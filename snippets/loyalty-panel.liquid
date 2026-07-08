@@ -25,7 +25,8 @@
   endif
 
   if customer
-    assign active_redeem_code = customer.metafields.custom.loyalty_redeem_code.value | strip
+    include 'loyalty-redeem-code-lookup'
+    assign active_redeem_code = loyalty_redeem_code
   endif
 
   assign rewards_url = pages.rewards.url | default: '/pages/rewards'

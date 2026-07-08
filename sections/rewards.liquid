@@ -67,8 +67,10 @@
             {%- endif -%}
           {%- endfor -%}
         {%- endcapture -%}
-        {%- render 'loyalty-redeem-card', balance: balance, form_content: redeem_form_blocks -%}
+        {%- render 'loyalty-redeem-card', balance: balance, form_content: redeem_form_blocks, show_active_code: false -%}
       </div>
+
+      {%- render 'loyalty-active-codes', redeem_value: redeem_value -%}
     {%- else -%}
       <div class="rewards__balance-card rewards__balance-card--guest">
         <div class="rewards__balance-main">

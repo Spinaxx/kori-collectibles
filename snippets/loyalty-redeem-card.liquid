@@ -1,31 +1,29 @@
+{%- include 'loyalty-redeem-code-lookup' -%}
+
 {%- liquid
+
   assign balance = balance | default: 0 | plus: 0
   assign redeem_points = redeem_points | default: settings.loyalty_redeem_points | default: 100
   assign redeem_value = redeem_value | default: settings.loyalty_redeem_value_gbp | default: 5
   assign redeem_email = settings.loyalty_redeem_email | default: shop.email
   assign redeem_method = settings.loyalty_redeem_method | default: 'flow'
   assign proxy_url = settings.loyalty_redeem_proxy_url | default: '/apps/kori-loyalty/redeem'
+  assign active_code = loyalty_redeem_code
+  assign show_active_code = show_active_code
+  if show_active_code == nil and compact
+    assign show_active_code = true
+  elsif show_active_code == nil
+    assign show_active_code = false
+  endif
+
   assign points_needed = redeem_points
   assign can_redeem = false
-  assign active_code = blank
-  assign redeem_code_key = settings.loyalty_redeem_code_metafield | default: 'custom.loyalty_redeem_code' | strip
-  assign redeem_code_parts = redeem_code_key | split: '.'
-  assign redeem_code_ns = redeem_code_parts[0] | strip
-  assign redeem_code_id = redeem_code_parts[1] | strip
 
   if customer
-    if redeem_code_ns != blank and redeem_code_id != blank
-      assign active_code = customer.metafields[redeem_code_ns][redeem_code_id].value
-    endif
-    if active_code == blank
-      assign active_code = customer.metafields.custom.loyalty_redeem_code.value
-    endif
-    assign active_code = active_code | strip
-
     if balance < redeem_points
       assign points_needed = redeem_points | minus: balance
     endif
-    if balance >= redeem_points
+    if balance >= redeem_points and active_code == blank
       assign can_redeem = true
     endif
   endif
@@ -39,6 +37,7 @@
   data-redeem-value="{{ redeem_value }}"
   data-proxy-url="{{ proxy_url | escape }}"
   data-fallback-email="{{ redeem_email | escape }}"
+  data-active-code-display="{% if show_active_code %}inline{% else %}below{% endif %}"
   {% if active_code != blank %}data-active-code="{{ active_code | escape }}"{% endif %}
 >
   <div class="loyalty-redeem__offer">
@@ -47,7 +46,7 @@
   </div>
 
   {%- if customer -%}
-    {%- if active_code != blank -%}
+    {%- if active_code != blank and show_active_code -%}
       <div class="loyalty-redeem__success" data-loyalty-redeem-success>
         <p class="loyalty-redeem__success-label">Your discount code</p>
         <p class="loyalty-redeem__code" data-loyalty-redeem-code>{{ active_code | escape }}</p>
@@ -57,6 +56,8 @@
           <button type="button" class="button button--secondary button--full" data-loyalty-redeem-copy>Copy code</button>
         </div>
       </div>
+    {%- elsif active_code != blank and show_active_code == false -%}
+      <p class="loyalty-redeem__hint" data-loyalty-redeem-has-code>Your active discount code is shown below.</p>
     {%- elsif can_redeem -%}
       <div class="loyalty-redeem__ready" data-loyalty-redeem-ready>
         {%- if redeem_method == 'proxy' -%}
@@ -65,10 +66,16 @@
             Redeem {{ redeem_points }} points
           </button>
         {%- else -%}
-          <p class="loyalty-redeem__hint">Tap below to confirm your redemption. Your code will appear here once Flow finishes.</p>
-          <button type="button" class="button button--full" data-loyalty-redeem-form-trigger>
-            Get my discount code
-          </button>
+          <p class="loyalty-redeem__hint">Tap below to confirm your redemption.</p>
+          {%- if compact and rewards_url != blank -%}
+            <a class="button button--full" href="{{ rewards_url }}">
+              Get my discount code
+            </a>
+          {%- else -%}
+            <button type="button" class="button button--full" data-loyalty-redeem-form-trigger>
+              Get my discount code
+            </button>
+          {%- endif -%}
         {%- endif -%}
       </div>
 
@@ -86,15 +93,40 @@
       <p class="loyalty-redeem__loading" data-loyalty-redeem-loading hidden>Creating your code…</p>
 
       {%- unless compact -%}
-        <div class="loyalty-redeem__form-slot" id="loyalty-redeem-form">
-          {%- if form_content != blank -%}
-            {{ form_content }}
-          {%- elsif redeem_method == 'flow' -%}
-            <p class="loyalty-redeem__form-note">
-              Add your <strong>Redeem loyalty points</strong> Shopify Form block here in the theme editor.
-            </p>
-          {%- endif -%}
-        </div>
+        {%- if redeem_method == 'flow' -%}
+          <div class="loyalty-redeem-modal" data-loyalty-redeem-modal hidden>
+            <div class="loyalty-redeem-modal__backdrop" data-loyalty-redeem-modal-close></div>
+            <div
+              class="loyalty-redeem-modal__panel"
+              id="loyalty-redeem-form"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="loyalty-redeem-modal-title"
+            >
+              <div class="loyalty-redeem-modal__header">
+                <div>
+                  <p class="loyalty-redeem-modal__eyebrow">Redeem points</p>
+                  <h3 class="loyalty-redeem-modal__title" id="loyalty-redeem-modal-title">Get your discount code</h3>
+                </div>
+                <button type="button" class="icon-btn" data-loyalty-redeem-modal-close aria-label="Close">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="loyalty-redeem-modal__body">
+                {%- if form_content != blank -%}
+                  {{ form_content }}
+                {%- else -%}
+                  <p class="loyalty-redeem__form-note">
+                    Add your <strong>Redeem loyalty points</strong> Shopify Form block here in the theme editor.
+                  </p>
+                {%- endif -%}
+              </div>
+              <p class="loyalty-redeem-modal__hint">After submitting, your code will appear in <strong>Your active rewards</strong> below.</p>
+            </div>
+          </div>
+        {%- endif -%}
       {%- endunless -%}
     {%- else -%}
       <p class="loyalty-redeem__locked">{{ points_needed }} more points needed</p>

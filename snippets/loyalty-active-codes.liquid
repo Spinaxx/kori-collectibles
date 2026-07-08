@@ -1,0 +1,43 @@
+{%- include 'loyalty-redeem-code-lookup' -%}
+
+{%- liquid
+  assign redeem_value = redeem_value | default: settings.loyalty_redeem_value_gbp | default: 5
+  assign has_code = false
+  if loyalty_redeem_code != blank
+    assign has_code = true
+  endif
+-%}
+
+{%- if customer and has_code -%}
+  <section
+    class="rewards__codes"
+    data-loyalty-active-codes
+    data-redeem-value="{{ redeem_value }}"
+  >
+    <h2 class="rewards__codes-title">Your active rewards</h2>
+    <div class="rewards__codes-list">
+      <article class="rewards__code-card" data-loyalty-code-card>
+        <div class="rewards__code-card-main">
+          <p class="rewards__code-label">Discount code</p>
+          <p class="rewards__code-value" data-loyalty-active-code>{{ loyalty_redeem_code | escape }}</p>
+          <p class="rewards__code-meta">£{{ redeem_value }} off · single use · does not expire</p>
+        </div>
+        <div class="rewards__code-actions">
+          <a
+            class="button button--full"
+            href="/discount/{{ loyalty_redeem_code | url_encode }}"
+            data-loyalty-active-apply
+          >
+            Apply to cart
+          </a>
+          <button type="button" class="button button--secondary button--full" data-loyalty-active-copy>
+            Copy code
+          </button>
+        </div>
+        <p class="rewards__code-invalid" data-loyalty-code-invalid hidden role="status">
+          This code has already been used or is no longer valid.
+        </p>
+      </article>
+    </div>
+  </section>
+{%- endif -%}
