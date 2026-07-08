@@ -9,6 +9,7 @@
  */
 {
   "current": {
+    "logo_width": 140,
     "color_bg": "#0c0e14",
     "color_surface": "#151821",
     "color_surface_2": "#1c2030",
@@ -19,17 +20,23 @@
     "color_danger": "#ff6b5a",
     "color_button": "#f2f0eb",
     "color_button_text": "#0c0e14",
-    "page_width": 1360,
-    "logo_width": 140,
-    "show_stock_count": true,
-    "currency_note": "Prices in GBP",
-    "cart_free_shipping_threshold": "40",
-    "empty_cart_message": "Your cart is empty - the binder awaits.",
     "logo_text": "Kori Collectibles",
     "menu": "main-menu",
     "footer_brand_name": "Kori Collectibles",
     "footer_about": "Independent TCG shop for singles, sealed product, and collectors who care about condition.",
     "footer_disclaimer": "Not affiliated with or endorsed by any card publisher.",
-    "content_for_index": []
+    "page_width": 1360,
+    "show_stock_count": true,
+    "currency_note": "Prices in GBP",
+    "empty_cart_message": "Your cart is empty - the binder awaits.",
+    "cart_free_shipping_threshold": "40",
+    "content_for_index": [],
+    "blocks": {
+      "6174324309569838175": {
+        "type": "shopify://apps/smile-io/blocks/smile-shopify-app/2fae4e25-1841-4ea2-bc02-bd548478c4f6",
+        "disabled": false,
+        "settings": {}
+      }
+    }
   }
 }
