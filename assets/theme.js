@@ -697,7 +697,7 @@
   };
 
   const initProductForm = () => {
-    const form = qs('[data-product-form]');
+    const form = qs('.product-form');
     if (!form) return;
 
     const variantsEl = qs('[data-product-variants]', form);
@@ -706,8 +706,10 @@
     const pills = qsa('.product-form__pill-input', form);
     if (!variantsEl || !pills.length) return;
 
-    const addToCartLabel = form.getAttribute('data-add-to-cart') || 'Add to cart';
-    const soldOutLabel = form.getAttribute('data-sold-out') || 'Sold out';
+    const addToCartEl = qs('[data-add-to-cart]', form);
+    const soldOutEl = qs('[data-sold-out]', form);
+    const addToCartLabel = addToCartEl ? addToCartEl.textContent.trim() : 'Add to cart';
+    const soldOutLabel = soldOutEl ? soldOutEl.textContent.trim() : 'Sold out';
 
     let variants = [];
     try {
