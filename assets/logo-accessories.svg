@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" role="img" aria-label="Accessories">
-  <rect x="12" y="18" width="54" height="84" rx="6" fill="none" stroke="#2DD4BF" stroke-width="5"/>
-  <path d="M28 40h22M28 58h22M28 76h14" stroke="#2DD4BF" stroke-width="5" stroke-linecap="round"/>
-  <text x="86" y="78" fill="#F2F0EB" font-family="'Space Grotesk', Arial, sans-serif" font-size="46" font-weight="700" letter-spacing="1">ACCESSORIES</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" role="img" aria-label="Accessories">
+  <rect x="6" y="10" width="34" height="52" rx="4" fill="none" stroke="#2DD4BF" stroke-width="3.5"/>
+  <path d="M16 24h14M16 36h14M16 48h10" stroke="#2DD4BF" stroke-width="3.5" stroke-linecap="round"/>
+  <text
+    x="52"
+    y="47"
+    fill="#F2F0EB"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="30"
+    font-weight="700"
+    textLength="258"
+    lengthAdjust="spacingAndGlyphs"
+  >ACCESSORIES</text>
 </svg>
