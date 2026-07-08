@@ -1,0 +1,61 @@
+<section class="wrap cart-page" {{ section.shopify_attributes }}>
+  <h1>{{ 'cart.title' | t }}</h1>
+
+  {% if cart.item_count == 0 %}
+    <p class="cart-empty">Your cart is empty.</p>
+    <a href="{{ routes.all_products_collection_url }}" class="btn-primary">Browse singles</a>
+  {% else %}
+    <form action="{{ routes.cart_url }}" method="post">
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th>Card</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart.items %}
+            <tr>
+              <td>
+                <div class="cart-item__title">
+                  <a href="{{ item.url }}">{{ item.product.title }}</a>
+                </div>
+                {% unless item.product.has_only_default_variant %}
+                  <div class="cart-item__meta">{{ item.variant.title }}</div>
+                {% endunless %}
+              </td>
+              <td>
+                <input
+                  type="number"
+                  name="updates[]"
+                  value="{{ item.quantity }}"
+                  min="0"
+                  aria-label="Quantity"
+                  style="width:72px;background:var(--ink-2);border:1px solid rgba(255,255,255,0.12);color:var(--text-light);padding:8px;border-radius:8px;"
+                >
+              </td>
+              <td class="mono">{{ item.final_line_price | money }}</td>
+              <td>
+                <a href="{{ item.url_to_remove }}">{{ 'cart.remove' | t }}</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="cart-actions">
+        <button type="submit" name="update" class="btn-ghost">{{ 'cart.update' | t }}</button>
+        <button type="submit" name="checkout" class="btn-primary">{{ 'cart.checkout' | t }}</button>
+      </div>
+    </form>
+  {% endif %}
+</section>
+
+{% schema %}
+{
+  "name": "Cart",
+  "settings": []
+}
+{% endschema %}

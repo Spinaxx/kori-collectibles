@@ -1,0 +1,168 @@
+<section class="hero wrap" {{ section.shopify_attributes }}>
+  <div>
+    {% if section.settings.eyebrow != blank %}
+      <div class="eyebrow">{{ section.settings.eyebrow }}</div>
+    {% endif %}
+    <h1>
+      {{ section.settings.heading_line_1 }}
+      {% if section.settings.heading_line_2 != blank %}
+        <br>
+        {{ section.settings.heading_line_2 }}
+        {% if section.settings.heading_em != blank %}
+          <em>{{ section.settings.heading_em }}</em>
+        {% endif %}
+        {{ section.settings.heading_after }}
+      {% endif %}
+    </h1>
+    {% if section.settings.text != blank %}
+      <p class="hero__text">{{ section.settings.text }}</p>
+    {% endif %}
+    <div class="hero-actions">
+      {% if section.settings.primary_label != blank %}
+        <a href="{{ section.settings.primary_link }}" class="btn-primary">{{ section.settings.primary_label }}</a>
+      {% endif %}
+      {% if section.settings.secondary_label != blank %}
+        <a href="{{ section.settings.secondary_link }}" class="btn-ghost">{{ section.settings.secondary_label }}</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="tilt-stage">
+    <div class="tilt-card" id="tiltCard">
+      <div class="tilt-shine" id="tiltShine"></div>
+      <div class="tilt-inner">
+        <div class="tilt-top">
+          <span class="tilt-name">{{ section.settings.card_name }}</span>
+          <span class="tilt-hp">{{ section.settings.card_hp }}</span>
+        </div>
+        <div class="tilt-art">
+          <div class="holo-sweep"></div>
+          {% if section.settings.card_image != blank %}
+            {{
+              section.settings.card_image
+              | image_url: width: 600
+              | image_tag: loading: 'eager', alt: section.settings.card_name
+            }}
+          {% else %}
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <ellipse cx="50" cy="58" rx="26" ry="22" fill="#3c2a52"/>
+              <path d="M24 45 L10 20 L34 34 Z" fill="#5a3d78"/>
+              <path d="M76 45 L90 20 L66 34 Z" fill="#5a3d78"/>
+              <circle cx="40" cy="55" r="5" fill="#f4f1ff"/>
+              <circle cx="60" cy="55" r="5" fill="#f4f1ff"/>
+              <path d="M38 70 Q50 78 62 70" stroke="#f4f1ff" stroke-width="3" fill="none" stroke-linecap="round"/>
+            </svg>
+          {% endif %}
+        </div>
+        <div class="tilt-bottom">
+          <div class="tilt-desc">{{ section.settings.card_desc }}</div>
+          <div class="tilt-set">{{ section.settings.card_set }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Independent Pokémon TCG shop"
+    },
+    {
+      "type": "text",
+      "id": "heading_line_1",
+      "label": "Heading line 1",
+      "default": "The hunt is"
+    },
+    {
+      "type": "text",
+      "id": "heading_line_2",
+      "label": "Heading line 2 (before highlight)",
+      "default": "half the "
+    },
+    {
+      "type": "text",
+      "id": "heading_em",
+      "label": "Heading highlight",
+      "default": "foil"
+    },
+    {
+      "type": "text",
+      "id": "heading_after",
+      "label": "Heading (after highlight)",
+      "default": "."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Supporting text",
+      "default": "Singles, sealed product, and grading — sourced and condition-checked by people who actually play. No mystery packs, no guesswork on stock."
+    },
+    {
+      "type": "text",
+      "id": "primary_label",
+      "label": "Primary button label",
+      "default": "Browse singles"
+    },
+    {
+      "type": "url",
+      "id": "primary_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_label",
+      "label": "Secondary button label",
+      "default": "Shop sealed product"
+    },
+    {
+      "type": "url",
+      "id": "secondary_link",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "header",
+      "content": "Featured card"
+    },
+    {
+      "type": "text",
+      "id": "card_name",
+      "label": "Card name",
+      "default": "Duskwing"
+    },
+    {
+      "type": "text",
+      "id": "card_hp",
+      "label": "Card HP",
+      "default": "HP 120"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_image",
+      "label": "Card art (optional)"
+    },
+    {
+      "type": "textarea",
+      "id": "card_desc",
+      "label": "Card description",
+      "default": "Ability — Nightfall Veil: once per turn, hide this card behind your active card."
+    },
+    {
+      "type": "text",
+      "id": "card_set",
+      "label": "Card set code",
+      "default": "HR·07 · 083/165"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero"
+    }
+  ]
+}
+{% endschema %}

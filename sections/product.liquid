@@ -1,0 +1,85 @@
+{%- liquid
+  assign energy = 'colorless'
+  if product.metafields.custom.energy_type != blank
+    assign energy = product.metafields.custom.energy_type | downcase | strip
+  else
+    for tag in product.tags
+      assign tag_down = tag | downcase
+      if tag_down == 'fire' or tag_down == 'water' or tag_down == 'grass' or tag_down == 'electric' or tag_down == 'psychic'
+        assign energy = tag_down
+        break
+      endif
+    endfor
+  endif
+-%}
+
+<section class="wrap product-page" {{ section.shopify_attributes }}>
+  <div class="product-media">
+    <div class="product-media__frame">
+      {% if product.featured_image %}
+        {{
+          product.featured_image
+          | image_url: width: 1200
+          | image_tag: loading: 'eager', widths: '400, 600, 800, 1200', sizes: '(max-width: 900px) 90vw, 45vw', alt: product.title
+        }}
+      {% else %}
+        <div class="slot-art" style="inset: 20%;">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <ellipse cx="50" cy="60" rx="24" ry="20" fill="#5a5870"/>
+            <circle cx="42" cy="58" r="4" fill="#f4f1ff"/>
+            <circle cx="58" cy="58" r="4" fill="#f4f1ff"/>
+          </svg>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="product-info">
+    <div class="eyebrow">{{ energy }} · {{ product.vendor | default: 'Holo Row' }}</div>
+    <h1>{{ product.title }}</h1>
+    <div class="product-price">{{ product.price | money }}</div>
+
+    {% if product.description != blank %}
+      <div class="product-description">{{ product.description }}</div>
+    {% endif %}
+
+    <div class="product-form">
+      {% form 'product', product %}
+        {% assign current_variant = product.selected_or_first_available_variant %}
+
+        {% if product.has_only_default_variant == false %}
+          <select name="id" aria-label="Variant">
+            {% for variant in product.variants %}
+              <option
+                value="{{ variant.id }}"
+                {% if variant == current_variant %}selected{% endif %}
+                {% unless variant.available %}disabled{% endunless %}
+              >
+                {{ variant.title }} — {{ variant.price | money }}
+              </option>
+            {% endfor %}
+          </select>
+        {% else %}
+          <input type="hidden" name="id" value="{{ current_variant.id }}">
+        {% endif %}
+
+        <label class="mono" style="font-size:12px;color:var(--muted);" for="Quantity-{{ section.id }}">Quantity</label>
+        <input id="Quantity-{{ section.id }}" type="number" name="quantity" min="1" value="1">
+
+        <button type="submit" class="btn-primary" {% unless current_variant.available %}disabled{% endunless %}>
+          {% if current_variant.available %}Add to cart{% else %}Sold out{% endif %}
+        </button>
+      {% endform %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product",
+  "settings": [],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

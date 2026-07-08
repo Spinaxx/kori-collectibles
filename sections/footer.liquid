@@ -1,0 +1,120 @@
+<footer class="site-footer" id="footer" {{ section.shopify_attributes }}>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-col">
+        <p class="footer-brand">{{ section.settings.brand_name | default: shop.name }}</p>
+        {% if section.settings.address != blank %}
+          <p>{{ section.settings.address | newline_to_br }}</p>
+        {% endif %}
+      </div>
+
+      <div class="footer-col">
+        <h4>Hours</h4>
+        {% if section.settings.hours_weekday != blank %}
+          <p>{{ section.settings.hours_weekday }}</p>
+        {% endif %}
+        {% if section.settings.hours_weekend != blank %}
+          <p>{{ section.settings.hours_weekend }}</p>
+        {% endif %}
+      </div>
+
+      <div class="footer-col">
+        <h4>Shop</h4>
+        {% for link in section.settings.menu.links %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% else %}
+          <a href="{{ routes.all_products_collection_url }}">Singles</a>
+          <a href="{{ routes.all_products_collection_url }}">Sealed product</a>
+          <a href="#trust">Grading</a>
+        {% endfor %}
+      </div>
+
+      <div class="footer-col">
+        <h4>Follow</h4>
+        {% if section.settings.instagram_url != blank %}
+          <a href="{{ section.settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a>
+        {% endif %}
+        {% if section.settings.discord_url != blank %}
+          <a href="{{ section.settings.discord_url }}" target="_blank" rel="noopener">Discord</a>
+        {% endif %}
+        {% if section.settings.instagram_url == blank and section.settings.discord_url == blank %}
+          {% for link in section.settings.social_menu.links %}
+            <a href="{{ link.url }}">{{ link.title }}</a>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}.
+        {{ section.settings.disclaimer }}
+      </span>
+      <span>{{ section.settings.bottom_note }}</span>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand name",
+      "default": "Holo Row"
+    },
+    {
+      "type": "textarea",
+      "id": "address",
+      "label": "Address",
+      "default": "42 Union Street\nHerne Bay, CT6 5AB"
+    },
+    {
+      "type": "text",
+      "id": "hours_weekday",
+      "label": "Weekday hours",
+      "default": "Mon–Sat · 10:00–18:00"
+    },
+    {
+      "type": "text",
+      "id": "hours_weekend",
+      "label": "Weekend hours",
+      "default": "Sun · 11:00–16:00"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Shop menu"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "discord_url",
+      "label": "Discord URL"
+    },
+    {
+      "type": "link_list",
+      "id": "social_menu",
+      "label": "Social menu (fallback)"
+    },
+    {
+      "type": "text",
+      "id": "disclaimer",
+      "label": "Disclaimer",
+      "default": "Not affiliated with or endorsed by any card publisher."
+    },
+    {
+      "type": "text",
+      "id": "bottom_note",
+      "label": "Bottom note",
+      "default": "Prices update daily"
+    }
+  ]
+}
+{% endschema %}

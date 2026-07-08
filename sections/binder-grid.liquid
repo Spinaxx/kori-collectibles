@@ -1,0 +1,117 @@
+{%- liquid
+  assign collection = section.settings.collection
+  assign product_limit = section.settings.products_to_show
+-%}
+
+<div class="wrap" id="grid" {{ section.shopify_attributes }}>
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>{{ section.settings.heading }}</h2>
+        {% if section.settings.subheading != blank %}
+          <p>{{ section.settings.subheading }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if section.settings.show_filters %}
+      <div class="filters" data-binder-filters>
+        <button type="button" class="filter-tab active" data-e="all">All</button>
+        <button type="button" class="filter-tab" data-e="fire">Fire</button>
+        <button type="button" class="filter-tab" data-e="water">Water</button>
+        <button type="button" class="filter-tab" data-e="grass">Grass</button>
+        <button type="button" class="filter-tab" data-e="electric">Electric</button>
+        <button type="button" class="filter-tab" data-e="psychic">Psychic</button>
+      </div>
+    {% endif %}
+
+    <div class="binder-grid" data-binder-grid>
+      {% if collection != blank and collection.products_count > 0 %}
+        {% for product in collection.products limit: product_limit %}
+          {% render 'product-card', product: product %}
+        {% endfor %}
+      {% else %}
+        {% comment %} Demo placeholders when no collection is selected yet {% endcomment %}
+        {% assign demo_cards = 'Emberling:fire:£3.20:3 left:rare,Tidecoil:water:£1.80:12 left:,Verdant Sprig:grass:£8.50:1 left:rare,Voltling:electric:£2.40:21 left:,Mindglass:psychic:£4.10:7 left:,Cinderpup:fire:£1.20:30 left:,Abysshell:water:£12.00:2 left:rare,Mosswhelp:grass:£0.90:44 left:' | split: ',' %}
+        {% for card in demo_cards %}
+          {% if card != blank %}
+            {% assign parts = card | split: ':' %}
+            {% assign name = parts[0] %}
+            {% assign energy = parts[1] %}
+            {% assign price = parts[2] %}
+            {% assign stock = parts[3] %}
+            {% assign rare = parts[4] %}
+            <div class="slot show{% if rare == 'rare' %} slot-rare{% endif %}" data-e="{{ energy }}">
+              <div class="slot-card">
+                <span class="slot-badge e-{{ energy }}">{{ energy }}</span>
+                <div class="slot-art">
+                  <svg viewBox="0 0 100 100" aria-hidden="true">
+                    <ellipse cx="50" cy="60" rx="24" ry="20" fill="#3a3b4d"/>
+                    <circle cx="42" cy="58" r="4" fill="#f4f1ff"/>
+                    <circle cx="58" cy="58" r="4" fill="#f4f1ff"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="slot-info">
+                <div class="slot-name">{{ name }}</div>
+                <div class="slot-set">Demo · sample</div>
+              </div>
+              <div class="slot-foot">
+                <span class="slot-price">{{ price }}</span>
+                <span class="slot-stock{% if stock contains '1 ' or stock contains '2 ' or stock contains '3 ' %} low{% endif %}">{{ stock }}</span>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+        <div class="binder-empty" style="display:none" data-empty-hint>
+          Connect a collection in the theme editor to replace demo cards with real products.
+        </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "Binder grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "New in the binder"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Filter by energy type — same way you'd flip through a physical box."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "label": "Products to show",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show energy filters",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Binder grid"
+    }
+  ]
+}
+{% endschema %}

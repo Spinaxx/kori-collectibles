@@ -1,0 +1,116 @@
+{%- if section.settings.show_ticker -%}
+  <div class="ticker-bar" {{ section.shopify_attributes }}>
+    <div class="ticker-track">
+      {%- for block in section.blocks -%}
+        <span {{ block.shopify_attributes }}>
+          {{ block.settings.text }}
+          {%- if block.settings.highlight != blank -%}
+            <b>{{ block.settings.highlight }}</b>
+          {%- endif -%}
+          {{ block.settings.text_after }}
+        </span>
+      {%- endfor -%}
+      {%- comment -%} Duplicate for seamless loop {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        <span aria-hidden="true">
+          {{ block.settings.text }}
+          {%- if block.settings.highlight != blank -%}
+            <b>{{ block.settings.highlight }}</b>
+          {%- endif -%}
+          {{ block.settings.text_after }}
+        </span>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+<header class="site-header">
+  <div class="wrap">
+    <nav class="site-header__nav" aria-label="Primary">
+      <a class="logo" href="{{ routes.root_url }}">
+        <span class="logo-mark" aria-hidden="true"></span>
+        {{ section.settings.logo_text | default: shop.name }}
+      </a>
+
+      <div class="nav-links">
+        {% for link in section.settings.menu.links %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% endfor %}
+      </div>
+
+      <div class="nav-actions">
+        {% if section.settings.cta_label != blank %}
+          <a href="{{ section.settings.cta_link }}" class="nav-cta">{{ section.settings.cta_label }}</a>
+        {% endif %}
+        <a href="{{ routes.cart_url }}" class="nav-cart" aria-label="Cart">
+          {% if cart.item_count > 0 %}
+            <span class="nav-cart__count">{{ cart.item_count }}</span>
+          {% endif %}
+          {{ 'icon-cart.svg' | inline_asset_content }}
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_ticker",
+      "label": "Show ticker bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo text",
+      "default": "Holo Row"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "ticker_item",
+      "name": "Ticker item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text before highlight",
+          "default": "RESTOCK — "
+        },
+        {
+          "type": "text",
+          "id": "highlight",
+          "label": "Highlighted text",
+          "default": "Skyward Blitz"
+        },
+        {
+          "type": "text",
+          "id": "text_after",
+          "label": "Text after highlight",
+          "default": " booster boxes back Friday 10am"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

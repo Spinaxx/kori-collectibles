@@ -1,0 +1,38 @@
+<section class="wrap collection-page" {{ section.shopify_attributes }}>
+  <h1>{{ collection.title }}</h1>
+  {% if collection.description != blank %}
+    <div class="collection-page__intro">{{ collection.description }}</div>
+  {% endif %}
+
+  <div class="filters" data-binder-filters>
+    <button type="button" class="filter-tab active" data-e="all">All</button>
+    <button type="button" class="filter-tab" data-e="fire">Fire</button>
+    <button type="button" class="filter-tab" data-e="water">Water</button>
+    <button type="button" class="filter-tab" data-e="grass">Grass</button>
+    <button type="button" class="filter-tab" data-e="electric">Electric</button>
+    <button type="button" class="filter-tab" data-e="psychic">Psychic</button>
+  </div>
+
+  <div class="binder-grid" data-binder-grid>
+    {% paginate collection.products by 24 %}
+      {% for product in collection.products %}
+        {% render 'product-card', product: product %}
+      {% else %}
+        <div class="binder-empty">No cards in this collection yet.</div>
+      {% endfor %}
+
+      {% if paginate.pages > 1 %}
+        <div class="pagination" style="grid-column: 1 / -1;">
+          {{ paginate | default_pagination }}
+        </div>
+      {% endif %}
+    {% endpaginate %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection",
+  "settings": []
+}
+{% endschema %}

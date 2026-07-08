@@ -1,0 +1,51 @@
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "header": {
+      "type": "header",
+      "blocks": {
+        "ticker_1": {
+          "type": "ticker_item",
+          "settings": {
+            "text": "RESTOCK — ",
+            "highlight": "Skyward Blitz",
+            "text_after": " booster boxes back Friday 10am"
+          }
+        },
+        "ticker_2": {
+          "type": "ticker_item",
+          "settings": {
+            "text": "Grading turnaround currently ",
+            "highlight": "9–11 days",
+            "text_after": ""
+          }
+        },
+        "ticker_3": {
+          "type": "ticker_item",
+          "settings": {
+            "text": "Buylist prices updated ",
+            "highlight": "daily",
+            "text_after": " before opening"
+          }
+        },
+        "ticker_4": {
+          "type": "ticker_item",
+          "settings": {
+            "text": "Singles condition-checked under lamp, every time",
+            "highlight": "",
+            "text_after": ""
+          }
+        }
+      },
+      "block_order": ["ticker_1", "ticker_2", "ticker_3", "ticker_4"],
+      "settings": {
+        "show_ticker": true,
+        "logo_text": "Holo Row",
+        "cta_label": "Shop now",
+        "cta_link": "#grid"
+      }
+    }
+  },
+  "order": ["header"]
+}

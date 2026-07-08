@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holo Row — Pokémon TCG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14151f;
+    --ink-2:#1c1d2b;
+    --ink-3:#252739;
+    --paper:#faf6ea;
+    --paper-2:#f0e9d8;
+    --text-dark:#1c1b24;
+    --text-light:#f4f1ff;
+    --muted:#9694ab;
+    --muted-2:#5a5870;
+    --holo-a:#8b5cf6;
+    --holo-b:#22b8b0;
+    --holo-c:#f2a65a;
+    --fire:#e8543e;
+    --water:#3e8ede;
+    --grass:#4fa65b;
+    --electric:#d9ab1f;
+    --psychic:#b15fc7;
+    --colorless:#9a96ab;
+    --radius-card:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--text-light);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+  h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-0.01em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;text-decoration:none;}
+  ::selection{background:var(--holo-a);color:white;}
+
+  /* ---- ticker ---- */
+  .ticker-bar{
+    background:var(--ink-2);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    overflow:hidden;
+    white-space:nowrap;
+    padding:8px 0;
+  }
+  .ticker-track{
+    display:inline-block;
+    padding-left:100%;
+    animation:scroll-left 32s linear infinite;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:0.02em;
+  }
+  .ticker-track span{margin-right:48px;}
+  .ticker-track span b{color:var(--holo-c);font-weight:500;}
+  @keyframes scroll-left{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-100%);}
+  }
+
+  /* ---- nav ---- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(20,21,31,0.9);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 0;
+  }
+  .logo{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:-0.02em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .logo-mark{
+    width:22px;height:22px;border-radius:5px;
+    background:conic-gradient(from 120deg,var(--holo-a),var(--holo-b),var(--holo-c),var(--holo-a));
+    flex-shrink:0;
+  }
+  .nav-links{display:flex;gap:32px;font-size:14px;color:var(--muted);}
+  .nav-links a{transition:color .2s;}
+  .nav-links a:hover{color:var(--text-light);}
+  .nav-cta{
+    font-size:13px;font-weight:500;
+    background:var(--paper);color:var(--text-dark);
+    padding:9px 18px;border-radius:8px;
+    transition:transform .15s;
+  }
+  .nav-cta:hover{transform:translateY(-1px);}
+  @media (max-width:760px){.nav-links{display:none;}}
+
+  /* ---- hero ---- */
+  .hero{
+    padding:88px 0 72px;
+    display:grid;grid-template-columns:1.05fr 0.95fr;gap:56px;align-items:center;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:12px;
+    color:var(--holo-b);letter-spacing:0.06em;text-transform:uppercase;
+    margin-bottom:18px;display:flex;align-items:center;gap:8px;
+  }
+  .eyebrow::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--holo-b);display:inline-block;}
+  .hero h1{
+    font-size:56px;line-height:1.03;margin-bottom:22px;
+  }
+  .hero h1 em{
+    font-style:normal;
+    background:linear-gradient(100deg,var(--holo-a),var(--holo-b) 50%,var(--holo-c));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p{font-size:17px;color:var(--muted);max-width:440px;margin-bottom:32px;}
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--paper);color:var(--text-dark);
+    padding:14px 24px;border-radius:9px;font-weight:600;font-size:14px;
+    transition:transform .15s;
+  }
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-ghost{
+    border:1px solid rgba(255,255,255,0.18);
+    padding:14px 24px;border-radius:9px;font-weight:500;font-size:14px;
+    color:var(--text-light);transition:border-color .2s,background .2s;
+  }
+  .btn-ghost:hover{border-color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.03);}
+
+  /* ---- tilt card ---- */
+  .tilt-stage{
+    perspective:1200px;display:flex;justify-content:center;
+  }
+  .tilt-card{
+    width:280px;aspect-ratio:5/7;border-radius:16px;position:relative;
+    background:linear-gradient(160deg,var(--ink-3),var(--ink-2));
+    border:1px solid rgba(255,255,255,0.1);
+    transform-style:preserve-3d;
+    transition:transform .12s ease-out;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .tilt-shine{
+    position:absolute;inset:0;
+    background:radial-gradient(circle at 50% 50%, rgba(255,255,255,0.35), transparent 55%);
+    opacity:0;transition:opacity .2s;
+    mix-blend-mode:overlay;
+    pointer-events:none;
+  }
+  .tilt-card:hover .tilt-shine{opacity:1;}
+  .tilt-inner{
+    position:absolute;inset:14px;border-radius:10px;
+    background:var(--paper);
+    display:flex;flex-direction:column;
+    overflow:hidden;
+  }
+  .tilt-top{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 14px 8px;
+  }
+  .tilt-name{font-family:'Space Grotesk';font-weight:700;font-size:15px;color:var(--text-dark);}
+  .tilt-hp{font-family:'JetBrains Mono';font-size:11px;color:var(--fire);font-weight:500;}
+  .tilt-art{
+    flex:1;margin:0 14px;border-radius:8px;
+    background:linear-gradient(145deg,#ffe0c7,#ffc9a8);
+    display:flex;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;
+  }
+  .tilt-art svg{width:64%;height:64%;}
+  .holo-sweep{
+    position:absolute;inset:0;
+    background:linear-gradient(115deg,transparent 30%, rgba(139,92,246,0.35) 42%, rgba(34,184,176,0.3) 50%, rgba(242,166,90,0.35) 58%, transparent 70%);
+    background-size:250% 250%;
+    animation:sweep 5s ease-in-out infinite;
+    mix-blend-mode:color-dodge;
+  }
+  @keyframes sweep{
+    0%,100%{background-position:0% 0%;}
+    50%{background-position:100% 100%;}
+  }
+  .tilt-bottom{padding:10px 14px 14px;}
+  .tilt-set{font-family:'JetBrains Mono';font-size:10px;color:var(--muted-2);}
+  .tilt-desc{font-size:11px;color:var(--text-dark);opacity:0.75;margin-top:4px;line-height:1.4;}
+
+  /* ---- section shared ---- */
+  section{padding:64px 0;}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;gap:16px;}
+  .section-head h2{font-size:28px;}
+  .section-head p{color:var(--muted);font-size:14px;max-width:380px;}
+
+  /* ---- filter tabs ---- */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;}
+  .filter-tab{
+    font-family:'JetBrains Mono';font-size:12px;padding:8px 16px;border-radius:100px;
+    border:1px solid rgba(255,255,255,0.12);color:var(--muted);cursor:pointer;
+    background:transparent;transition:all .15s;
+  }
+  .filter-tab.active,.filter-tab:hover{
+    color:var(--text-dark);background:var(--paper);border-color:var(--paper);
+  }
+  .filter-tab[data-e="fire"].active{background:var(--fire);border-color:var(--fire);color:#2a0a05;}
+  .filter-tab[data-e="water"].active{background:var(--water);border-color:var(--water);color:#04203f;}
+  .filter-tab[data-e="grass"].active{background:var(--grass);border-color:var(--grass);color:#0e2412;}
+  .filter-tab[data-e="electric"].active{background:var(--electric);border-color:var(--electric);color:#2e2405;}
+  .filter-tab[data-e="psychic"].active{background:var(--psychic);border-color:var(--psychic);color:#2c0f34;}
+
+  /* ---- binder grid ---- */
+  .binder-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:18px;
+  }
+  @media (max-width:900px){.binder-grid{grid-template-columns:repeat(2,1fr);}}
+  .slot{
+    background:var(--ink-2);border:1px solid rgba(255,255,255,0.07);
+    border-radius:var(--radius-card);padding:14px;
+    display:none;flex-direction:column;gap:10px;
+    transition:transform .18s,border-color .18s;
+  }
+  .slot.show{display:flex;}
+  .slot:hover{transform:translateY(-4px);border-color:rgba(255,255,255,0.18);}
+  .slot-card{
+    aspect-ratio:5/7;border-radius:9px;position:relative;overflow:hidden;
+    background:var(--paper);
+  }
+  .slot-badge{
+    position:absolute;top:8px;left:8px;font-family:'JetBrains Mono';font-size:9px;
+    font-weight:500;padding:3px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:0.03em;
+  }
+  .e-fire{background:var(--fire);color:#2a0a05;}
+  .e-water{background:var(--water);color:#04203f;}
+  .e-grass{background:var(--grass);color:#0e2412;}
+  .e-electric{background:var(--electric);color:#2e2405;}
+  .e-psychic{background:var(--psychic);color:#2c0f34;}
+  .e-colorless{background:var(--colorless);color:#1e1c26;}
+  .slot-art{position:absolute;inset:22% 16% 30%;display:flex;align-items:center;justify-content:center;}
+  .slot-art svg{width:100%;height:100%;}
+  .slot-rare .slot-card::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(115deg,transparent 35%, rgba(139,92,246,0.3) 45%, rgba(34,184,176,0.25) 52%, rgba(242,166,90,0.3) 60%, transparent 72%);
+    background-size:220% 220%;animation:sweep 6s ease-in-out infinite;mix-blend-mode:color-dodge;
+  }
+  .slot-info{padding:0 2px;}
+  .slot-name{font-family:'Space Grotesk';font-weight:600;font-size:13.5px;color:var(--text-light);}
+  .slot-set{font-family:'JetBrains Mono';font-size:10.5px;color:var(--muted);margin-top:2px;}
+  .slot-foot{display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+  .slot-price{font-family:'JetBrains Mono';font-weight:500;font-size:14px;color:var(--text-light);}
+  .slot-stock{font-size:10px;color:var(--muted);}
+  .slot-stock.low{color:var(--holo-c);}
+
+  /* ---- trust strip ---- */
+  .trust{background:var(--ink-2);border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);}
+  .trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;padding:56px 0;}
+  @media (max-width:760px){.trust-grid{grid-template-columns:1fr;}}
+  .trust-item h3{font-size:17px;margin-bottom:8px;}
+  .trust-item p{font-size:14px;color:var(--muted);max-width:280px;}
+  .trust-num{font-family:'JetBrains Mono';font-size:12px;color:var(--holo-b);margin-bottom:10px;display:block;}
+
+  /* ---- footer ---- */
+  footer{padding:56px 0 40px;}
+  .footer-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px;margin-bottom:40px;}
+  .footer-col h4{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px;font-weight:500;}
+  .footer-col p, .footer-col a{font-size:14px;color:var(--text-light);display:block;margin-bottom:8px;}
+  .footer-col a{color:var(--muted);transition:color .15s;}
+  .footer-col a:hover{color:var(--text-light);}
+  .footer-bottom{
+    border-top:1px solid rgba(255,255,255,0.07);padding-top:24px;
+    display:flex;justify-content:space-between;color:var(--muted);font-size:12px;flex-wrap:wrap;gap:12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker-bar">
+  <div class="ticker-track">
+    <span>RESTOCK — <b>Skyward Blitz</b> booster boxes back Friday 10am</span>
+    <span>Grading turnaround currently <b>9–11 days</b></span>
+    <span>Buylist prices updated <b>daily</b> before opening</span>
+    <span>Singles condition-checked under lamp, every time</span>
+    <span>RESTOCK — <b>Skyward Blitz</b> booster boxes back Friday 10am</span>
+    <span>Grading turnaround currently <b>9–11 days</b></span>
+    <span>Buylist prices updated <b>daily</b> before opening</span>
+    <span>Singles condition-checked under lamp, every time</span>
+  </div>
+</div>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="logo"><span class="logo-mark"></span>Holo Row</div>
+      <div class="nav-links">
+        <a href="#grid">Singles</a>
+        <a href="#grid">Sealed</a>
+        <a href="#trust">Grading</a>
+        <a href="#footer">Location</a>
+      </div>
+      <a href="#grid" class="nav-cta">Shop now</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Independent Pokémon TCG shop</div>
+      <h1>The hunt is<br>half the <em>foil</em>.</h1>
+      <p>Singles, sealed product, and grading — sourced and condition-checked by people who actually play. No mystery packs, no guesswork on stock.</p>
+      <div class="hero-actions">
+        <a href="#grid" class="btn-primary">Browse singles</a>
+        <a href="#grid" class="btn-ghost">Shop sealed product</a>
+      </div>
+    </div>
+    <div class="tilt-stage">
+      <div class="tilt-card" id="tiltCard">
+        <div class="tilt-shine" id="tiltShine"></div>
+        <div class="tilt-inner">
+          <div class="tilt-top">
+            <span class="tilt-name">Duskwing</span>
+            <span class="tilt-hp">HP 120</span>
+          </div>
+          <div class="tilt-art">
+            <div class="holo-sweep"></div>
+            <svg viewBox="0 0 100 100"><ellipse cx="50" cy="58" rx="26" ry="22" fill="#3c2a52"/><path d="M24 45 L10 20 L34 34 Z" fill="#5a3d78"/><path d="M76 45 L90 20 L66 34 Z" fill="#5a3d78"/><circle cx="40" cy="55" r="5" fill="#f4f1ff"/><circle cx="60" cy="55" r="5" fill="#f4f1ff"/><path d="M38 70 Q50 78 62 70" stroke="#f4f1ff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="tilt-bottom">
+            <div class="tilt-desc">Ability — Nightfall Veil: once per turn, hide this card behind your active card.</div>
+            <div class="tilt-set">HR·07 · 083/165</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap" id="grid">
+  <section>
+    <div class="section-head">
+      <div>
+        <h2>New in the binder</h2>
+        <p>Filter by energy type — same way you'd flip through a physical box.</p>
+      </div>
+    </div>
+    <div class="filters">
+      <button class="filter-tab active" data-e="all">All</button>
+      <button class="filter-tab" data-e="fire">Fire</button>
+      <button class="filter-tab" data-e="water">Water</button>
+      <button class="filter-tab" data-e="grass">Grass</button>
+      <button class="filter-tab" data-e="electric">Electric</button>
+      <button class="filter-tab" data-e="psychic">Psychic</button>
+    </div>
+
+    <div class="binder-grid" id="bindergrid">
+
+      <div class="slot show slot-rare" data-e="fire">
+        <div class="slot-card"><span class="slot-badge e-fire">Fire</span>
+          <div class="slot-art"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="24" ry="20" fill="#7a2a1a"/><path d="M50 10 Q60 30 50 40 Q40 30 50 10Z" fill="#e8543e"/><circle cx="42" cy="58" r="4" fill="#fff1e6"/><circle cx="58" cy="58" r="4" fill="#fff1e6"/></svg></div>
+        </div>
+        <div class="slot-info"><div class="slot-name">Emberling</div><div class="slot-set">HR·07 · 014/165</div></div>
+        <div class="slot-foot"><span class="slot-price">£3.20</span><span class="slot-stock low">3 left</span></div>
+      </div>
+
+      <div class="slot show" data-e="water">
+        <div class="slot-card"><span class="slot-badge e-water">Water</span>
+          <div class="slot-art"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="26" ry="18" fill="#1f5f8f"/><path d="M50 15 Q65 35 50 45 Q35 35 50 15Z" fill="#3e8ede"/><circle cx="42" cy="58" r="4" fill="#eaf6ff"/><circle cx="58" cy="58" r="4" fill="#eaf6ff"/></svg></div>
+        </div>
+        <div class="slot-info"><div class="slot-name">Tidecoil</div><div class="slot-set">SV·04 · 021/198</div></div>
+        <div class="slot-foot"><span class="slot-price">£1.80</span><span class="slot-stock">12 left</span></div>
+      </div>
+
+      <div class="slot show slot-rare" data-e="grass">
+        <div class="slot-card"><span class="slot-badge e-grass">Grass</span>
+          <div class="slot-art"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="25" ry="19" fill="#2b5c33"/><path d="M50 12 L58 28 L42 28 Z" fill="#4fa65b"/><path d="M35 20 L45 30 L30 32 Z" fill="#4fa65b"/><path d="M65 20 L55 30 L70 32 Z" fill="#4fa65b"/><circle cx="42" cy="58" r="4" fill="#eafbea"/><circle cx="58" cy="58" r="4" fill="#eafbea"/></svg></div>
+        </div>
+        <div class="slot-info"><div class="slot-name">Verdant Sprig</div><div class="slot-set">HR·07 · 003/165</div></div>
+        <div class="slot-foot"><span class="slot-price">£8.50</span><span class="slot-stock low">1 left</span></div>
+      </div>
+
+      <div class="slot show" data-e="electric">
+        <div class="slot-card"><span class="slot-badge e-electric">Electric</span>
+          <div class="slot-art"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="24" ry="19" fill="#7a611a"/><path d="M55 12 L38 45 L50 45 L45 68 L66 35 L52 35 Z" fill="#e0c030"/></svg></div>
+        </div>
+        <div class="slot-info"><div class="slot-name">Voltling</div><div class="slot-set">SV·04 · 067/198</div></div>
+        <div class="slot-foot"><span class="slot-price">£2.40</span><span class="slot-stock">21 left</span></div>
+      </div>
+
+      <div class="slot show" data-e="psychic">
+        <div class="slot-card"><span class="slot-badge e-psychic">Psychic</span>
+          <div class="slot-art"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="24" ry="20" fill="#5a2a6b"/><circle cx="50" cy="35" r="12" fill="#b15fc7"/><circle cx="42" cy="58" r="4" fill="#f7ecff"/><circle cx="58" cy="58" r="4" fill="#f7ecff"/></svg></div>
+        </div>
+        <div class="slot-info"><div class="slot-name">Mindglass</div><div class="slot-set">HR·07 · 091/165</div></div>
+        <div class="slot-foot"><span class="slot-price">£4.10</span><span class="slot-stock">7 left</span></div>
+      </div>
+
+      <div class="slot show" data-e="fire">
+        <div class="slot-card"><span class="slot-badge e-fire">Fire</span>
+          <div class="slot-art"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="62" rx="27" ry="18" fill="#7a2a1a"/><path d="M30 25 Q50 5 70 25 Q60 35 50 30 Q40 35 30 25Z" fill="#e8543e"/><circle cx="42" cy="58" r="4" fill="#fff1e6"/><circle cx="58" cy="58" r="4" fill="#fff1e6"/></svg></div>
+        </div>
+        <div class="slot-info"><div class="slot-name">Cinderpup</div><div class="slot-set">SV·04 · 009/198</div></div>
+        <div class="slot-foot"><span class="slot-price">£1.20</span><span class="slot-stock">30 left</span></div>
+      </div>
+
+      <div class="slot show slot-rare" data-e="water">
+        <div class="slot-card"><span class="slot-badge e-water">Water</span>
+          <div class="slot-art"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="27" ry="20" fill="#1f5f8f"/><path d="M25 40 Q50 20 75 40 Q65 55 50 48 Q35 55 25 40Z" fill="#3e8ede"/><circle cx="42" cy="58" r="4" fill="#eaf6ff"/><circle cx="58" cy="58" r="4" fill="#eaf6ff"/></svg></div>
+        </div>
+        <div class="slot-info"><div class="slot-name">Abysshell</div><div class="slot-set">HR·07 · 044/165</div></div>
+        <div class="slot-foot"><span class="slot-price">£12.00</span><span class="slot-stock low">2 left</span></div>
+      </div>
+
+      <div class="slot show" data-e="grass">
+        <div class="slot-card"><span class="slot-badge e-grass">Grass</span>
+          <div class="slot-art"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="24" ry="19" fill="#2b5c33"/><circle cx="50" cy="35" r="10" fill="#4fa65b"/><circle cx="42" cy="58" r="4" fill="#eafbea"/><circle cx="58" cy="58" r="4" fill="#eafbea"/></svg></div>
+        </div>
+        <div class="slot-info"><div class="slot-name">Mosswhelp</div><div class="slot-set">SV·04 · 002/198</div></div>
+        <div class="slot-foot"><span class="slot-price">£0.90</span><span class="slot-stock">44 left</span></div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<div class="trust" id="trust">
+  <div class="wrap">
+    <div class="trust-grid">
+      <div class="trust-item">
+        <span class="trust-num">01</span>
+        <h3>Every single, checked twice</h3>
+        <p>Condition graded under lamp against our own reference sheet before it hits the shelf or the site.</p>
+      </div>
+      <div class="trust-item">
+        <span class="trust-num">02</span>
+        <h3>We buy collections</h3>
+        <p>Bring in a binder or a bulk box — cash or store credit, quoted while you wait.</p>
+      </div>
+      <div class="trust-item">
+        <span class="trust-num">03</span>
+        <h3>Grading drop-off in store</h3>
+        <p>Submit through us for better turnaround than mailing in solo, tracked from drop-off to return.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer id="footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-col">
+        <h4>Holo Row</h4>
+        <p style="color:var(--muted);max-width:220px;">42 Union Street<br>Herne Bay, CT6 5AB</p>
+      </div>
+      <div class="footer-col">
+        <h4>Hours</h4>
+        <p style="color:var(--muted);">Mon–Sat · 10:00–18:00</p>
+        <p style="color:var(--muted);">Sun · 11:00–16:00</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="#grid">Singles</a>
+        <a href="#grid">Sealed product</a>
+        <a href="#trust">Grading</a>
+      </div>
+      <div class="footer-col">
+        <h4>Follow</h4>
+        <a href="#">Instagram</a>
+        <a href="#">Discord</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Holo Row. Not affiliated with or endorsed by any card publisher.</span>
+      <span>Prices update daily</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const tiltCard = document.getElementById('tiltCard');
+  const tiltShine = document.getElementById('tiltShine');
+  tiltCard.addEventListener('mousemove', (e) => {
+    const r = tiltCard.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+    const rx = (0.5 - y) * 22;
+    const ry = (x - 0.5) * 26;
+    tiltCard.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(1.03)`;
+    tiltShine.style.background = `radial-gradient(circle at ${x*100}% ${y*100}%, rgba(255,255,255,0.4), transparent 55%)`;
+  });
+  tiltCard.addEventListener('mouseleave', () => {
+    tiltCard.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+  });
+
+  const tabs = document.querySelectorAll('.filter-tab');
+  const slots = document.querySelectorAll('.slot');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const e = tab.dataset.e;
+      slots.forEach(slot => {
+        if (e === 'all' || slot.dataset.e === e) slot.classList.add('show');
+        else slot.classList.remove('show');
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

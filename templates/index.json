@@ -1,0 +1,64 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "eyebrow": "Independent Pokémon TCG shop",
+        "heading_line_1": "The hunt is",
+        "heading_line_2": "half the ",
+        "heading_em": "foil",
+        "heading_after": ".",
+        "text": "Singles, sealed product, and grading — sourced and condition-checked by people who actually play. No mystery packs, no guesswork on stock.",
+        "primary_label": "Browse singles",
+        "primary_link": "#grid",
+        "secondary_label": "Shop sealed product",
+        "secondary_link": "#grid",
+        "card_name": "Duskwing",
+        "card_hp": "HP 120",
+        "card_desc": "Ability — Nightfall Veil: once per turn, hide this card behind your active card.",
+        "card_set": "HR·07 · 083/165"
+      }
+    },
+    "binder": {
+      "type": "binder-grid",
+      "settings": {
+        "heading": "New in the binder",
+        "subheading": "Filter by energy type — same way you'd flip through a physical box.",
+        "products_to_show": 8,
+        "show_filters": true
+      }
+    },
+    "trust": {
+      "type": "trust",
+      "blocks": {
+        "trust_1": {
+          "type": "trust_item",
+          "settings": {
+            "number": "01",
+            "heading": "Every single, checked twice",
+            "text": "Condition graded under lamp against our own reference sheet before it hits the shelf or the site."
+          }
+        },
+        "trust_2": {
+          "type": "trust_item",
+          "settings": {
+            "number": "02",
+            "heading": "We buy collections",
+            "text": "Bring in a binder or a bulk box — cash or store credit, quoted while you wait."
+          }
+        },
+        "trust_3": {
+          "type": "trust_item",
+          "settings": {
+            "number": "03",
+            "heading": "Grading drop-off in store",
+            "text": "Submit through us for better turnaround than mailing in solo, tracked from drop-off to return."
+          }
+        }
+      },
+      "block_order": ["trust_1", "trust_2", "trust_3"],
+      "settings": {}
+    }
+  },
+  "order": ["hero", "binder", "trust"]
+}
