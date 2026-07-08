@@ -1016,38 +1016,53 @@ ul {
 }
 
 .game-tile--coming-soon {
-  opacity: 0.95;
+  pointer-events: auto;
 }
 
 .game-tile--coming-soon .game-tile__logo,
 .game-tile--coming-soon .game-tile__label,
 .game-tile--coming-soon .game-tile__meta {
-  opacity: 0.55;
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+
+.game-tile--coming-soon:hover {
+  transform: none;
+  border-color: var(--border);
 }
 
 .game-tile__banner {
   position: absolute;
-  top: 0.85rem;
-  right: -2.75rem;
-  z-index: 2;
-  width: 9.5rem;
-  padding: 0.28rem 0;
-  background: linear-gradient(90deg, var(--accent-2), #ffcf70);
-  color: #1a1205;
-  text-align: center;
-  transform: rotate(32deg);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background: rgba(12, 14, 20, 0.62);
+  backdrop-filter: grayscale(1) blur(1px);
+  -webkit-backdrop-filter: grayscale(1) blur(1px);
   pointer-events: none;
 }
 
 .game-tile__banner-text {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(242, 240, 235, 0.18);
+  background: rgba(12, 14, 20, 0.78);
+  color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  white-space: nowrap;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.2;
 }
 
 .game-tile__logo {
