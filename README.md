@@ -98,7 +98,7 @@ Awards **1 point per £1** of subtotal (`Math.round(subtotal)`). Match the rate 
 Create a second workflow:
 
 1. **Trigger:** Order cancelled
-2. **Condition:** Customer is not null
+2. **Condition:** Customer is not null (`order.customer.id` is not empty)
 3. **Action:** Run code — paste `shopify-flow/deduct-loyalty-on-order-cancelled.js`
 
    **Select inputs** (GraphQL):
@@ -111,37 +111,49 @@ Create a second workflow:
            amount
          }
        }
-       displayFinancialStatus
+       currentSubtotalPriceSet {
+         shopMoney {
+           amount
+         }
+       }
+       totalPriceSet {
+         shopMoney {
+           amount
+         }
+       }
+       totalRefundedSet {
+         shopMoney {
+           amount
+         }
+       }
        customer {
+         id
          loyaltyPoints {
            value
          }
-       }
-       loyaltyPointsAwarded {
-         value
        }
      }
    }
    ```
 
-   Map `loyaltyPoints` → `custom.loyalty_points` and `loyaltyPointsAwarded` → `custom.loyalty_points_awarded`.
+   Map `loyaltyPoints` → customer metafield **`custom.loyalty_points`** (key: `loyalty_points`, not `custom_loyalty_points`).
 
    **Define outputs** (GraphQL):
 
    ```graphql
    type Output {
-     "The new loyalty points total as a string"
+     "The customer's new loyalty points balance after deduction"
      newLoyaltyPoints: String!
    }
    ```
 
+   The code mirrors the award flow: `earned = Math.round(order total)`, then `new balance = current - earned` (minimum 0). It tries subtotal first, then falls back to other order totals because cancelled orders often report `0` subtotal.
+
 4. **Action:** Update customer metafield → `custom.loyalty_points` = **Run code → newLoyaltyPoints**
 
-   Important: the key must be `loyalty_points` (not `custom_loyalty_points`) to match the award flow and theme.
+   Important: the key must be `loyalty_points` to match the award flow and theme.
 
-5. **Action:** Update order metafield → `custom.loyalty_points_awarded` = `0` (only if you use the order metafield on the award flow)
-
-This deducts the points that were awarded for that order. Unpaid cancelled orders are skipped automatically. The balance never goes below zero.
+Or import `shopify-flow/Deduct loyalty points on order cancelled.flow` directly in Flow.
 
 ### 4. Theme settings
 
