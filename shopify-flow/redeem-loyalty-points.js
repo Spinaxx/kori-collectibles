@@ -2,12 +2,19 @@
 //
 // Trigger: Metaobject entry created (your "Redeem loyalty points" Shopify Form)
 //
-// Input (GraphQL) — NO aliases, NO root "customer". Use field names only:
+// BEFORE Run code: add a Log output step and register metafields (Flow requirement).
+//   1. Add action → Log output (on the same Yes branch, before Run code)
+//   2. Add variable → Metaobject → formSubmittedBy → metafield custom.loyalty_points
+//      (alias name: loyaltyPoints)
+//   3. Add variable → Metaobject → formSubmittedBy → metafield custom.loyalty_redeem_code
+//      (alias name: loyaltyRedeemCode)
+//   4. Log message can be anything, e.g. {{ metaobject.formSubmittedBy.id }}
+//
+// Input (GraphQL) — only AFTER metafields are registered via Log output:
 // query {
 //   metaobject {
 //     formSubmittedBy {
 //       id
-//       email
 //       loyaltyPoints {
 //         value
 //       }
@@ -18,9 +25,7 @@
 //   }
 // }
 //
-// After pasting the query, use the input mapper (do not type metafield() in the query):
-//   loyaltyPoints      → Customer metafield custom.loyalty_points
-//   loyaltyRedeemCode  → Customer metafield custom.loyalty_redeem_code
+// Do NOT use: root "customer", email field, or metafield() aliases in the query.
 //
 // Define outputs (GraphQL):
 // type Output {
