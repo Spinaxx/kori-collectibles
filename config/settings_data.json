@@ -40,6 +40,13 @@
     "loyalty_redeem_proxy_url": "/apps/kori-loyalty/redeem",
     "empty_cart_message": "Your cart is empty - the binder awaits.",
     "cart_free_shipping_threshold": "40",
-    "content_for_index": []
+    "content_for_index": [],
+    "blocks": {
+      "13768625480086291342": {
+        "type": "shopify://apps/forms/blocks/forms/8744a304-fcb1-4347-b211-bb6b4759a76a",
+        "disabled": false,
+        "settings": {}
+      }
+    }
   }
 }

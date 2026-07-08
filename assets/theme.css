@@ -777,97 +777,16 @@ ul {
   color: var(--accent);
 }
 
-.loyalty-redeem-modal[hidden] {
-  display: none !important;
-}
-
-.loyalty-redeem-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 140;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem 1rem;
-  pointer-events: none;
-}
-
-.loyalty-redeem-modal.is-open {
-  pointer-events: auto;
-}
-
-.loyalty-redeem-modal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(8, 10, 14, 0.72);
-  backdrop-filter: blur(4px);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.loyalty-redeem-modal.is-open .loyalty-redeem-modal__backdrop {
-  opacity: 1;
-}
-
-.loyalty-redeem-modal__panel {
-  position: relative;
-  z-index: 1;
-  width: min(28rem, 100%);
-  max-height: min(34rem, calc(100vh - 3rem));
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) + 2px);
-  background:
-    linear-gradient(165deg, rgba(45, 212, 191, 0.1), transparent 42%),
-    var(--surface);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
-  overflow: hidden;
-  transform: translateY(0.75rem) scale(0.98);
-  opacity: 0;
-  transition: transform 0.22s ease, opacity 0.22s ease;
-}
-
-.loyalty-redeem-modal.is-open .loyalty-redeem-modal__panel {
-  transform: translateY(0) scale(1);
-  opacity: 1;
-}
-
-.loyalty-redeem-modal__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 1rem 1rem 0.75rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.loyalty-redeem-modal__eyebrow {
-  margin: 0 0 0.2rem;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.loyalty-redeem-modal__title {
-  margin: 0;
-  font-size: 1.1rem;
-  line-height: 1.2;
-}
-
-.loyalty-redeem-modal__body {
-  padding: 1rem;
-  overflow: auto;
-}
-
-.loyalty-redeem-modal__hint {
-  margin: 0;
-  padding: 0.75rem 1rem 1rem;
+.loyalty-redeem__form-slot {
+  margin-top: 1rem;
+  padding-top: 1rem;
   border-top: 1px solid var(--border);
-  font-size: 0.82rem;
-  color: var(--muted);
+}
+
+.loyalty-redeem__form-slot--highlight {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: var(--radius);
 }
 
 .loyalty-redeem__form-note {
