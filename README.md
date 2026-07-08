@@ -137,6 +137,8 @@ Create a second workflow:
 
 4. **Action:** Update customer metafield → `custom.loyalty_points` = **Run code → newLoyaltyPoints**
 
+   Important: the key must be `loyalty_points` (not `custom_loyalty_points`) to match the award flow and theme.
+
 5. **Action:** Update order metafield → `custom.loyalty_points_awarded` = `0` (only if you use the order metafield on the award flow)
 
 This deducts the points that were awarded for that order. Unpaid cancelled orders are skipped automatically. The balance never goes below zero.
