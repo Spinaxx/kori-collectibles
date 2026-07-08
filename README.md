@@ -155,6 +155,8 @@ Create a second workflow:
 
 Or import `shopify-flow/Deduct loyalty points on order cancelled.flow` directly in Flow.
 
+**Import tip:** Shopify `.flow` files include a SHA256 checksum prefix. If import fails, use the file from the repo as-is (do not edit it by hand), or run `python3 shopify-flow/build-flow.py` to regenerate it. Import the file named `Deduct loyalty points on order cancelled.flow` (not a copy with `(1)` in the name).
+
 ### 4. Theme settings
 
 **Theme settings → Loyalty rewards**
