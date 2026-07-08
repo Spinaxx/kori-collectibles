@@ -113,12 +113,32 @@ query {
 
 If errors persist, step 3 is incomplete — save the workflow after Log output, then reopen Run code.
 
-**Outputs** — Flow should detect these from the script; if prompted, define:
+**Define outputs (GraphQL)** — paste this in the **Define outputs** box on the Run code step. Flow will **not** show `loyaltyPointsTagRemove` (or the other tag fields) until this block is saved:
 
-- `discountCode` (String)
-- `newLoyaltyPoints` (String)
-- `redeemValueGbp` (String)
-- `reused` (String)
+```graphql
+type Output {
+  "Discount code to create (empty if not eligible)"
+  discountCode: String!
+  "Customer points balance after redemption"
+  newLoyaltyPoints: String!
+  "GBP value of the reward"
+  redeemValueGbp: String!
+  "true when customer already has an unused code"
+  reused: String!
+  "Customer tag for the new balance"
+  loyaltyPointsTag: String!
+  "Customer tag to remove before updating balance"
+  loyaltyPointsTagRemove: String!
+  "Customer tag for the active discount code"
+  loyaltyCodeTag: String!
+  "Previous code tag to remove (empty if none)"
+  loyaltyCodeTagRemove: String!
+}
+```
+
+Then **re-paste** the JavaScript from `shopify-flow/redeem-loyalty-points.js` (the `export default function main` part), **Save** the workflow, and reopen the Run code step. The tag outputs should appear under **Run code** in the variable picker.
+
+If they still do not appear, delete the Run code step, add a new one, paste input query + outputs + script again, and reconnect the following steps.
 
 ### Step 5 — Condition (has a code)
 
@@ -246,6 +266,7 @@ Check **Flow → Run history** if anything fails.
 | Run code GraphQL errors | No root `customer`, no `email`, no `metafield()` aliases in the query |
 | Run code shows 0 points | Confirm Log output aliases; metafield key is `loyalty_points` not `custom_loyalty_points` |
 | `newLoyaltyPoints` not in metafield step | Pick it from **Run code** outputs in the variable picker — do not type it |
+| `loyaltyPointsTagRemove` not in variable picker | Paste the full **Define outputs** GraphQL block from step 4 (includes all four tag fields). Save workflow, re-paste JS, reopen Run code. |
 | Discount create fails | Store needs discount permissions; try hardcoded `"amount": "5.00"` |
 | No code on storefront | Add **step 9** (metafield) and **step 10** (customer tags). |
 | Code/balance in admin but not on site | Add customer tags (step 10). Metafields alone are not enough for the theme. |
