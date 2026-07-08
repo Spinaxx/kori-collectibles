@@ -58,6 +58,8 @@ Admin → **Settings → Custom data → Orders → Add definition**
 
 ### 2. Award points (order paid)
 
+Full step-by-step: [`shopify-flow/AWARD-CANCEL-SETUP.md`](shopify-flow/AWARD-CANCEL-SETUP.md)
+
 Apps → **Flow** → Create workflow:
 
 1. **Trigger:** Order paid
@@ -147,10 +149,13 @@ Mirror the award flow:
    **Define outputs** (GraphQL):
 
    ```graphql
-   "The output of Run Code"
    type Output {
      "The new loyalty points total"
      newLoyaltyPoints: String!
+     "Customer tag to add"
+     loyaltyPointsTag: String!
+     "Customer tag to remove first"
+     loyaltyPointsTagRemove: String!
    }
    ```
 
@@ -159,9 +164,13 @@ Mirror the award flow:
    - Metafield: namespace `custom`, key `loyalty_points`
    - Value: **Add variable** → **Run code** → **newLoyaltyPoints**
 
+5. **Remove customer tags** → **Run code → loyaltyPointsTagRemove**
+
+6. **Add customer tags** → **Run code → loyaltyPointsTag**
+
 The code does: `new balance = current balance - round(order total)`, minimum 0. It falls back to `totalPriceSet` if subtotal is `0` on cancelled orders.
 
-Or import `shopify-flow/Deduct loyalty points on order cancelled.flow` directly in Flow, then re-check the `loyaltyPoints` mapping in Run code inputs.
+Full step-by-step: [`shopify-flow/AWARD-CANCEL-SETUP.md`](shopify-flow/AWARD-CANCEL-SETUP.md)
 
 ### 4. Redeem points (Shopify Flow — recommended)
 

@@ -1,35 +1,6 @@
 {%- liquid
   assign redeem_value = redeem_value | default: settings.loyalty_redeem_value_gbp | default: 5
-  assign loyalty_redeem_code = active_redeem_code | default: loyalty_redeem_code | strip
-
-  if loyalty_redeem_code == blank and customer
-    for tag in customer.tags
-      assign tag_stripped = tag | strip
-      if tag_stripped contains 'loyalty-code:'
-        assign code_from_tag = tag_stripped | split: 'loyalty-code:' | last | strip
-        if code_from_tag != blank
-          assign loyalty_redeem_code = code_from_tag
-        endif
-      endif
-    endfor
-  endif
-
-  if loyalty_redeem_code == blank and customer
-    assign redeem_code_key = settings.loyalty_redeem_code_metafield | default: 'custom.loyalty_redeem_code' | strip
-    assign redeem_code_parts = redeem_code_key | split: '.'
-    assign redeem_code_ns = redeem_code_parts[0] | strip
-    assign redeem_code_id = redeem_code_parts[1] | strip
-    assign code_from_metafield = blank
-
-    if redeem_code_ns != blank and redeem_code_id != blank
-      assign code_from_metafield = customer.metafields[redeem_code_ns][redeem_code_id].value
-    endif
-    if code_from_metafield == blank
-      assign code_from_metafield = customer.metafields.custom.loyalty_redeem_code.value
-    endif
-    assign loyalty_redeem_code = code_from_metafield | strip
-  endif
-
+  assign loyalty_redeem_code = active_redeem_code | strip
   assign has_code = false
   if loyalty_redeem_code != blank
     assign has_code = true
