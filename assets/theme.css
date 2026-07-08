@@ -994,15 +994,15 @@ ul {
 .game-tile {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  padding: 1rem 0.85rem 0.95rem;
+  gap: 0.65rem;
+  padding: 1.1rem 0.95rem 0.95rem;
   background:
     linear-gradient(160deg, rgba(45, 212, 191, 0.08), transparent 45%),
     var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   transition: border-color 0.15s, transform 0.15s, background 0.15s;
-  min-height: 132px;
+  min-height: 126px;
 }
 
 .game-tile:hover {
@@ -1014,26 +1014,24 @@ ul {
 }
 
 .game-tile__logo {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 0.75rem;
-  background: rgba(242, 240, 235, 0.04);
-  border: 1px solid rgba(242, 240, 235, 0.08);
-  color: var(--accent);
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 2.75rem;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
   flex-shrink: 0;
 }
 
 .game-tile__logo img {
-  width: 1.65rem;
-  height: 1.65rem;
+  width: auto;
+  max-width: 100%;
+  height: 2.55rem;
   object-fit: contain;
-}
-
-.game-tile__mark {
-  filter: brightness(0) saturate(100%) invert(79%) sepia(29%) saturate(620%) hue-rotate(120deg) brightness(95%) contrast(92%);
+  object-position: left center;
 }
 
 .game-tile__label {

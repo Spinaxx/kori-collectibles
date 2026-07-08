@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-  <rect x="18" y="14" width="28" height="36" rx="3" stroke="currentColor" stroke-width="3"/>
-  <path d="M24 24h16M24 32h16M24 40h10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M38 44h8v6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" role="img" aria-label="Accessories">
+  <rect x="12" y="18" width="54" height="84" rx="6" fill="none" stroke="#2DD4BF" stroke-width="5"/>
+  <path d="M28 40h22M28 58h22M28 76h14" stroke="#2DD4BF" stroke-width="5" stroke-linecap="round"/>
+  <text x="86" y="78" fill="#F2F0EB" font-family="'Space Grotesk', Arial, sans-serif" font-size="46" font-weight="700" letter-spacing="1">ACCESSORIES</text>
 </svg>

@@ -65,7 +65,8 @@
             "meta": "Singles · Sealed",
             "link": "shopify://collections/pokemon",
             "logo": "shopify://shop_images/Pokemon_Trading_Card_Game_logo_svg.webp",
-            "logo_key": "pokemon"
+            "logo_key": "pokemon",
+            "show_title": false
           }
         },
         "g2": {
@@ -74,7 +75,8 @@
             "title": "Yu-Gi-Oh!",
             "meta": "Singles · Sealed",
             "link": "",
-            "logo_key": "yugioh"
+            "logo_key": "yugioh",
+            "show_title": false
           }
         },
         "g3": {
@@ -83,7 +85,8 @@
             "title": "Magic",
             "meta": "Singles · Sealed",
             "link": "",
-            "logo_key": "magic"
+            "logo_key": "magic",
+            "show_title": false
           }
         },
         "g4": {
@@ -92,7 +95,8 @@
             "title": "One Piece",
             "meta": "Sealed",
             "link": "",
-            "logo_key": "onepiece"
+            "logo_key": "onepiece",
+            "show_title": false
           }
         },
         "g5": {
@@ -101,7 +105,8 @@
             "title": "Lorcana",
             "meta": "Sealed",
             "link": "",
-            "logo_key": "lorcana"
+            "logo_key": "lorcana",
+            "show_title": false
           }
         },
         "g6": {
@@ -110,7 +115,8 @@
             "title": "Accessories",
             "meta": "Sleeves · Binders",
             "link": "",
-            "logo_key": "accessories"
+            "logo_key": "accessories",
+            "show_title": false
           }
         }
       },

@@ -33,7 +33,7 @@
             when 'pokemon'
               assign logo_asset = 'logo-pokemon.svg'
             when 'yugioh'
-              assign logo_asset = 'logo-yugioh.svg'
+              assign logo_asset = 'logo-yugioh.png'
             when 'magic'
               assign logo_asset = 'logo-magic.svg'
             when 'onepiece'
@@ -45,38 +45,38 @@
           endcase
         -%}
         <a
-          class="game-tile{% if block.settings.logo != blank %} game-tile--has-logo{% endif %}"
+          class="game-tile"
           href="{% if block.settings.link != blank %}{{ block.settings.link }}{% else %}{{ routes.collections_url }}{% endif %}"
           {{ block.shopify_attributes }}
         >
-          {%- if block.settings.logo != blank -%}
-            <span class="game-tile__logo game-tile__logo--custom" aria-hidden="true">
+          <span class="game-tile__logo" aria-hidden="true">
+            {%- if block.settings.logo != blank -%}
               <img
-                src="{{ block.settings.logo | image_url: width: 320 }}"
-                srcset="{{ block.settings.logo | image_url: width: 160 }} 160w, {{ block.settings.logo | image_url: width: 240 }} 240w, {{ block.settings.logo | image_url: width: 320 }} 320w"
-                sizes="96px"
+                src="{{ block.settings.logo | image_url: width: 360 }}"
+                srcset="{{ block.settings.logo | image_url: width: 180 }} 180w, {{ block.settings.logo | image_url: width: 280 }} 280w, {{ block.settings.logo | image_url: width: 360 }} 360w"
+                sizes="120px"
                 alt=""
-                width="96"
+                width="120"
                 height="48"
                 loading="lazy"
               >
-            </span>
-          {%- else -%}
-            <span class="game-tile__logo game-tile__logo--mark" aria-hidden="true">
+            {%- else -%}
               <img
-                class="game-tile__mark"
                 src="{{ logo_asset | asset_url }}"
                 alt=""
-                width="40"
-                height="40"
+                width="120"
+                height="48"
                 loading="lazy"
               >
-            </span>
+            {%- endif -%}
+          </span>
+          {%- if block.settings.show_title -%}
+            <span class="game-tile__label">{{ block.settings.title | escape }}</span>
           {%- endif -%}
-          <span class="game-tile__label">{{ block.settings.title | escape }}</span>
           {%- if block.settings.meta != blank -%}
             <span class="game-tile__meta">{{ block.settings.meta | escape }}</span>
           {%- endif -%}
+          <span class="visually-hidden">{{ block.settings.title | escape }}</span>
         </a>
       {%- endfor -%}
     </div>
@@ -112,6 +112,12 @@
           "default": "Pokemon"
         },
         {
+          "type": "checkbox",
+          "id": "show_title",
+          "label": "Show title under logo",
+          "default": false
+        },
+        {
           "type": "text",
           "id": "meta",
           "label": "Meta",
@@ -125,14 +131,13 @@
         {
           "type": "image_picker",
           "id": "logo",
-          "label": "Official logo",
-          "info": "Upload the official game logo (PNG/SVG with transparent background). Recommended. No border is shown around custom logos."
+          "label": "Override logo",
+          "info": "Optional. Leave empty to use the built-in official logo."
         },
         {
           "type": "select",
           "id": "logo_key",
-          "label": "Fallback mark",
-          "info": "Only used when no official logo is uploaded.",
+          "label": "Built-in logo",
           "default": "auto",
           "options": [
             { "value": "auto", "label": "Auto from title" },
@@ -151,12 +156,12 @@
     {
       "name": "Game grid",
       "blocks": [
-        { "type": "game", "settings": { "title": "Pokemon", "meta": "Singles · Sealed", "logo_key": "pokemon" } },
-        { "type": "game", "settings": { "title": "Yu-Gi-Oh!", "meta": "Singles · Sealed", "logo_key": "yugioh" } },
-        { "type": "game", "settings": { "title": "Magic", "meta": "Singles · Sealed", "logo_key": "magic" } },
-        { "type": "game", "settings": { "title": "One Piece", "meta": "Sealed", "logo_key": "onepiece" } },
-        { "type": "game", "settings": { "title": "Lorcana", "meta": "Sealed", "logo_key": "lorcana" } },
-        { "type": "game", "settings": { "title": "Accessories", "meta": "Sleeves · Binders", "logo_key": "accessories" } }
+        { "type": "game", "settings": { "title": "Pokemon", "meta": "Singles · Sealed", "logo_key": "pokemon", "show_title": false } },
+        { "type": "game", "settings": { "title": "Yu-Gi-Oh!", "meta": "Singles · Sealed", "logo_key": "yugioh", "show_title": false } },
+        { "type": "game", "settings": { "title": "Magic", "meta": "Singles · Sealed", "logo_key": "magic", "show_title": false } },
+        { "type": "game", "settings": { "title": "One Piece", "meta": "Sealed", "logo_key": "onepiece", "show_title": false } },
+        { "type": "game", "settings": { "title": "Lorcana", "meta": "Sealed", "logo_key": "lorcana", "show_title": false } },
+        { "type": "game", "settings": { "title": "Accessories", "meta": "Sleeves · Binders", "logo_key": "accessories", "show_title": false } }
       ]
     }
   ]
