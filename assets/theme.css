@@ -458,7 +458,8 @@ ul {
 }
 
 .cart-drawer__loyalty-link {
-  margin: 0;
+  display: inline-block;
+  margin-top: 0.35rem;
   padding: 0;
   border: 0;
   background: none;
@@ -470,16 +471,28 @@ ul {
   text-underline-offset: 0.15em;
 }
 
+.cart-drawer__loyalty-line {
+  margin: 0;
+}
+
 /* Loyalty panel (Smile-style) */
 
 .loyalty-widget {
+  position: relative;
+}
+
+.loyalty-widget__modal {
   position: fixed;
   inset: 0;
   z-index: 135;
   pointer-events: none;
 }
 
-.loyalty-widget.is-open {
+.loyalty-widget__modal[hidden] {
+  display: none !important;
+}
+
+.loyalty-widget.is-open .loyalty-widget__modal {
   pointer-events: auto;
 }
 
@@ -487,7 +500,7 @@ ul {
   position: fixed;
   right: 1rem;
   bottom: 1rem;
-  z-index: 2;
+  z-index: 145;
   display: flex;
   align-items: center;
   justify-content: center;

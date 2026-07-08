@@ -27,38 +27,41 @@
   if customer and balance >= redeem_points
     assign can_redeem = true
   endif
+
+  assign rewards_url = pages.rewards.url | default: '/pages/rewards'
+  if settings.loyalty_page != blank and settings.loyalty_page.url != blank
+    assign rewards_url = settings.loyalty_page.url
+  endif
 -%}
 
 <div class="loyalty-widget" data-loyalty-widget>
-  {%- if settings.loyalty_show_launcher -%}
-    <button
-      type="button"
-      class="loyalty-launcher"
-      data-open-loyalty-panel
-      aria-expanded="false"
-      aria-controls="LoyaltyPanel"
-      aria-label="Open rewards"
-    >
-      <svg class="loyalty-launcher__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path fill="currentColor" d="M12 2l2.2 6.8H21l-5.5 4 2.1 6.7L12 15.8 6.4 19.5l2.1-6.7L3 8.8h6.8L12 2z"/>
-      </svg>
-      {%- if customer and balance > 0 -%}
-        <span class="loyalty-launcher__badge">{{ balance }}</span>
-      {%- endif -%}
-    </button>
-  {%- endif -%}
-
-  <div class="loyalty-panel__backdrop" data-loyalty-backdrop data-close-loyalty-panel hidden></div>
-
-  <div
-    class="loyalty-panel"
-    id="LoyaltyPanel"
-    data-loyalty-panel
-    role="dialog"
-    aria-modal="true"
-    aria-label="{{ program_name | escape }}"
-    hidden
+  <button
+    type="button"
+    class="loyalty-launcher"
+    data-open-loyalty-panel
+    aria-expanded="false"
+    aria-controls="LoyaltyPanel"
+    aria-label="Open rewards"
   >
+    <svg class="loyalty-launcher__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path fill="currentColor" d="M12 2l2.2 6.8H21l-5.5 4 2.1 6.7L12 15.8 6.4 19.5l2.1-6.7L3 8.8h6.8L12 2z"/>
+    </svg>
+    {%- if customer and balance > 0 -%}
+      <span class="loyalty-launcher__badge">{{ balance }}</span>
+    {%- endif -%}
+  </button>
+
+  <div class="loyalty-widget__modal" data-loyalty-modal hidden>
+    <div class="loyalty-panel__backdrop" data-loyalty-backdrop data-close-loyalty-panel></div>
+
+    <div
+      class="loyalty-panel"
+      id="LoyaltyPanel"
+      data-loyalty-panel
+      role="dialog"
+      aria-modal="true"
+      aria-label="{{ program_name | escape }}"
+    >
     <div class="loyalty-panel__header">
       <div>
         <p class="loyalty-panel__eyebrow">Rewards</p>
@@ -112,9 +115,7 @@
           </div>
         </section>
 
-        {%- if settings.loyalty_page != blank -%}
-          <a class="loyalty-panel__link" href="{{ settings.loyalty_page.url }}">Full program details</a>
-        {%- endif -%}
+        <a class="loyalty-panel__link" href="{{ rewards_url }}">Full program details</a>
       {%- else -%}
         <div class="loyalty-panel__guest">
           <p class="loyalty-panel__guest-title">Join free &amp; earn on every order</p>
@@ -140,5 +141,6 @@
         </section>
       {%- endif -%}
     </div>
+  </div>
   </div>
 </div>

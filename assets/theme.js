@@ -927,15 +927,14 @@
     const widget = qs('[data-loyalty-widget]');
     if (!widget) return;
 
+    const modal = qs('[data-loyalty-modal]', widget);
     const panel = qs('[data-loyalty-panel]', widget);
-    const backdrop = qs('[data-loyalty-backdrop]', widget);
     let open = false;
 
     const setOpen = (next) => {
       open = next;
       widget.classList.toggle('is-open', open);
-      if (panel) panel.hidden = !open;
-      if (backdrop) backdrop.hidden = !open;
+      if (modal) modal.hidden = !open;
       document.documentElement.style.overflow = open ? 'hidden' : '';
       qsa('[data-open-loyalty-panel]').forEach((btn) => {
         btn.setAttribute('aria-expanded', String(open));
