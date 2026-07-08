@@ -41,8 +41,11 @@ Admin → **Settings → Custom data → Customers → Add definition**
 - Name: `Loyalty points`
 - Namespace and key: `custom.loyalty_points`
 - Type: **Integer**
+- **Storefront API access:** read (required for the theme to display the balance)
 
 **Only use this one definition.** Do not create a second metafield with key `custom_loyalty_points` — that is a different field and causes award/cancel/theme to disagree on the balance.
+
+The storefront reads `custom.loyalty_points` everywhere via **Theme settings → Loyalty rewards → Customer points metafield** (default `custom.loyalty_points`). The rewards page uses the same source — it no longer has its own metafield setting.
 
 Admin → **Settings → Custom data → Orders → Add definition**
 

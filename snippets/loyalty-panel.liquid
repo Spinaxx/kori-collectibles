@@ -3,21 +3,15 @@
     break
   endif
 
-  assign points_key = settings.loyalty_points_metafield | default: 'custom.loyalty_points'
-  assign points_parts = points_key | split: '.'
-  assign points_ns = points_parts[0]
-  assign points_id = points_parts[1]
+  render 'loyalty-balance'
+
   assign points_rate = settings.loyalty_points_per_gbp | default: 1
   assign redeem_points = settings.loyalty_redeem_points | default: 100
   assign redeem_value = settings.loyalty_redeem_value_gbp | default: 5
   assign program_name = settings.loyalty_program_name | default: 'Kori Collectors Club'
   assign redeem_email = settings.loyalty_redeem_email | default: shop.email
   assign points_needed = redeem_points
-
-  assign balance = 0
-  if customer and points_ns != blank and points_id != blank
-    assign balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
-  endif
+  assign balance = loyalty_balance
 
   if customer and balance < redeem_points
     assign points_needed = redeem_points | minus: balance

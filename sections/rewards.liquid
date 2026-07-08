@@ -1,17 +1,11 @@
 {%- liquid
-  assign points_key = section.settings.points_metafield | default: settings.loyalty_points_metafield | default: 'custom.loyalty_points'
-  assign points_parts = points_key | split: '.'
-  assign points_ns = points_parts[0]
-  assign points_id = points_parts[1]
+  render 'loyalty-balance'
+
   assign points_rate = section.settings.points_per_gbp | default: settings.loyalty_points_per_gbp | default: 1
   assign redeem_points = section.settings.redeem_points | default: settings.loyalty_redeem_points | default: 100
   assign redeem_value = section.settings.redeem_value_gbp | default: settings.loyalty_redeem_value_gbp | default: 5
 
-  assign balance = 0
-  if customer and points_ns != blank and points_id != blank
-    assign balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
-  endif
-
+  assign balance = loyalty_balance
   assign redeem_blocks = balance | divided_by: redeem_points | floor
   assign redeemable_gbp = redeem_blocks | times: redeem_value
 -%}
@@ -144,13 +138,6 @@
       "id": "intro",
       "label": "Introduction",
       "default": "Collect points every time you shop. The more you hunt, the more you save."
-    },
-    {
-      "type": "text",
-      "id": "points_metafield",
-      "label": "Customer points metafield",
-      "default": "custom.loyalty_points",
-      "info": "Must match the customer metafield used by Shopify Flow."
     },
     {
       "type": "range",
