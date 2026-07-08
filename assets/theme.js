@@ -112,6 +112,27 @@
     return `£${formatted}`;
   };
 
+  // Predictive search returns decimal currency strings (e.g. "1400.00"), not cents.
+  const formatSuggestMoney = (amount) => {
+    const value = Number(amount);
+    const safe = Number.isFinite(value) ? value : 0;
+    try {
+      return new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: (window.Shopify && Shopify.currency && Shopify.currency.active) || 'GBP',
+      }).format(safe);
+    } catch (err) {
+      return `£${safe.toFixed(2)}`;
+    }
+  };
+
+  const escapeHtml = (str) =>
+    String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+
   const initCartDrawer = () => {
     const drawer = qs('[data-cart-drawer]');
     if (!drawer) return;
@@ -147,13 +168,6 @@
         el.textContent = `Spend ${formatMoney(threshold - totalPrice, moneyFormat)} more for free UK delivery`;
       }
     };
-
-    const escapeHtml = (str) =>
-      String(str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
 
     const itemImage = (item) => {
       const src =
@@ -458,27 +472,6 @@
     });
   };
 
-  // Predictive search returns decimal currency strings (e.g. "1400.00"), not cents.
-  const formatMoney = (amount) => {
-    const value = Number(amount);
-    const safe = Number.isFinite(value) ? value : 0;
-    try {
-      return new Intl.NumberFormat('en-GB', {
-        style: 'currency',
-        currency: (window.Shopify && Shopify.currency && Shopify.currency.active) || 'GBP',
-      }).format(safe);
-    } catch (err) {
-      return `£${safe.toFixed(2)}`;
-    }
-  };
-
-  const escapeHtml = (str) =>
-    String(str || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-
   const initPredictiveSearch = () => {
     const forms = qsa('[data-predictive-search]');
     if (!forms.length) return;
@@ -516,7 +509,7 @@
               product.price_min != null && product.price_min !== ''
                 ? product.price_min
                 : product.price;
-            const price = formatMoney(priceValue);
+            const price = formatSuggestMoney(priceValue);
             const vendor = product.vendor
               ? `<div class="predictive__meta">${escapeHtml(product.vendor)}</div>`
               : '';
@@ -630,7 +623,7 @@
               <div class="card__body">
                 <div class="card__title">${escapeHtml(product.title)}</div>
                 <div class="card__footer">
-                  <span class="card__price">${escapeHtml(formatMoney(product.price))}</span>
+                  <span class="card__price">${escapeHtml(formatSuggestMoney(product.price))}</span>
                 </div>
               </div>
             </a>
