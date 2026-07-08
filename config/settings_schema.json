@@ -259,17 +259,28 @@
         "default": 5
       },
       {
+        "type": "select",
+        "id": "loyalty_redeem_method",
+        "label": "Redemption method",
+        "default": "flow",
+        "options": [
+          { "value": "flow", "label": "Shopify Flow + form (recommended)" },
+          { "value": "proxy", "label": "App proxy (instant code)" }
+        ],
+        "info": "Flow uses a Shopify Form submission to trigger redemption. See shopify-flow/REDEEM-SETUP.md."
+      },
+      {
         "type": "text",
         "id": "loyalty_redeem_email",
         "label": "Redemption email",
-        "info": "Fallback if instant redemption is unavailable. Defaults to your shop email."
+        "info": "Fallback contact if redemption fails. Defaults to your shop email."
       },
       {
         "type": "text",
         "id": "loyalty_redeem_proxy_url",
         "label": "Redemption app proxy URL",
         "default": "/apps/kori-loyalty/redeem",
-        "info": "See loyalty-redeem/README.md for one-time app proxy setup."
+        "info": "Only used when Redemption method is App proxy. See loyalty-redeem/README.md."
       },
       {
         "type": "paragraph",

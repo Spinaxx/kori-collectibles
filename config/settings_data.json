@@ -35,6 +35,7 @@
     "loyalty_points_metafield": "custom.loyalty_points",
     "loyalty_redeem_points": 100,
     "loyalty_redeem_value_gbp": 5,
+    "loyalty_redeem_method": "flow",
     "loyalty_redeem_email": "support@koricollectibles.co.uk",
     "loyalty_redeem_proxy_url": "/apps/kori-loyalty/redeem",
     "empty_cart_message": "Your cart is empty - the binder awaits.",

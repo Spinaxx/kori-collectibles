@@ -777,6 +777,24 @@ ul {
   color: var(--accent);
 }
 
+.loyalty-redeem__form-slot {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.loyalty-redeem__form-slot--highlight {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: var(--radius);
+}
+
+.loyalty-redeem__form-note {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
 .loyalty-redeem__actions {
   display: grid;
   gap: 0.5rem;

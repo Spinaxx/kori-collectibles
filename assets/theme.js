@@ -1002,12 +1002,13 @@
     };
 
     qsa('[data-loyalty-redeem]').forEach((root) => {
+      const method = root.dataset.redeemMethod || 'flow';
       const proxyUrl = root.dataset.proxyUrl;
       const fallbackEmail = root.dataset.fallbackEmail;
       const redeemPoints = root.dataset.redeemPoints || '100';
       const activeCode = root.dataset.activeCode;
 
-      if (activeCode) {
+      if (activeCode && !qs('[data-loyalty-redeem-code]', root)?.textContent?.trim()) {
         showCode(root, {
           code: activeCode,
           applyUrl: `/discount/${encodeURIComponent(activeCode)}`,
@@ -1015,11 +1016,23 @@
       }
 
       const trigger = qs('[data-loyalty-redeem-trigger]', root);
+      const formTrigger = qs('[data-loyalty-redeem-form-trigger]', root);
       const copyBtn = qs('[data-loyalty-redeem-copy]', root);
       const errorEl = qs('[data-loyalty-redeem-error]', root);
       const loadingEl = qs('[data-loyalty-redeem-loading]', root);
 
-      if (trigger && proxyUrl) {
+      if (formTrigger) {
+        formTrigger.addEventListener('click', () => {
+          const target = document.getElementById('loyalty-redeem-form');
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            target.classList.add('loyalty-redeem__form-slot--highlight');
+            setTimeout(() => target.classList.remove('loyalty-redeem__form-slot--highlight'), 2000);
+          }
+        });
+      }
+
+      if (trigger && proxyUrl && method === 'proxy') {
         trigger.addEventListener('click', async () => {
           if (loadingEl) loadingEl.hidden = false;
           if (errorEl) errorEl.hidden = true;

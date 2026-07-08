@@ -153,18 +153,20 @@ The code does: `new balance = current balance - round(order total)`, minimum 0. 
 
 Or import `shopify-flow/Deduct loyalty points on order cancelled.flow` directly in Flow, then re-check the `loyaltyPoints` mapping in Run code inputs.
 
-### 4. Redeem points (instant discount codes)
+### 4. Redeem points (Shopify Flow — recommended)
 
-Customers redeem from the **rewards page** or **loyalty panel** when they have enough points. The theme calls a small app proxy that:
+Flow can create discount codes and deduct points, but it **cannot start from a theme button click**. Use a **Shopify Form** so submission triggers Flow.
 
-1. Verifies the signed-in customer
-2. Creates a single-use £5 off discount code (default)
-3. Deducts 100 points from `custom.loyalty_points`
-4. Shows the code with **Apply to cart** / **Copy code**
+**Setup:** follow [`shopify-flow/REDEEM-SETUP.md`](shopify-flow/REDEEM-SETUP.md)
 
-**One-time setup:** follow [`loyalty-redeem/README.md`](loyalty-redeem/README.md) to deploy the handler and connect a Shopify custom app proxy at `/apps/kori-loyalty/redeem`.
+1. Create a **Redeem loyalty points** form in Shopify Forms
+2. Embed it on the rewards page (`#loyalty-redeem-form`)
+3. Flow trigger: **Metaobject entry created** → Run code (`redeem-loyalty-points.js`) → **Send Admin API request** → update metafields
+4. Customer submits the form → refreshes → sees code on the rewards page
 
-Optional customer metafield for active codes:
+**Optional:** App proxy for instant codes without a form — see [`loyalty-redeem/README.md`](loyalty-redeem/README.md). Set **Theme settings → Redemption method → App proxy**.
+
+Customer metafield for active codes:
 
 - Namespace and key: `custom.loyalty_redeem_code`
 - Type: **Single line text**
@@ -177,8 +179,8 @@ Optional customer metafield for active codes:
 - Enable rewards program
 - Show floating rewards button
 - Set redeem threshold (default 100 points = £5 off)
-- Redemption app proxy URL (default `/apps/kori-loyalty/redeem`)
-- Redemption email (fallback if instant redeem is unavailable)
+- **Redemption method** — Shopify Flow + form (default) or App proxy
+- Redemption email (fallback)
 
 ### 6. Optional rewards page
 
