@@ -36,7 +36,9 @@
         <div class="product__desc">{{ product.description }}</div>
       {%- endif -%}
 
-      {% form 'product', product, class: 'product-form', data-product-form: '', data-add-to-cart: 'products.add_to_cart' | t, data-sold-out: 'products.sold_out' | t %}
+      {%- assign product_add_label = 'products.add_to_cart' | t -%}
+      {%- assign product_sold_label = 'products.sold_out' | t -%}
+      {% form 'product', product, class: 'product-form', data-product-form: '', data-add-to-cart: product_add_label, data-sold-out: product_sold_label %}
         {%- assign current = product.selected_or_first_available_variant -%}
 
         {%- unless product.has_only_default_variant -%}
