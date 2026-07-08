@@ -7,10 +7,12 @@
     assign points_ns = points_parts[0] | strip
     assign points_id = points_parts[1] | strip
 
-    if points_ns == 'custom' and points_id == 'loyalty_points' and customer.metafields.custom.loyalty_points != blank
-      assign loyalty_balance = customer.metafields.custom.loyalty_points.value | default: 0 | plus: 0
-    elsif points_ns != blank and points_id != blank and customer.metafields[points_ns][points_id] != blank
+    if points_ns != blank and points_id != blank
       assign loyalty_balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
+    endif
+
+    if loyalty_balance == 0
+      assign loyalty_balance = customer.metafields.custom.loyalty_points.value | default: 0 | plus: 0
     endif
   endif
 -%}

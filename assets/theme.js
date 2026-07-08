@@ -965,7 +965,27 @@
     });
   };
 
+  const initLoyaltyBalanceSync = () => {
+    const raw = document.body.dataset.loyaltyBalance;
+    if (raw === undefined || raw === '') return;
+
+    const layoutBalance = Number(raw);
+    if (Number.isNaN(layoutBalance)) return;
+
+    qsa('[data-loyalty-balance]').forEach((el) => {
+      const current = el.textContent.trim();
+      if (current === '' || current === '0') {
+        el.textContent = String(layoutBalance);
+      }
+    });
+  };
+
   const boot = () => {
+    try {
+      initLoyaltyBalanceSync();
+    } catch (err) {
+      console.error('initLoyaltyBalanceSync failed', err);
+    }
     try {
       initAnnouncementMarquee();
     } catch (err) {

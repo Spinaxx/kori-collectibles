@@ -1,11 +1,24 @@
-{%- include 'loyalty-balance' -%}
-
 {%- liquid
+  assign balance = 0
+
+  if customer
+    assign points_key = settings.loyalty_points_metafield | default: 'custom.loyalty_points' | strip
+    assign points_parts = points_key | split: '.'
+    assign points_ns = points_parts[0] | strip
+    assign points_id = points_parts[1] | strip
+
+    if points_ns != blank and points_id != blank
+      assign balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
+    endif
+
+    if balance == 0
+      assign balance = customer.metafields.custom.loyalty_points.value | default: 0 | plus: 0
+    endif
+  endif
+
   assign points_rate = section.settings.points_per_gbp | default: settings.loyalty_points_per_gbp | default: 1
   assign redeem_points = section.settings.redeem_points | default: settings.loyalty_redeem_points | default: 100
   assign redeem_value = section.settings.redeem_value_gbp | default: settings.loyalty_redeem_value_gbp | default: 5
-
-  assign balance = loyalty_balance | default: 0 | plus: 0
   assign redeem_blocks = balance | divided_by: redeem_points | floor
   assign redeemable_gbp = redeem_blocks | times: redeem_value
 -%}

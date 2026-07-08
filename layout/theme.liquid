@@ -64,7 +64,7 @@
     {{ content_for_header }}
   </head>
 
-  <body>
+  <body{% if customer %} data-loyalty-balance="{{ loyalty_balance | default: 0 }}"{% endif %}>
     <a class="skip-link" href="#MainContent">Skip to content</a>
 
     {%- assign main_menu = linklists[settings.menu] -%}
