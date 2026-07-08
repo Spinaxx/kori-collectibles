@@ -145,11 +145,54 @@
     const contents = qs('[data-cart-contents]', drawer);
     const footer = qs('[data-cart-footer]', drawer);
 
+    let closeTimer = null;
+
     const setOpen = (open) => {
-      drawer.hidden = !open;
-      drawer.classList.toggle('is-open', open);
       qsa('[data-open-cart]').forEach((btn) => btn.setAttribute('aria-expanded', String(open)));
       document.documentElement.style.overflow = open ? 'hidden' : '';
+
+      if (closeTimer) {
+        clearTimeout(closeTimer);
+        closeTimer = null;
+      }
+
+      if (open) {
+        drawer.hidden = false;
+        // Force layout so the slide-in transition runs after becoming visible.
+        void drawer.offsetWidth;
+        requestAnimationFrame(() => {
+          drawer.classList.add('is-open');
+        });
+        return;
+      }
+
+      const panel = qs('.cart-drawer__panel', drawer);
+      const finishClose = () => {
+        drawer.classList.remove('is-open');
+        drawer.hidden = true;
+        if (panel) panel.removeEventListener('transitionend', onEnd);
+        if (closeTimer) {
+          clearTimeout(closeTimer);
+          closeTimer = null;
+        }
+      };
+      const onEnd = (e) => {
+        if (e.target !== panel || e.propertyName !== 'transform') return;
+        finishClose();
+      };
+
+      if (!drawer.classList.contains('is-open')) {
+        finishClose();
+        return;
+      }
+
+      drawer.classList.remove('is-open');
+      if (!panel) {
+        finishClose();
+        return;
+      }
+      panel.addEventListener('transitionend', onEnd);
+      closeTimer = setTimeout(finishClose, 320);
     };
 
     const updateCountBadge = (count) => {
