@@ -5,14 +5,60 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import time
+import uuid
 from pathlib import Path
 
 FORM_ID = "1063387"
-META_DEFINITION_GID = f"gid://shopify/MetaobjectDefinition/{FORM_ID}"
 
-SCRIPT_PATH = Path(__file__).with_name("redeem-loyalty-points.js")
-SCRIPT = SCRIPT_PATH.read_text(encoding="utf-8").split("export default function main", 1)[1]
-SCRIPT = "export default function main" + SCRIPT.split("// Next steps in Flow", 1)[0].rstrip()
+SCRIPT = """const REDEEM_POINTS = 100;
+const REDEEM_VALUE_GBP = 5;
+
+export default function main(input) {
+  const customer = input.customer ?? input.metaobject?.formSubmittedBy;
+
+  if (!customer) {
+    return {
+      discountCode: '',
+      newLoyaltyPoints: '0',
+      redeemValueGbp: String(REDEEM_VALUE_GBP),
+      reused: 'false',
+    };
+  }
+
+  const current = Number(customer.loyaltyPoints?.value ?? 0);
+  const existingCode = String(customer.loyaltyRedeemCode?.value ?? '').trim();
+
+  if (existingCode) {
+    return {
+      discountCode: existingCode,
+      newLoyaltyPoints: String(current),
+      redeemValueGbp: String(REDEEM_VALUE_GBP),
+      reused: 'true',
+    };
+  }
+
+  if (current < REDEEM_POINTS) {
+    return {
+      discountCode: '',
+      newLoyaltyPoints: String(current),
+      redeemValueGbp: String(REDEEM_VALUE_GBP),
+      reused: 'false',
+    };
+  }
+
+  const customerId = String(customer.id ?? '').replace(/\\D/g, '') || '0';
+  const code = `KORI-${customerId}-${Date.now().toString(36).toUpperCase()}`;
+  const newBalance = Math.max(0, current - REDEEM_POINTS);
+
+  return {
+    discountCode: code,
+    newLoyaltyPoints: String(newBalance),
+    redeemValueGbp: String(REDEEM_VALUE_GBP),
+    reused: 'false',
+  };
+}"""
 
 INPUT_QUERY = """query {
   metaobject {
@@ -43,108 +89,61 @@ OUTPUT_SCHEMA = (
     "}"
 )
 
-CONDITION_CUSTOMER = {
-    "uuid": "01KX2REDEEM000000000000001",
-    "lhs": {
-        "uuid": "01KX2REDEEM000000000000002",
-        "parent_uuid": "01KX2REDEEM000000000000001",
-        "lhs": {
-            "uuid": "01KX2REDEEM000000000000003",
-            "parent_uuid": "01KX2REDEEM000000000000002",
-            "value": "metaobject.formSubmittedBy.id",
-            "comparison_value_type": "EnvironmentValue",
-            "full_environment_path": "metaobject.formSubmittedBy.id",
-        },
-        "rhs": {
-            "uuid": "01KX2REDEEM000000000000004",
-            "parent_uuid": "01KX2REDEEM000000000000002",
-            "value": "",
-            "comparison_value_type": "LiteralValue",
-        },
-        "value_type": "EnvironmentScalarDefinition:ID",
-        "operator": "not_empty_and_not_nil?",
-        "operation_type": "Comparison",
-    },
-    "operator": "AND",
-    "operation_type": "LogicalExpression",
-}
+ULID_ENCODING = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 
-CONDITION_CODE = {
-    "uuid": "01KX2REDEEM000000000000005",
-    "lhs": {
-        "uuid": "01KX2REDEEM000000000000006",
-        "parent_uuid": "01KX2REDEEM000000000000005",
-        "lhs": {
-            "uuid": "01KX2REDEEM000000000000007",
-            "parent_uuid": "01KX2REDEEM000000000000006",
-            "value": "runCode.discountCode",
-            "comparison_value_type": "EnvironmentValue",
-            "full_environment_path": "runCode.discountCode",
-        },
-        "rhs": {
-            "uuid": "01KX2REDEEM000000000000008",
-            "parent_uuid": "01KX2REDEEM000000000000006",
-            "value": "",
-            "comparison_value_type": "LiteralValue",
-        },
-        "value_type": "EnvironmentScalarDefinition:String",
-        "operator": "not_empty_and_not_nil?",
-        "operation_type": "Comparison",
-    },
-    "operator": "AND",
-    "operation_type": "LogicalExpression",
-}
 
-CONDITION_NOT_REUSED = {
-    "uuid": "01KX2REDEEM000000000000009",
-    "lhs": {
-        "uuid": "01KX2REDEEM00000000000000A",
-        "parent_uuid": "01KX2REDEEM000000000000009",
-        "lhs": {
-            "uuid": "01KX2REDEEM00000000000000B",
-            "parent_uuid": "01KX2REDEEM00000000000000A",
-            "value": "runCode.reused",
-            "comparison_value_type": "EnvironmentValue",
-            "full_environment_path": "runCode.reused",
-        },
-        "rhs": {
-            "uuid": "01KX2REDEEM00000000000000C",
-            "parent_uuid": "01KX2REDEEM00000000000000A",
-            "value": "false",
-            "comparison_value_type": "LiteralValue",
-        },
-        "value_type": "EnvironmentScalarDefinition:String",
-        "operator": "==",
-        "operation_type": "Comparison",
-    },
-    "operator": "AND",
-    "operation_type": "LogicalExpression",
-}
+def new_step_id() -> str:
+    return str(uuid.uuid4())
 
-DISCOUNT_MUTATION_INPUTS = {
-    "basicCodeDiscount": {
-        "title": "Loyalty reward {{ runCode.discountCode }}",
-        "code": "{{ runCode.discountCode }}",
-        "startsAt": "{{ 'now' | date: '%Y-%m-%dT%H:%M:%SZ' }}",
-        "endsAt": "{{ 'now' | date: '%s' | plus: 172800 | date: '%Y-%m-%dT%H:%M:%SZ' }}",
-        "customerSelection": {
-            "customers": {
-                "add": ["{{ metaobject.formSubmittedBy.id }}"],
+
+def new_ulid() -> str:
+    timestamp_ms = int(time.time() * 1000)
+    randomness = int.from_bytes(os.urandom(10), "big")
+
+    value = (timestamp_ms << 80) | randomness
+    chars = []
+    for _ in range(26):
+        chars.append(ULID_ENCODING[value & 31])
+        value >>= 5
+    return "".join(reversed(chars))
+
+
+def single_condition(
+    env_path: str,
+    *,
+    value_type: str,
+    operator: str,
+    rhs_value: str = "",
+) -> dict:
+    root_uuid = new_ulid()
+    comp_uuid = new_ulid()
+    lhs_uuid = new_ulid()
+    rhs_uuid = new_ulid()
+    return {
+        "uuid": root_uuid,
+        "lhs": {
+            "uuid": comp_uuid,
+            "parent_uuid": root_uuid,
+            "lhs": {
+                "uuid": lhs_uuid,
+                "parent_uuid": comp_uuid,
+                "value": env_path,
+                "comparison_value_type": "EnvironmentValue",
+                "full_environment_path": env_path,
             },
-        },
-        "customerGets": {
-            "value": {
-                "discountAmount": {
-                    "amount": "{{ runCode.redeemValueGbp }}",
-                    "appliesOnEachItem": False,
-                },
+            "rhs": {
+                "uuid": rhs_uuid,
+                "parent_uuid": comp_uuid,
+                "value": rhs_value,
+                "comparison_value_type": "LiteralValue",
             },
-            "items": {"all": True},
+            "value_type": value_type,
+            "operator": operator,
+            "operation_type": "Comparison",
         },
-        "usageLimit": 1,
-        "appliesOncePerCustomer": True,
-    },
-}
+        "operator": "AND",
+        "operation_type": "LogicalExpression",
+    }
 
 
 def condition_step(step_id: str, y: int, condition: dict) -> dict:
@@ -212,33 +211,67 @@ def customer_metafield_step(
     }
 
 
-def build_workflow() -> dict:
+def build_workflow(*, variant: str) -> dict:
+    """variant: core (import-safe), full (includes discount + metafields)."""
+    include_discount_create = variant == "full"
+    include_metafields = variant == "full"
+    trigger_id = new_step_id()
+    cond_customer_id = new_step_id()
+    run_code_id = new_step_id()
+    cond_code_id = new_step_id()
+    cond_reused_id = new_step_id()
+    admin_api_id = new_step_id() if include_discount_create else None
+    points_id = new_step_id()
+    code_id = new_step_id()
+
+    discount_inputs = {
+        "basicCodeDiscount": {
+            "title": "Loyalty reward {{ runCode.discountCode }}",
+            "code": "{{ runCode.discountCode }}",
+            "startsAt": "{{ 'now' | date: '%Y-%m-%dT%H:%M:%SZ' }}",
+            "endsAt": "{{ 'now' | date: '%s' | plus: 172800 | date: '%Y-%m-%dT%H:%M:%SZ' }}",
+            "customerSelection": {
+                "customers": {
+                    "add": ["{{ metaobject.formSubmittedBy.id }}"],
+                },
+            },
+            "customerGets": {
+                "value": {
+                    "discountAmount": {
+                        "amount": "{{ runCode.redeemValueGbp }}",
+                        "appliesOnEachItem": False,
+                    },
+                },
+                "items": {"all": True},
+            },
+            "usageLimit": 1,
+            "appliesOncePerCustomer": True,
+        },
+    }
+
     steps = [
         {
-            "step_id": "01redeem-trigger-0001-0001-000000000001",
+            "step_id": trigger_id,
             "step_position": [0, 0],
-            "config_field_values": [
-                {
-                    "config_field_id": "metaobject_definition_id",
-                    "value": json.dumps(
-                        {
-                            "value": META_DEFINITION_GID,
-                            "default_value": META_DEFINITION_GID,
-                        },
-                        separators=(",", ":"),
-                    ),
-                }
-            ],
+            "config_field_values": [],
             "task_id": "shopify::admin::metaobject_created",
             "task_version": "0.1",
             "task_type": "TRIGGER",
             "description": None,
-            "note": f"Shopify Form ID {FORM_ID}. Re-select the form in Flow if import does not bind it.",
+            "note": None,
             "name": None,
         },
-        condition_step("01redeem-cond-00001-0001-000000000001", 120, CONDITION_CUSTOMER),
+        condition_step(
+            cond_customer_id,
+            120,
+            single_condition(
+                "metaobject.formSubmittedBy.id",
+                value_type="EnvironmentScalarDefinition:ID",
+                operator="not_empty_and_not_nil?",
+            ),
+        ),
         {
-            "step_id": "01redeem-runcode-001-0001-000000000001",
+            "step_id": run_code_id,
             "step_position": [0, 260],
             "config_field_values": [
                 {"config_field_id": "input", "value": INPUT_QUERY},
@@ -252,57 +285,93 @@ def build_workflow() -> dict:
             "note": None,
             "name": "Run code",
         },
-        condition_step("01redeem-cond-00002-0001-000000000001", 400, CONDITION_CODE),
-        condition_step("01redeem-cond-00003-0001-000000000001", 540, CONDITION_NOT_REUSED),
-        {
-            "step_id": "01redeem-adminapi-01-0001-000000000001",
-            "step_position": [0, 680],
-            "config_field_values": [
-                {
-                    "config_field_id": "api_call",
-                    "value": json.dumps(
-                        {
-                            "name": "discountCodeBasicCreate",
-                            "blob": json.dumps(
-                                DISCOUNT_MUTATION_INPUTS, separators=(",", ":")
-                            ),
-                        },
-                        separators=(",", ":"),
-                    ),
-                }
-            ],
-            "task_id": "shopify::admin::admin_api_operation",
-            "task_version": "0.1",
-            "task_type": "ACTION",
-            "description": None,
-            "note": None,
-            "name": None,
-        },
-        customer_metafield_step(
-            "01redeem-points-0001-0001-000000000001",
-            820,
-            "loyalty_points",
-            "number_integer",
-            "{{ runCode.newLoyaltyPoints }}",
+        condition_step(
+            cond_code_id,
+            400,
+            single_condition(
+                "runCode.discountCode",
+                value_type="EnvironmentScalarDefinition:String",
+                operator="not_empty_and_not_nil?",
+            ),
         ),
-        customer_metafield_step(
-            "01redeem-code-00001-0001-000000000001",
-            960,
-            "loyalty_redeem_code",
-            "single_line_text_field",
-            "{{ runCode.discountCode }}",
+        condition_step(
+            cond_reused_id,
+            540,
+            single_condition(
+                "runCode.reused",
+                value_type="EnvironmentScalarDefinition:String",
+                operator="==",
+                rhs_value="false",
+            ),
         ),
     ]
 
-    links = [
-        ("01redeem-trigger-0001-0001-000000000001", "output", "01redeem-cond-00001-0001-000000000001", "input"),
-        ("01redeem-cond-00001-0001-000000000001", "true", "01redeem-runcode-001-0001-000000000001", "input"),
-        ("01redeem-runcode-001-0001-000000000001", "output", "01redeem-cond-00002-0001-000000000001", "input"),
-        ("01redeem-cond-00002-0001-000000000001", "true", "01redeem-cond-00003-0001-000000000001", "input"),
-        ("01redeem-cond-00003-0001-000000000001", "true", "01redeem-adminapi-01-0001-000000000001", "input"),
-        ("01redeem-adminapi-01-0001-000000000001", "output", "01redeem-points-0001-0001-000000000001", "input"),
-        ("01redeem-points-0001-0001-000000000001", "output", "01redeem-code-00001-0001-000000000001", "input"),
-    ]
+    if include_discount_create:
+        steps.append(
+            {
+                "step_id": admin_api_id,
+                "step_position": [0, 680],
+                "config_field_values": [
+                    {
+                        "config_field_id": "api_call",
+                        "value": json.dumps(
+                            {
+                                "name": "discountCodeBasicCreate",
+                                "blob": json.dumps(discount_inputs, separators=(",", ":")),
+                            },
+                            separators=(",", ":"),
+                        ),
+                    }
+                ],
+                "task_id": "shopify::admin::admin_api_operation",
+                "task_version": "0.1",
+                "task_type": "ACTION",
+                "description": None,
+                "note": None,
+                "name": None,
+            }
+        )
+        points_y = 820
+    else:
+        points_y = 680
+
+    if include_metafields:
+        steps.extend(
+            [
+                customer_metafield_step(
+                    points_id,
+                    points_y,
+                    "loyalty_points",
+                    "number_integer",
+                    "{{ runCode.newLoyaltyPoints }}",
+                ),
+                customer_metafield_step(
+                    code_id,
+                    points_y + 140,
+                    "loyalty_redeem_code",
+                    "single_line_text_field",
+                    "{{ runCode.discountCode }}",
+                ),
+            ]
+        )
+
+    if include_discount_create:
+        links = [
+            (trigger_id, "output", cond_customer_id, "input"),
+            (cond_customer_id, "true", run_code_id, "input"),
+            (run_code_id, "output", cond_code_id, "input"),
+            (cond_code_id, "true", cond_reused_id, "input"),
+            (cond_reused_id, "true", admin_api_id, "input"),
+            (admin_api_id, "output", points_id, "input"),
+            (points_id, "output", code_id, "input"),
+        ]
+    else:
+        links = [
+            (trigger_id, "output", cond_customer_id, "input"),
+            (cond_customer_id, "true", run_code_id, "input"),
+            (run_code_id, "output", cond_code_id, "input"),
+            (cond_code_id, "true", cond_reused_id, "input"),
+        ]
 
     return {
         "__metadata": {"version": 0.1},
@@ -319,7 +388,7 @@ def build_workflow() -> dict:
             ],
             "patched_fields": [
                 {
-                    "id": "01redeem-patch-loyalty-points-00000001",
+                    "id": str(uuid.uuid4()),
                     "handle": "loyaltyPoints",
                     "field": "metafield",
                     "patched_type": "Customer",
@@ -330,7 +399,7 @@ def build_workflow() -> dict:
                     "merchant_configured": True,
                 },
                 {
-                    "id": "01redeem-patch-redeem-code-00000001",
+                    "id": str(uuid.uuid4()),
                     "handle": "loyaltyRedeemCode",
                     "field": "metafield",
                     "patched_type": "Customer",
@@ -349,13 +418,19 @@ def build_workflow() -> dict:
     }
 
 
-def export_flow(path: Path) -> None:
-    body = json.dumps(build_workflow(), separators=(",", ":"), ensure_ascii=True)
+def export_flow(path: Path, *, variant: str) -> None:
+    body = json.dumps(
+        build_workflow(variant=variant),
+        separators=(",", ":"),
+        ensure_ascii=True,
+    )
     digest = hashlib.sha256(body.encode("utf-8")).hexdigest()
     path.write_text(f"{digest}:{body}", encoding="utf-8")
 
 
 if __name__ == "__main__":
-    target = Path(__file__).with_name("Redeem loyalty points.flow")
-    export_flow(target)
-    print(f"Wrote {target}")
+    base = Path(__file__).parent
+    export_flow(base / "Redeem loyalty points.flow", variant="core")
+    export_flow(base / "Redeem loyalty points (full).flow", variant="full")
+    print("Wrote Redeem loyalty points.flow (core — add discount + metafields after import)")
+    print("Wrote Redeem loyalty points (full).flow")
