@@ -290,13 +290,6 @@
         "info": "Only used when Redemption method is App proxy. See loyalty-redeem/README.md."
       },
       {
-        "type": "text",
-        "id": "loyalty_status_proxy_url",
-        "label": "Loyalty status app proxy URL",
-        "default": "/apps/kori-loyalty/status",
-        "info": "Used on every page load to sync points and active codes when Liquid cannot read customer metafields. Requires the loyalty app proxy worker."
-      },
-      {
         "type": "paragraph",
         "content": "Points are awarded and reversed by Shopify Flow on paid/cancelled orders. See README for setup steps."
       }

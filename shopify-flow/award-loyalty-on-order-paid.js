@@ -20,17 +20,26 @@
 // type Output {
 //   "The new loyalty points total as a string"
 //   newLoyaltyPoints: String!
+//   "Customer tag to add (storefront reads this)"
+//   loyaltyPointsTag: String!
+//   "Customer tag to remove before adding the new one"
+//   loyaltyPointsTagRemove: String!
 // }
 //
-// Map loyaltyPoints → customer metafield custom.loyalty_points ONLY.
-// Do NOT map to custom_loyalty_points — that is a different field.
+// After Update customer metafield, add Flow steps:
+// 1. Remove customer tags → loyaltyPointsTagRemove
+// 2. Add customer tags → loyaltyPointsTag
 
 export default function main(input) {
   const order = input.order;
   const customer = order?.customer;
 
   if (!customer) {
-    return { newLoyaltyPoints: '0' };
+    return {
+      newLoyaltyPoints: '0',
+      loyaltyPointsTag: 'loyalty-points:0',
+      loyaltyPointsTagRemove: 'loyalty-points:0',
+    };
   }
 
   const current = Number(customer.loyaltyPoints?.value ?? 0);
@@ -40,5 +49,7 @@ export default function main(input) {
 
   return {
     newLoyaltyPoints: String(newBalance),
+    loyaltyPointsTag: `loyalty-points:${newBalance}`,
+    loyaltyPointsTagRemove: `loyalty-points:${current}`,
   };
 }

@@ -1,41 +1,15 @@
 {%- include 'loyalty-auth-urls' -%}
+{%- include 'loyalty-customer-data' -%}
 
 {%- liquid
-  assign balance = 0
-
-  if customer
-    assign points_key = settings.loyalty_points_metafield | default: 'custom.loyalty_points' | strip
-    assign points_parts = points_key | split: '.'
-    assign points_ns = points_parts[0] | strip
-    assign points_id = points_parts[1] | strip
-    assign points_value = customer.metafields.custom.loyalty_points.value
-
-    if points_value == blank and points_ns != blank and points_id != blank
-      assign points_value = customer.metafields[points_ns][points_id].value
-    endif
-
-    assign balance = points_value | default: 0 | plus: 0
-  endif
+  assign balance = loyalty_balance | default: 0 | plus: 0
+  assign active_redeem_code = loyalty_redeem_code | strip
 
   assign points_rate = section.settings.points_per_gbp | default: settings.loyalty_points_per_gbp | default: 1
   assign redeem_points = section.settings.redeem_points | default: settings.loyalty_redeem_points | default: 100
   assign redeem_value = section.settings.redeem_value_gbp | default: settings.loyalty_redeem_value_gbp | default: 5
   assign redeem_blocks = balance | divided_by: redeem_points | floor
   assign redeemable_gbp = redeem_blocks | times: redeem_value
-
-  assign active_redeem_code = blank
-  assign redeem_code_key = settings.loyalty_redeem_code_metafield | default: 'custom.loyalty_redeem_code' | strip
-  assign redeem_code_parts = redeem_code_key | split: '.'
-  assign redeem_code_ns = redeem_code_parts[0] | strip
-  assign redeem_code_id = redeem_code_parts[1] | strip
-
-  if customer
-    assign active_redeem_code = customer.metafields.custom.loyalty_redeem_code.value
-    if active_redeem_code == blank and redeem_code_ns != blank and redeem_code_id != blank
-      assign active_redeem_code = customer.metafields[redeem_code_ns][redeem_code_id].value
-    endif
-    assign active_redeem_code = active_redeem_code | strip
-  endif
 -%}
 
 <section class="section rewards">

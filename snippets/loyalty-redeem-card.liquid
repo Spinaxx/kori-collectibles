@@ -1,19 +1,6 @@
 {%- liquid
-  assign loyalty_redeem_code = blank
-  assign redeem_code_key = settings.loyalty_redeem_code_metafield | default: 'custom.loyalty_redeem_code' | strip
-  assign redeem_code_parts = redeem_code_key | split: '.'
-  assign redeem_code_ns = redeem_code_parts[0] | strip
-  assign redeem_code_id = redeem_code_parts[1] | strip
-
-  if customer
-    assign loyalty_redeem_code = customer.metafields.custom.loyalty_redeem_code.value
-    if loyalty_redeem_code == blank and redeem_code_ns != blank and redeem_code_id != blank
-      assign loyalty_redeem_code = customer.metafields[redeem_code_ns][redeem_code_id].value
-    endif
-    assign loyalty_redeem_code = loyalty_redeem_code | strip
-  endif
-
-  assign balance = balance | default: 0 | plus: 0
+  assign balance = balance | default: loyalty_balance | default: 0 | plus: 0
+  assign loyalty_redeem_code = active_redeem_code | default: loyalty_redeem_code | strip
   assign redeem_points = redeem_points | default: settings.loyalty_redeem_points | default: 100
   assign redeem_value = redeem_value | default: settings.loyalty_redeem_value_gbp | default: 5
   assign redeem_email = settings.loyalty_redeem_email | default: shop.email

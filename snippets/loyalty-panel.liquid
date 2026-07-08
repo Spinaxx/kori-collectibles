@@ -19,23 +19,9 @@
   endif
 
   assign can_redeem = false
-  assign active_redeem_code = blank
-  if customer and balance >= redeem_points
+  assign active_redeem_code = loyalty_redeem_code | strip
+  if customer and balance >= redeem_points and active_redeem_code == blank
     assign can_redeem = true
-  endif
-
-  assign loyalty_redeem_code = blank
-  assign redeem_code_key = settings.loyalty_redeem_code_metafield | default: 'custom.loyalty_redeem_code' | strip
-  assign redeem_code_parts = redeem_code_key | split: '.'
-  assign redeem_code_ns = redeem_code_parts[0] | strip
-  assign redeem_code_id = redeem_code_parts[1] | strip
-
-  if customer
-    assign loyalty_redeem_code = customer.metafields.custom.loyalty_redeem_code.value
-    if loyalty_redeem_code == blank and redeem_code_ns != blank and redeem_code_id != blank
-      assign loyalty_redeem_code = customer.metafields[redeem_code_ns][redeem_code_id].value
-    endif
-    assign active_redeem_code = loyalty_redeem_code | strip
   endif
 
   assign rewards_url = pages.rewards.url | default: '/pages/rewards'

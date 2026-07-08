@@ -49,6 +49,14 @@
 //   redeemValueGbp: String!
 //   "true when customer already has an unused code"
 //   reused: String!
+//   "Customer tag for the new balance"
+//   loyaltyPointsTag: String!
+//   "Customer tag to remove before updating balance"
+//   loyaltyPointsTagRemove: String!
+//   "Customer tag for the active discount code"
+//   loyaltyCodeTag: String!
+//   "Previous code tag to remove (empty if none)"
+//   loyaltyCodeTagRemove: String!
 // }
 //
 // Next steps in Flow (after Run code):
@@ -57,6 +65,8 @@
 // 3. Send Admin API request → discountCodeBasicCreate (see REDEEM-SETUP.md)
 // 4. Update customer metafield → custom.loyalty_points = newLoyaltyPoints
 // 5. Update customer metafield → custom.loyalty_redeem_code = discountCode
+// 6. Remove customer tags → loyaltyPointsTagRemove (+ loyaltyCodeTagRemove if not empty)
+// 7. Add customer tags → loyaltyPointsTag (+ loyaltyCodeTag if not empty)
 
 const REDEEM_POINTS = 100;
 const REDEEM_VALUE_GBP = 5;
@@ -70,11 +80,16 @@ export default function main(input) {
       newLoyaltyPoints: '0',
       redeemValueGbp: String(REDEEM_VALUE_GBP),
       reused: 'false',
+      loyaltyPointsTag: 'loyalty-points:0',
+      loyaltyPointsTagRemove: 'loyalty-points:0',
+      loyaltyCodeTag: '',
+      loyaltyCodeTagRemove: '',
     };
   }
 
   const current = Number(customer.loyaltyPoints?.value ?? 0);
   const existingCode = String(customer.loyaltyRedeemCode?.value ?? '').trim();
+  const pointsTagRemove = `loyalty-points:${current}`;
 
   if (existingCode) {
     return {
@@ -82,6 +97,10 @@ export default function main(input) {
       newLoyaltyPoints: String(current),
       redeemValueGbp: String(REDEEM_VALUE_GBP),
       reused: 'true',
+      loyaltyPointsTag: `loyalty-points:${current}`,
+      loyaltyPointsTagRemove: pointsTagRemove,
+      loyaltyCodeTag: `loyalty-code:${existingCode}`,
+      loyaltyCodeTagRemove: '',
     };
   }
 
@@ -91,6 +110,10 @@ export default function main(input) {
       newLoyaltyPoints: String(current),
       redeemValueGbp: String(REDEEM_VALUE_GBP),
       reused: 'false',
+      loyaltyPointsTag: `loyalty-points:${current}`,
+      loyaltyPointsTagRemove: pointsTagRemove,
+      loyaltyCodeTag: '',
+      loyaltyCodeTagRemove: '',
     };
   }
 
@@ -103,5 +126,9 @@ export default function main(input) {
     newLoyaltyPoints: String(newBalance),
     redeemValueGbp: String(REDEEM_VALUE_GBP),
     reused: 'false',
+    loyaltyPointsTag: `loyalty-points:${newBalance}`,
+    loyaltyPointsTagRemove: pointsTagRemove,
+    loyaltyCodeTag: `loyalty-code:${code}`,
+    loyaltyCodeTagRemove: '',
   };
 }

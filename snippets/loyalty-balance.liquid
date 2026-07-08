@@ -1,17 +1,1 @@
-{%- liquid
-  assign loyalty_balance = 0
-
-  if customer
-    assign points_key = settings.loyalty_points_metafield | default: 'custom.loyalty_points' | strip
-    assign points_parts = points_key | split: '.'
-    assign points_ns = points_parts[0] | strip
-    assign points_id = points_parts[1] | strip
-    assign points_value = customer.metafields.custom.loyalty_points.value
-
-    if points_value == blank and points_ns != blank and points_id != blank
-      assign points_value = customer.metafields[points_ns][points_id].value
-    endif
-
-    assign loyalty_balance = points_value | default: 0 | plus: 0
-  endif
--%}
+{%- include 'loyalty-customer-data' -%}

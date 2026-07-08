@@ -1,0 +1,71 @@
+{%- comment -%}
+  Loyalty balance + active redeem code for the logged-in customer.
+  Customer tags are the primary source (always readable on the storefront).
+  Metafields are a fallback when tags are not set yet.
+
+  Tag format (set by Shopify Flow):
+    loyalty-points:150
+    loyalty-code:KORI-123-ABC
+{%- endcomment -%}
+{%- liquid
+  assign loyalty_balance = 0
+  assign loyalty_redeem_code = blank
+
+  unless customer
+    break
+  endunless
+
+  for tag in customer.tags
+    assign tag_stripped = tag | strip
+    if tag_stripped contains 'loyalty-points:'
+      assign points_from_tag = tag_stripped | split: 'loyalty-points:' | last | strip
+      if points_from_tag != blank
+        assign loyalty_balance = points_from_tag | plus: 0
+      endif
+    endif
+    if tag_stripped contains 'loyalty-code:'
+      assign code_from_tag = tag_stripped | split: 'loyalty-code:' | last | strip
+      if code_from_tag != blank
+        assign loyalty_redeem_code = code_from_tag
+      endif
+    endif
+  endfor
+
+  assign points_key = settings.loyalty_points_metafield | default: 'custom.loyalty_points' | strip
+  assign points_parts = points_key | split: '.'
+  assign points_ns = points_parts[0] | strip
+  assign points_id = points_parts[1] | strip
+  assign points_from_metafield = blank
+
+  if points_ns != blank and points_id != blank
+    assign points_from_metafield = customer.metafields[points_ns][points_id].value
+  endif
+  if points_from_metafield == blank
+    assign points_from_metafield = customer.metafields.custom.loyalty_points.value
+  endif
+
+  if points_from_metafield != blank
+    assign points_from_metafield = points_from_metafield | plus: 0
+    if loyalty_balance == 0 and points_from_metafield > 0
+      assign loyalty_balance = points_from_metafield
+    elsif loyalty_balance == 0 and points_from_metafield == 0
+      assign loyalty_balance = 0
+    endif
+  endif
+
+  if loyalty_redeem_code == blank
+    assign redeem_code_key = settings.loyalty_redeem_code_metafield | default: 'custom.loyalty_redeem_code' | strip
+    assign redeem_code_parts = redeem_code_key | split: '.'
+    assign redeem_code_ns = redeem_code_parts[0] | strip
+    assign redeem_code_id = redeem_code_parts[1] | strip
+    assign code_from_metafield = blank
+
+    if redeem_code_ns != blank and redeem_code_id != blank
+      assign code_from_metafield = customer.metafields[redeem_code_ns][redeem_code_id].value
+    endif
+    if code_from_metafield == blank
+      assign code_from_metafield = customer.metafields.custom.loyalty_redeem_code.value
+    endif
+    assign loyalty_redeem_code = code_from_metafield | strip
+  endif
+-%}

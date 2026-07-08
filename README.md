@@ -30,7 +30,9 @@ A from-scratch Online Store 2.0 theme for a UK TCG shop, taking structure cues f
 
 ## Loyalty rewards (Shopify Flow)
 
-Native rewards with a Smile-style floating button and panel. Points live on each customer as a metafield and are awarded by **Shopify Flow**.
+Native rewards with a Smile-style floating button and panel. Points are stored on each customer (metafield + **customer tag**) and updated by **Shopify Flow**.
+
+**Storefront display:** The theme reads **customer tags** (`loyalty-points:150`, `loyalty-code:KORI-...`) because Shopify often does not expose customer metafields to Liquid on the live site. Flow must sync tags after every metafield update — see output fields in the Flow run code files.
 
 You can uninstall Smile.io and disable its app embed in the theme editor.
 
@@ -89,12 +91,20 @@ Apps → **Flow** → Create workflow:
    type Output {
      "The new loyalty points total as a string"
      newLoyaltyPoints: String!
+     "Customer tag to add"
+     loyaltyPointsTag: String!
+     "Customer tag to remove first"
+     loyaltyPointsTagRemove: String!
    }
    ```
 
 4. **Action:** Update customer metafield → `custom.loyalty_points` = **Run code → newLoyaltyPoints**
 
-5. **(Optional but recommended)** Add a second Run code output or a separate calculation step, then **Update order metafield** → `custom.loyalty_points_awarded` = points earned (`Math.round` of order subtotal). This makes cancellations exact. If you skip this, the cancel flow can still fall back to the subtotal formula.
+5. **Action:** Remove customer tags → **Run code → loyaltyPointsTagRemove**
+
+6. **Action:** Add customer tags → **Run code → loyaltyPointsTag**
+
+7. **(Optional but recommended)** Add a second Run code output or a separate calculation step, then **Update order metafield** → `custom.loyalty_points_awarded` = points earned (`Math.round` of order subtotal). This makes cancellations exact. If you skip this, the cancel flow can still fall back to the subtotal formula.
 
 Awards **1 point per £1** of subtotal (`Math.round(subtotal)`). Match the rate in **Theme settings → Loyalty rewards → Points earned per £1**.
 

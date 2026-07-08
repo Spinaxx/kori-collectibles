@@ -182,6 +182,37 @@ The rewards page reads `custom.loyalty_redeem_code` to display the code. **Witho
 
 In **Settings → Custom data → Customers → Loyalty redeem code**, enable **Storefront API access** (read).
 
+### Step 10 — Sync customer tags (required for storefront display)
+
+Shopify **does not reliably expose customer metafields to the theme**, even when admin shows the correct values. The theme reads **customer tags** instead — no app required.
+
+After step 9, on the same branch:
+
+**Remove old tags**
+
+- **Then → Remove customer tags**
+- Customer: **Metaobject → formSubmittedBy → id**
+- Tags: **Run code → loyaltyPointsTagRemove**
+- Add a second remove step (or comma-separate if Flow allows) for **Run code → loyaltyCodeTagRemove** — only when that output is not empty (skip if you cannot condition on empty; removing a missing tag is safe)
+
+**Add new tags**
+
+- **Then → Add customer tags**
+- Customer: **Metaobject → formSubmittedBy → id**
+- Tags: **Run code → loyaltyPointsTag**
+- Add **Run code → loyaltyCodeTag** when discount was created
+
+Tag format the theme expects:
+
+| Tag | Example |
+|-----|---------|
+| Points balance | `loyalty-points:150` |
+| Active discount code | `loyalty-code:KORI-123-ABC` |
+
+**One-time fix for existing customers:** Admin → **Customers** → open the customer → **Tags** → add `loyalty-points:XXX` (match their metafield balance) and `loyalty-code:YYY` if they have an active code. Refresh `/pages/rewards`.
+
+Add the same **Remove / Add customer tags** steps to your **award** and **cancel** Flow workflows (outputs are in `award-loyalty-on-order-paid.js` and `deduct-loyalty-on-order-cancelled.js`).
+
 ### Turn on
 
 **Save** → **Turn on workflow**.
@@ -216,45 +247,15 @@ Check **Flow → Run history** if anything fails.
 | Run code shows 0 points | Confirm Log output aliases; metafield key is `loyalty_points` not `custom_loyalty_points` |
 | `newLoyaltyPoints` not in metafield step | Pick it from **Run code** outputs in the variable picker — do not type it |
 | Discount create fails | Store needs discount permissions; try hardcoded `"amount": "5.00"` |
-| No code on storefront | Add **step 9** (save `loyalty_redeem_code` metafield). Enable **Storefront API read** on that metafield. Check customer record in admin has the code value. |
-| Code created in admin but not on site | Step 9 missing or failed — check Flow run history for the metafield update step. Also enable **Customer Account API → Read** on both metafield definitions (required for new customer accounts). Deploy the loyalty app proxy **status** endpoint — see section 6. |
-| Balance/code in admin but site shows 0 | Liquid often cannot read customer metafields on the storefront even when admin shows values. Use the app proxy status sync (section 6). |
+| No code on storefront | Add **step 9** (metafield) and **step 10** (customer tags). |
+| Code/balance in admin but not on site | Add customer tags (step 10). Metafields alone are not enough for the theme. |
+| Balance shows 0 but admin has points | Add tag `loyalty-points:XXX` on the customer in admin, or add tag sync steps to award/redeem Flow. |
 | Discount expires too soon | Remove `endsAt` from the discount mutation (see step 7) |
 | Customer not signed in | `formSubmittedBy` is empty — form must be submitted while logged in |
 
 ---
 
-## 6. Storefront sync (when admin shows data but the site does not)
-
-Shopify often **does not expose customer metafields to Liquid** on the live storefront, even when values appear in admin and Flow runs successfully. This is common with **new customer accounts**.
-
-The theme fixes this by calling your **app proxy status** endpoint on page load and after form redemption:
-
-- Default URL: `/apps/kori-loyalty/status`
-- Theme setting: **Loyalty status app proxy URL**
-
-### One-time setup
-
-1. Deploy `loyalty-redeem/worker.js` (see `loyalty-redeem/README.md`).
-2. In your custom app **App proxy**, set **Proxy URL** to your worker root (e.g. `https://YOUR-WORKER.workers.dev/`) — not `/redeem` — so both `/redeem` and `/status` routes work.
-3. Install the app on the store (same app used for optional instant redemption).
-4. Confirm metafield definitions have **Storefront API → Read** and **Customer Account API → Read** for:
-   - `custom.loyalty_points`
-   - `custom.loyalty_redeem_code`
-
-### Verify
-
-While signed in, open `/apps/kori-loyalty/status` in the browser. You should see JSON like:
-
-```json
-{ "balance": 50, "redeemCode": "KORI-...", "applyUrl": "/discount/KORI-..." }
-```
-
-If that works, refresh `/pages/rewards` — balance and active code should appear without a manual refresh after redeeming.
-
----
-
-## Flow vs app proxy
+## Flow vs app proxy (optional)
 
 | | Flow + Form | App proxy (`loyalty-redeem/`) |
 |--|-------------|-------------------------------|

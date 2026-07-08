@@ -1101,30 +1101,6 @@
       }
     };
 
-    const syncLoyaltyFromProxy = async () => {
-      const statusUrl = document.body.dataset.loyaltyStatusUrl;
-      if (!statusUrl || document.body.dataset.customerLoggedIn !== 'true') return null;
-
-      try {
-        const response = await fetch(statusUrl, {
-          credentials: 'same-origin',
-          headers: { Accept: 'application/json' },
-        });
-        if (!response.ok) return null;
-
-        const data = await response.json();
-        if (data.balance !== undefined && data.balance !== null) {
-          updateLoyaltyBalance(data.balance);
-        }
-        if (data.redeemCode) {
-          revealActiveCode(data.redeemCode);
-        }
-        return data;
-      } catch {
-        return null;
-      }
-    };
-
     const isDiscountCodeValid = async (code) => {
       try {
         const response = await fetch(`/discount/${encodeURIComponent(code)}`, {
@@ -1193,14 +1169,6 @@
       const check = async () => {
         attempts += 1;
         try {
-          const proxyData = await syncLoyaltyFromProxy();
-          if (proxyData?.redeemCode) {
-            const modal = qs('[data-loyalty-redeem-modal]', root);
-            setRedeemModalOpen(modal, false, qs('[data-loyalty-redeem-form-trigger]', root));
-            if (loadingEl) loadingEl.hidden = true;
-            return;
-          }
-
           const url = new URL(window.location.href);
           url.searchParams.set('loyalty_poll', String(Date.now()));
           const response = await fetch(url.toString(), {
@@ -1393,7 +1361,6 @@
     });
 
     validateActiveCodes();
-    syncLoyaltyFromProxy();
   };
 
   const initLoyaltyBalanceSync = () => {

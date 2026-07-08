@@ -33,10 +33,16 @@
 // type Output {
 //   "The new loyalty points total"
 //   newLoyaltyPoints: String!
+//   "Customer tag to add"
+//   loyaltyPointsTag: String!
+//   "Customer tag to remove first"
+//   loyaltyPointsTagRemove: String!
 // }
 //
-// Next step: Update customer metafield → custom.loyalty_points
-// Value: Add variable → Run code → newLoyaltyPoints
+// Next steps:
+// 1. Update customer metafield → custom.loyalty_points = newLoyaltyPoints
+// 2. Remove customer tags → loyaltyPointsTagRemove
+// 3. Add customer tags → loyaltyPointsTag
 
 function earnedPoints(order) {
   const subtotal = parseFloat(order?.subtotalPriceSet?.shopMoney?.amount) || 0;
@@ -53,7 +59,11 @@ export default function main(input) {
   const customer = order?.customer;
 
   if (!customer) {
-    return { newLoyaltyPoints: '0' };
+    return {
+      newLoyaltyPoints: '0',
+      loyaltyPointsTag: 'loyalty-points:0',
+      loyaltyPointsTagRemove: 'loyalty-points:0',
+    };
   }
 
   const raw = customer.loyaltyPoints ? customer.loyaltyPoints.value : null;
@@ -61,12 +71,18 @@ export default function main(input) {
   const earned = earnedPoints(order);
 
   if (earned <= 0) {
-    return { newLoyaltyPoints: String(current) };
+    return {
+      newLoyaltyPoints: String(current),
+      loyaltyPointsTag: `loyalty-points:${current}`,
+      loyaltyPointsTagRemove: `loyalty-points:${current}`,
+    };
   }
 
   const newBalance = Math.max(0, current - earned);
 
   return {
     newLoyaltyPoints: String(newBalance),
+    loyaltyPointsTag: `loyalty-points:${newBalance}`,
+    loyaltyPointsTagRemove: `loyalty-points:${current}`,
   };
 }

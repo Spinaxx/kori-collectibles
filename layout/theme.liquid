@@ -76,7 +76,6 @@
   <body
     {% if customer %}data-customer-logged-in="true" data-loyalty-balance="{{ loyalty_balance | default: 0 }}"{% endif %}
     data-rewards-url="{{ rewards_url | escape }}"
-    data-loyalty-status-url="{{ settings.loyalty_status_proxy_url | default: '/apps/kori-loyalty/status' | escape }}"
   >
     <a class="skip-link" href="#MainContent">Skip to content</a>
 
