@@ -238,7 +238,15 @@
 
     <div class="search-modal" data-search-modal hidden>
       <div class="search-modal__box" role="dialog" aria-modal="true" aria-label="Search">
-        <form action="{{ routes.search_url }}" method="get" role="search" class="search-modal__form">
+        <form
+          action="{{ routes.search_url }}"
+          method="get"
+          role="search"
+          class="search-modal__form"
+          data-predictive-search
+          data-search-url="{{ routes.search_url }}"
+          data-suggest-url="{{ routes.predictive_search_url }}"
+        >
           <input type="hidden" name="type" value="product">
           <input
             class="search-modal__input"
@@ -246,6 +254,13 @@
             name="q"
             placeholder="Search cards, sets, sealed..."
             aria-label="Search"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            data-predictive-input
+            aria-controls="PredictiveResults"
+            aria-autocomplete="list"
           >
           <button type="submit" class="button">Search</button>
           <button type="button" class="icon-btn" data-close-search aria-label="Close">
@@ -254,6 +269,15 @@
             </svg>
           </button>
         </form>
+
+        <div
+          class="predictive"
+          id="PredictiveResults"
+          data-predictive-results
+          hidden
+          role="listbox"
+          aria-label="Search suggestions"
+        ></div>
       </div>
     </div>
 

@@ -25,12 +25,21 @@
         search.hidden = !open;
         document.documentElement.style.overflow = open ? 'hidden' : '';
         if (open) {
-          const input = qs('input[type="search"]', search);
+          const input = qs('[data-predictive-input]', search) || qs('input[type="search"]', search);
           if (input) setTimeout(() => input.focus(), 10);
+        } else {
+          const results = qs('[data-predictive-results]', search);
+          if (results) {
+            results.hidden = true;
+            results.innerHTML = '';
+          }
         }
       };
       searchOpen.addEventListener('click', () => set(true));
       qsa('[data-close-search]', search).forEach((el) => el.addEventListener('click', () => set(false)));
+      search.addEventListener('click', (e) => {
+        if (e.target === search) set(false);
+      });
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && !search.hidden) set(false);
       });
@@ -188,10 +197,132 @@
     });
   };
 
+  const formatMoney = (cents) => {
+    const value = Number(cents || 0) / 100;
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: (window.Shopify && Shopify.currency && Shopify.currency.active) || 'GBP',
+      }).format(value);
+    } catch (err) {
+      return `£${value.toFixed(2)}`;
+    }
+  };
+
+  const escapeHtml = (str) =>
+    String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+
+  const initPredictiveSearch = () => {
+    const form = qs('[data-predictive-search]');
+    const input = qs('[data-predictive-input]');
+    const results = qs('[data-predictive-results]');
+    if (!form || !input || !results) return;
+
+    const suggestUrl = form.getAttribute('data-suggest-url') || '/search/suggest.json';
+    const searchUrl = form.getAttribute('data-search-url') || '/search';
+    let timer = null;
+    let controller = null;
+    let lastQuery = '';
+
+    const renderEmpty = (message) => {
+      results.hidden = false;
+      results.innerHTML = `<p class="predictive__status">${escapeHtml(message)}</p>`;
+    };
+
+    const renderProducts = (products, query) => {
+      if (!products.length) {
+        renderEmpty(`No matches for “${query}”`);
+        return;
+      }
+
+      const items = products
+        .map((product) => {
+          const image =
+            product.image ||
+            (product.featured_image && (product.featured_image.url || product.featured_image)) ||
+            '';
+          const price = formatMoney(product.price);
+          const vendor = product.vendor ? `<div class="predictive__meta">${escapeHtml(product.vendor)}</div>` : '';
+          const media = image
+            ? `<div class="predictive__media"><img src="${escapeHtml(image)}" alt="" width="48" height="48" loading="lazy"></div>`
+            : `<div class="predictive__media"></div>`;
+
+          return `
+            <a class="predictive__item" href="${escapeHtml(product.url)}" role="option">
+              ${media}
+              <div class="predictive__copy">
+                <div class="predictive__title">${escapeHtml(product.title)}</div>
+                ${vendor}
+              </div>
+              <div class="predictive__price">${escapeHtml(price)}</div>
+            </a>
+          `;
+        })
+        .join('');
+
+      results.hidden = false;
+      results.innerHTML = `
+        <div class="predictive__list" role="presentation">${items}</div>
+        <div class="predictive__footer">
+          <span>${products.length} suggestion${products.length === 1 ? '' : 's'}</span>
+          <a href="${escapeHtml(searchUrl)}?type=product&q=${encodeURIComponent(query)}">View all results</a>
+        </div>
+      `;
+    };
+
+    const fetchSuggestions = async (query) => {
+      if (controller) controller.abort();
+      controller = new AbortController();
+
+      results.hidden = false;
+      results.innerHTML = `<p class="predictive__status">Searching…</p>`;
+
+      try {
+        const jsonUrl = `${suggestUrl}.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=8&resources[options][unavailable_products]=last`;
+        const res = await fetch(jsonUrl, {
+          headers: { Accept: 'application/json' },
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error(`Suggest failed: ${res.status}`);
+        const data = await res.json();
+        const products =
+          (data.resources && data.resources.results && data.resources.results.products) ||
+          [];
+        if (query !== lastQuery) return;
+        renderProducts(products, query);
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        renderEmpty('Could not load suggestions. Press Search to continue.');
+      }
+    };
+
+    const onInput = () => {
+      const query = input.value.trim();
+      lastQuery = query;
+      clearTimeout(timer);
+
+      if (query.length < 2) {
+        results.hidden = true;
+        results.innerHTML = '';
+        return;
+      }
+
+      timer = setTimeout(() => fetchSuggestions(query), 180);
+    };
+
+    input.addEventListener('input', onInput);
+    input.addEventListener('search', onInput);
+  };
+
   const boot = () => {
     initDrawers();
     initNavDropdowns();
     initHeroTilt();
+    initPredictiveSearch();
   };
 
   if (document.readyState === 'loading') {
