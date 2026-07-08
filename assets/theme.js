@@ -39,10 +39,26 @@
     const facets = qs('[data-facets]');
     const facetsOpen = qs('[data-open-facets]');
     if (facets && facetsOpen) {
-      facetsOpen.addEventListener('click', () => facets.classList.add('is-open'));
+      const setFacets = (open) => {
+        facets.classList.toggle('is-open', open);
+        document.documentElement.style.overflow = open ? 'hidden' : '';
+      };
+      facetsOpen.addEventListener('click', () => setFacets(true));
       qsa('[data-close-facets]', facets).forEach((el) =>
-        el.addEventListener('click', () => facets.classList.remove('is-open'))
+        el.addEventListener('click', () => setFacets(false))
       );
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && facets.classList.contains('is-open')) setFacets(false);
+      });
+    }
+
+    const sort = qs('[data-sort-by]');
+    if (sort) {
+      sort.addEventListener('change', () => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort_by', sort.value);
+        window.location.assign(url.toString());
+      });
     }
   };
 

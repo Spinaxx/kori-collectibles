@@ -1,99 +1,198 @@
-<section class="page-width">
-  <div class="collection-banner" style="padding-top:2rem;">
+{%- liquid
+  assign show_filters = section.settings.enable_filtering
+  assign products_per_page = section.settings.products_per_page | default: 24
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+  assign has_shopify_filters = false
+  if collection.filters.size > 0
+    assign has_shopify_filters = true
+  endif
+  assign active_values_count = 0
+  if has_shopify_filters
+    for filter in collection.filters
+      for value in filter.active_values
+        assign active_values_count = active_values_count | plus: 1
+      endfor
+      if filter.type == 'price_range'
+        if filter.min_value.value != blank or filter.max_value.value != blank
+          assign active_values_count = active_values_count | plus: 1
+        endif
+      endif
+    endfor
+  endif
+-%}
+
+<section class="page-width collection-page">
+  <div class="collection-banner">
     <h1>{{ collection.title | escape }}</h1>
     {%- if collection.description != blank -%}
       <p>{{ collection.description | strip_html | truncate: 220 }}</p>
     {%- endif -%}
   </div>
 
-  <div class="collection-layout">
-    {%- if collection.filters.size > 0 -%}
+  <div class="collection-layout{% if show_filters %} collection-layout--with-filters{% endif %}">
+    {%- if show_filters -%}
       <aside class="facets" data-facets>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+        <div class="facets__head">
           <div class="facets__title">Filters</div>
-          <button type="button" class="icon-btn facets-mobile-btn" data-close-facets aria-label="Close">
+          <button type="button" class="icon-btn facets-mobile-btn" data-close-facets aria-label="Close filters">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" width="20" height="20">
               <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
             </svg>
           </button>
         </div>
 
-        <form>
-          {%- for filter in collection.filters -%}
+        {%- if active_values_count > 0 or current_tags != blank -%}
+          <div class="facets__active">
+            {%- if has_shopify_filters -%}
+              {%- for filter in collection.filters -%}
+                {%- for value in filter.active_values -%}
+                  <a class="facet-chip" href="{{ value.url_to_remove }}">
+                    {{ value.label | escape }}
+                    <span aria-hidden="true">&times;</span>
+                  </a>
+                {%- endfor -%}
+              {%- endfor -%}
+            {%- endif -%}
+            {%- for tag in current_tags -%}
+              <span class="facet-chip-wrap">
+                {{ tag | link_to_remove_tag: tag | replace: '<a ', '<a class="facet-chip" ' }}
+              </span>
+            {%- endfor -%}
+            <a class="facet-chip facet-chip--clear" href="{{ collection.url }}">Clear all</a>
+          </div>
+        {%- endif -%}
+
+        {%- if has_shopify_filters -%}
+          <form class="facets__form" method="get" action="{{ collection.url }}">
+            <input type="hidden" name="sort_by" value="{{ sort_by }}">
+
+            {%- for filter in collection.filters -%}
+              <details class="facet-group" {% if filter.active_values.size > 0 or filter.type == 'price_range' %}open{% elsif forloop.index <= 3 %}open{% endif %}>
+                <summary>
+                  <span>{{ filter.label | escape }}</span>
+                  {%- if filter.active_values.size > 0 -%}
+                    <span class="facet-group__count">{{ filter.active_values.size }}</span>
+                  {%- endif -%}
+                </summary>
+
+                <div class="facet-list">
+                  {%- case filter.type -%}
+                    {%- when 'list', 'boolean' -%}
+                      {%- for value in filter.values -%}
+                        <label class="facet-option{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
+                          <input
+                            type="checkbox"
+                            name="{{ value.param_name }}"
+                            value="{{ value.value }}"
+                            {% if value.active %}checked{% endif %}
+                            {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                            onchange="this.form.submit()"
+                          >
+                          <span class="facet-option__label">{{ value.label | escape }}</span>
+                          <span class="facet-option__count">{{ value.count }}</span>
+                        </label>
+                      {%- endfor -%}
+
+                    {%- when 'price_range' -%}
+                      <div class="facet-price">
+                        <label>
+                          <span class="visually-hidden">Min price</span>
+                          <input
+                            type="number"
+                            name="{{ filter.min_value.param_name }}"
+                            {% if filter.min_value.value %}value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"{% endif %}
+                            placeholder="{{ filter.range_min | money_without_currency | replace: ',', '' }}"
+                            min="0"
+                            inputmode="decimal"
+                          >
+                        </label>
+                        <span class="facet-price__sep">to</span>
+                        <label>
+                          <span class="visually-hidden">Max price</span>
+                          <input
+                            type="number"
+                            name="{{ filter.max_value.param_name }}"
+                            {% if filter.max_value.value %}value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"{% endif %}
+                            placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                            min="0"
+                            inputmode="decimal"
+                          >
+                        </label>
+                      </div>
+                      <button type="submit" class="button button--secondary button--full">Apply price</button>
+                  {%- endcase -%}
+                </div>
+              </details>
+            {%- endfor -%}
+          </form>
+        {%- else -%}
+          {%- comment -%} Tag filters work without Search & Discovery; price/vendor need that app {%- endcomment -%}
+          {%- if collection.all_tags.size > 0 -%}
             <details class="facet-group" open>
-              <summary>{{ filter.label | escape }}</summary>
-              <div class="facet-list">
-                {%- case filter.type -%}
-                  {%- when 'list', 'boolean' -%}
-                    {%- for value in filter.values -%}
-                      <label>
-                        <input
-                          type="checkbox"
-                          name="{{ value.param_name }}"
-                          value="{{ value.value }}"
-                          {% if value.active %}checked{% endif %}
-                          {% if value.count == 0 and value.active == false %}disabled{% endif %}
-                          onchange="this.form.submit()"
-                        >
-                        <span>{{ value.label | escape }} ({{ value.count }})</span>
-                      </label>
-                    {%- endfor -%}
-                  {%- when 'price_range' -%}
-                    <div style="display:flex;gap:0.5rem;">
-                      <input
-                        type="number"
-                        name="{{ filter.min_value.param_name }}"
-                        {% if filter.min_value.value %}value="{{ filter.min_value.value | money_without_currency }}"{% endif %}
-                        placeholder="Min"
-                        style="width:100%;min-height:42px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.5rem;"
-                      >
-                      <input
-                        type="number"
-                        name="{{ filter.max_value.param_name }}"
-                        {% if filter.max_value.value %}value="{{ filter.max_value.value | money_without_currency }}"{% endif %}
-                        placeholder="Max"
-                        style="width:100%;min-height:42px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.5rem;"
-                      >
-                    </div>
-                    <button type="submit" class="button button--secondary button--full" style="margin-top:0.65rem;">Apply</button>
-                {%- endcase -%}
+              <summary><span>Tags</span></summary>
+              <div class="facet-list facet-list--tags">
+                {%- for tag in collection.all_tags limit: 48 -%}
+                  {%- if current_tags contains tag -%}
+                    {{ tag | link_to_remove_tag: tag | replace: '<a ', '<a class="facet-tag is-active" ' }}
+                  {%- else -%}
+                    {{ tag | link_to_add_tag: tag | replace: '<a ', '<a class="facet-tag" ' }}
+                  {%- endif -%}
+                {%- endfor -%}
               </div>
             </details>
-          {%- endfor -%}
+          {%- else -%}
+            <p class="facets__hint">
+              No product tags yet. Add tags on products, or enable filters in the
+              <strong>Search &amp; Discovery</strong> app for availability, price, vendor, and product type.
+            </p>
+          {%- endif -%}
 
-          <a class="section-link" href="{{ collection.url }}" style="display:inline-block;margin-top:1rem;">Clear all</a>
-        </form>
+          <p class="facets__hint">
+            For availability, price, vendor, and type filters: open Apps →
+            <strong>Search &amp; Discovery</strong> → Filters → add them for collections.
+          </p>
+        {%- endif -%}
       </aside>
     {%- endif -%}
 
-    <div>
+    <div class="collection-main">
       <div class="collection-toolbar">
-        <div style="color:var(--muted);font-size:0.88rem;">
+        <div class="collection-toolbar__count">
           {{ collection.products_count }} products
+          {%- if active_values_count > 0 -%}
+            <span class="collection-toolbar__filtered">· filtered</span>
+          {%- endif -%}
         </div>
-        <div style="display:flex;gap:0.5rem;align-items:center;">
-          {%- if collection.filters.size > 0 -%}
+        <div class="collection-toolbar__actions">
+          {%- if show_filters -%}
             <button type="button" class="button button--secondary facets-mobile-btn" data-open-facets>
               Filters
+              {%- if active_values_count > 0 -%}
+                <span class="facet-group__count">{{ active_values_count }}</span>
+              {%- endif -%}
             </button>
           {%- endif -%}
 
-          <label class="visually-hidden" for="SortBy">Sort by</label>
-          <select id="SortBy" name="sort_by" onchange="window.location.href=this.value">
-            {%- for option in collection.sort_options -%}
-              <option
-                value="{{ collection.url }}?sort_by={{ option.value }}"
-                {% if option.value == collection.sort_by %}selected{% endif %}
-              >
-                {{ option.name }}
-              </option>
-            {%- endfor -%}
-          </select>
+          {%- if section.settings.enable_sorting -%}
+            <label class="visually-hidden" for="SortBy">Sort by</label>
+            <select
+              id="SortBy"
+              name="sort_by"
+              aria-label="Sort by"
+              data-sort-by
+            >
+              {%- for option in collection.sort_options -%}
+                <option value="{{ option.value }}" {% if option.value == sort_by %}selected{% endif %}>
+                  {{ option.name }}
+                </option>
+              {%- endfor -%}
+            </select>
+          {%- endif -%}
         </div>
       </div>
 
       <div class="product-grid">
-        {%- paginate collection.products by section.settings.products_per_page -%}
+        {%- paginate collection.products by products_per_page -%}
           {%- for product in collection.products -%}
             {%- liquid
               assign variant = product.selected_or_first_available_variant
@@ -121,7 +220,7 @@
                       {{ product.featured_image | image_url: width: 480 }} 480w,
                       {{ product.featured_image | image_url: width: 700 }} 700w
                     "
-                    sizes="(max-width: 749px) 45vw, 23vw"
+                    sizes="(max-width: 749px) 45vw, 18vw"
                     alt="{{ image_alt | escape }}"
                     width="{{ product.featured_image.width }}"
                     height="{{ product.featured_image.height }}"
@@ -157,7 +256,12 @@
               </div>
             </a>
           {%- else -%}
-            <div class="empty-state" style="grid-column:1/-1">No products in this collection yet.</div>
+            <div class="empty-state" style="grid-column:1/-1">
+              No products match these filters.
+              <div style="margin-top:0.75rem;">
+                <a class="button button--secondary" href="{{ collection.url }}">Clear filters</a>
+              </div>
+            </div>
           {%- endfor -%}
 
           {%- if paginate.pages > 1 -%}
@@ -197,6 +301,18 @@
       "step": 4,
       "label": "Products per page",
       "default": 24
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "Enable filtering",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "Enable sorting",
+      "default": true
     }
   ]
 }
