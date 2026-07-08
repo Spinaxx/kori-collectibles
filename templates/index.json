@@ -1,62 +1,90 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
-    "hero": {
-      "type": "hero",
+    "kori_hero": {
+      "type": "kori-hero",
       "settings": {
+        "color_scheme": "scheme-1",
         "eyebrow": "Independent Pokémon TCG shop",
         "heading_line_1": "The hunt is",
         "heading_line_2": "half the ",
         "heading_em": "foil",
         "heading_after": ".",
-        "text": "Singles, sealed product, and grading — sourced and condition-checked by people who actually play. No mystery packs, no guesswork on stock.",
+        "text": "Singles, sealed product, and grading — sourced and condition-checked by people who actually play.",
         "primary_label": "Browse singles",
-        "primary_link": "#grid",
         "secondary_label": "Shop sealed product",
-        "secondary_link": "#grid",
         "min_price": 5,
         "pool_size": 50,
         "fallback_name": "Featured single"
       }
     },
-    "binder": {
-      "type": "binder-grid",
-      "settings": {
-        "heading": "New in the binder",
-        "subheading": "Fresh pulls and fresh stock — condition-checked before they hit the site.",
-        "products_to_show": 8
-      }
-    },
-    "trust": {
-      "type": "trust",
+    "collage_WEBV9J": {
+      "type": "collage",
       "blocks": {
-        "trust_1": {
-          "type": "trust_item",
+        "image_rjLh6G": {
+          "type": "image",
           "settings": {
-            "number": "01",
-            "heading": "Every single, checked twice",
-            "text": "Condition graded under lamp against our own reference sheet before it hits the shelf or the site."
+            "image": "shopify://shop_images/Mega_Evolutions_Banner_mobil_600x600_999df7a3-6fb0-422d-8f02-3751bec58937.webp"
           }
         },
-        "trust_2": {
-          "type": "trust_item",
+        "image_ePTzNp": {
+          "type": "image",
           "settings": {
-            "number": "02",
-            "heading": "We buy collections",
-            "text": "Bring in a binder or a bulk box — cash or store credit, quoted while you wait."
+            "image": "shopify://shop_images/497676800_703579128987233_5123409185585563602_n.jpg"
           }
         },
-        "trust_3": {
-          "type": "trust_item",
+        "image_73Ftwr": {
+          "type": "image",
           "settings": {
-            "number": "03",
-            "heading": "Grading drop-off in store",
-            "text": "Submit through us for better turnaround than mailing in solo, tracked from drop-off to return."
+            "image": "shopify://shop_images/Destined_Rivals_FP_Banner_8e925582-ccd8-4fd6-96bc-c36386d87e15.webp"
           }
         }
       },
-      "block_order": ["trust_1", "trust_2", "trust_3"],
-      "settings": {}
+      "block_order": ["image_rjLh6G", "image_ePTzNp", "image_73Ftwr"],
+      "name": "t:sections.collage.presets.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "h1",
+        "desktop_layout": "left",
+        "mobile_layout": "column",
+        "card_styles": "product-card-wrapper",
+        "color_scheme": "scheme-1",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "featured_collection": {
+      "type": "featured-collection",
+      "settings": {
+        "collection": "all",
+        "products_to_show": 8,
+        "title": "Featured products",
+        "heading_size": "h2",
+        "description": "",
+        "show_description": false,
+        "description_style": "body",
+        "columns_desktop": 4,
+        "enable_desktop_slider": false,
+        "full_width": false,
+        "show_view_all": true,
+        "view_all_style": "solid",
+        "color_scheme": "scheme-1",
+        "image_ratio": "portrait",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "quick_add": "none",
+        "columns_mobile": "2",
+        "swipe_on_mobile": false,
+        "padding_top": 44,
+        "padding_bottom": 36
+      }
     }
   },
-  "order": ["hero", "binder", "trust"]
+  "order": ["kori_hero", "collage_WEBV9J", "featured_collection"]
 }

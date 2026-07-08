@@ -1,18 +1,1 @@
-{
-  "type": "footer",
-  "name": "Footer",
-  "sections": {
-    "footer": {
-      "type": "footer",
-      "settings": {
-        "brand_name": "Kori Collectibles",
-        "address": "42 Union Street\nHerne Bay, CT6 5AB",
-        "hours_weekday": "Mon–Sat · 10:00–18:00",
-        "hours_weekend": "Sun · 11:00–16:00",
-        "disclaimer": "Not affiliated with or endorsed by any card publisher.",
-        "bottom_note": "Prices update daily"
-      }
-    }
-  },
-  "order": ["footer"]
-}
+{"name":"t:sections.footer.name","type":"footer","sections":{"footer":{"type":"footer","settings":{"color_scheme":"scheme-1","newsletter_enable":true,"newsletter_heading":"Subscribe to our emails","enable_follow_on_shop":true,"show_social":true,"enable_country_selector":true,"enable_language_selector":true,"payment_enable":true,"show_policy":true,"margin_top":0,"padding_top":36,"padding_bottom":36}}},"order":["footer"]}

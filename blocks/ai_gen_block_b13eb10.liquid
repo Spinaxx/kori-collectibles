@@ -1,0 +1,606 @@
+{% doc %}
+  @prompt
+    Update the existing custom collection filter block so that the dropdown selector behaviour (replacing checkboxes with single-select dropdowns for filter groups like era, set, and artist) also applies correctly on mobile viewports. Currently the mobile view is still showing checkboxes instead of dropdowns. Ensure the dropdown UI is fully responsive and renders consistently across all screen sizes, including small/mobile screens. Do not change the desktop behaviour.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-collection-filter-{{ai_gen_id}} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.padding }}px;
+    background-color: {{ block.settings.background_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-collection-filter__title-{{ai_gen_id}} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 {{ block.settings.spacing }}px 0;
+    font-weight: 600;
+  }
+
+  .ai-collection-filter__group-{{ai_gen_id}} {
+    margin-bottom: {{ block.settings.spacing }}px;
+  }
+
+  .ai-collection-filter__group-title-{{ai_gen_id}} {
+    font-size: {{ block.settings.label_size }}px;
+    color: {{ block.settings.label_color }};
+    margin: 0 0 8px 0;
+    font-weight: 500;
+  }
+
+  .ai-collection-filter__dropdown-{{ai_gen_id}} {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: {{ block.settings.dropdown_text_size }}px;
+    color: {{ block.settings.dropdown_text_color }};
+    background-color: {{ block.settings.dropdown_bg_color }};
+    border: 1px solid {{ block.settings.dropdown_border_color }};
+    border-radius: {{ block.settings.dropdown_border_radius }}px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+  }
+
+  .ai-collection-filter__dropdown-{{ai_gen_id}}:focus {
+    outline: 2px solid {{ block.settings.dropdown_border_color }};
+    outline-offset: 2px;
+  }
+
+  .ai-collection-filter__dropdown-{{ai_gen_id}}:hover {
+    border-color: {{ block.settings.dropdown_hover_border_color }};
+  }
+
+  .ai-collection-filter__button-group-{{ai_gen_id}} {
+    display: flex;
+    gap: 8px;
+    margin-top: {{ block.settings.spacing }}px;
+  }
+
+  .ai-collection-filter__button-{{ai_gen_id}} {
+    flex: 1;
+    padding: 10px 16px;
+    font-size: {{ block.settings.button_text_size }}px;
+    border: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ai-collection-filter__button--apply-{{ai_gen_id}} {
+    background-color: {{ block.settings.apply_button_bg }};
+    color: {{ block.settings.apply_button_color }};
+  }
+
+  .ai-collection-filter__button--apply-{{ai_gen_id}}:hover {
+    background-color: {{ block.settings.apply_button_hover_bg }};
+  }
+
+  .ai-collection-filter__button--clear-{{ai_gen_id}} {
+    background-color: {{ block.settings.clear_button_bg }};
+    color: {{ block.settings.clear_button_color }};
+  }
+
+  .ai-collection-filter__button--clear-{{ai_gen_id}}:hover {
+    background-color: {{ block.settings.clear_button_hover_bg }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-collection-filter-{{ai_gen_id}} {
+      padding: {{ block.settings.padding | times: 0.75 }}px;
+    }
+
+    .ai-collection-filter__title-{{ai_gen_id}} {
+      font-size: {{ block.settings.title_size | times: 0.9 }}px;
+    }
+
+    .ai-collection-filter__dropdown-{{ai_gen_id}} {
+      padding: 10px 14px;
+      font-size: {{ block.settings.dropdown_text_size | times: 0.95 }}px;
+    }
+  }
+{% endstyle %}
+
+<collection-filter-{{ai_gen_id}} class="ai-collection-filter-{{ai_gen_id}}" {{ block.shopify_attributes }}>
+  {% if block.settings.show_title %}
+    <h3 class="ai-collection-filter__title-{{ai_gen_id}}">{{ block.settings.title }}</h3>
+  {% endif %}
+
+  <form class="ai-collection-filter__form-{{ai_gen_id}}" data-filter-form>
+    {% if block.settings.enable_era_filter %}
+      <div class="ai-collection-filter__group-{{ai_gen_id}}">
+        <label for="filter-era-{{ai_gen_id}}" class="ai-collection-filter__group-title-{{ai_gen_id}}">
+          {{ block.settings.era_label }}
+        </label>
+        <select 
+          id="filter-era-{{ai_gen_id}}" 
+          name="filter.p.m.custom.era" 
+          class="ai-collection-filter__dropdown-{{ai_gen_id}}"
+          data-filter-select
+        >
+          <option value="">{{ block.settings.era_placeholder }}</option>
+          {% assign era_values = block.settings.era_options | split: ',' %}
+          {% for era in era_values %}
+            {% assign era_trimmed = era | strip %}
+            {% if era_trimmed != blank %}
+              <option value="{{ era_trimmed }}">{{ era_trimmed }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+
+    {% if block.settings.enable_set_filter %}
+      <div class="ai-collection-filter__group-{{ai_gen_id}}">
+        <label for="filter-set-{{ai_gen_id}}" class="ai-collection-filter__group-title-{{ai_gen_id}}">
+          {{ block.settings.set_label }}
+        </label>
+        <select 
+          id="filter-set-{{ai_gen_id}}" 
+          name="filter.p.m.custom.set" 
+          class="ai-collection-filter__dropdown-{{ai_gen_id}}"
+          data-filter-select
+        >
+          <option value="">{{ block.settings.set_placeholder }}</option>
+          {% assign set_values = block.settings.set_options | split: ',' %}
+          {% for set in set_values %}
+            {% assign set_trimmed = set | strip %}
+            {% if set_trimmed != blank %}
+              <option value="{{ set_trimmed }}">{{ set_trimmed }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+
+    {% if block.settings.enable_artist_filter %}
+      <div class="ai-collection-filter__group-{{ai_gen_id}}">
+        <label for="filter-artist-{{ai_gen_id}}" class="ai-collection-filter__group-title-{{ai_gen_id}}">
+          {{ block.settings.artist_label }}
+        </label>
+        <select 
+          id="filter-artist-{{ai_gen_id}}" 
+          name="filter.p.m.custom.artist" 
+          class="ai-collection-filter__dropdown-{{ai_gen_id}}"
+          data-filter-select
+        >
+          <option value="">{{ block.settings.artist_placeholder }}</option>
+          {% assign artist_values = block.settings.artist_options | split: ',' %}
+          {% for artist in artist_values %}
+            {% assign artist_trimmed = artist | strip %}
+            {% if artist_trimmed != blank %}
+              <option value="{{ artist_trimmed }}">{{ artist_trimmed }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+
+    <div class="ai-collection-filter__button-group-{{ai_gen_id}}">
+      <button 
+        type="submit" 
+        class="ai-collection-filter__button-{{ai_gen_id}} ai-collection-filter__button--apply-{{ai_gen_id}}"
+      >
+        {{ block.settings.apply_label }}
+      </button>
+      <button 
+        type="button" 
+        class="ai-collection-filter__button-{{ai_gen_id}} ai-collection-filter__button--clear-{{ai_gen_id}}"
+        data-clear-filters
+      >
+        {{ block.settings.clear_label }}
+      </button>
+    </div>
+  </form>
+</collection-filter-{{ai_gen_id}}>
+
+<script>
+  (function() {
+    class CollectionFilter{{ai_gen_id}} extends HTMLElement {
+      constructor() {
+        super();
+        this.form = this.querySelector('[data-filter-form]');
+        this.clearButton = this.querySelector('[data-clear-filters]');
+        this.selects = this.querySelectorAll('[data-filter-select]');
+      }
+
+      connectedCallback() {
+        this.initializeFromURL();
+        this.setupEventListeners();
+      }
+
+      initializeFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        this.selects.forEach((select) => {
+          const paramValue = params.get(select.name);
+          if (paramValue) {
+            select.value = paramValue;
+          }
+        });
+      }
+
+      setupEventListeners() {
+        if (this.form) {
+          this.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.applyFilters();
+          });
+        }
+
+        if (this.clearButton) {
+          this.clearButton.addEventListener('click', () => {
+            this.clearFilters();
+          });
+        }
+
+        this.selects.forEach((select) => {
+          select.addEventListener('change', () => {
+            if ({{ block.settings.auto_apply | json }}) {
+              this.applyFilters();
+            }
+          });
+        });
+      }
+
+      applyFilters() {
+        const formData = new FormData(this.form);
+        const params = new URLSearchParams(window.location.search);
+        
+        this.selects.forEach((select) => {
+          const value = formData.get(select.name);
+          if (value && value !== '') {
+            params.set(select.name, value);
+          } else {
+            params.delete(select.name);
+          }
+        });
+
+        const newURL = `${window.location.pathname}?${params.toString()}`;
+        window.location.href = newURL;
+      }
+
+      clearFilters() {
+        this.selects.forEach((select) => {
+          select.value = '';
+        });
+
+        const params = new URLSearchParams(window.location.search);
+        this.selects.forEach((select) => {
+          params.delete(select.name);
+        });
+
+        const newURL = params.toString() 
+          ? `${window.location.pathname}?${params.toString()}`
+          : window.location.pathname;
+        
+        window.location.href = newURL;
+      }
+    }
+
+    customElements.define('collection-filter-{{ai_gen_id}}', CollectionFilter{{ai_gen_id}});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collection filters",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Title"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show title",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Filter products"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Era filter"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_era_filter",
+      "label": "Enable era filter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "era_label",
+      "label": "Label",
+      "default": "Era"
+    },
+    {
+      "type": "text",
+      "id": "era_placeholder",
+      "label": "Placeholder",
+      "default": "Select era"
+    },
+    {
+      "type": "textarea",
+      "id": "era_options",
+      "label": "Options",
+      "default": "Modern, Golden Age, Silver Age, Bronze Age",
+      "info": "Comma-separated list of era options"
+    },
+    {
+      "type": "header",
+      "content": "Set filter"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_set_filter",
+      "label": "Enable set filter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "set_label",
+      "label": "Label",
+      "default": "Set"
+    },
+    {
+      "type": "text",
+      "id": "set_placeholder",
+      "label": "Placeholder",
+      "default": "Select set"
+    },
+    {
+      "type": "textarea",
+      "id": "set_options",
+      "label": "Options",
+      "default": "Base Set, Expansion, Limited Edition",
+      "info": "Comma-separated list of set options"
+    },
+    {
+      "type": "header",
+      "content": "Artist filter"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_artist_filter",
+      "label": "Enable artist filter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "artist_label",
+      "label": "Label",
+      "default": "Artist"
+    },
+    {
+      "type": "text",
+      "id": "artist_placeholder",
+      "label": "Placeholder",
+      "default": "Select artist"
+    },
+    {
+      "type": "textarea",
+      "id": "artist_options",
+      "label": "Options",
+      "default": "Artist 1, Artist 2, Artist 3",
+      "info": "Comma-separated list of artist options"
+    },
+    {
+      "type": "header",
+      "content": "Filter labels"
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Label size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Dropdown style"
+    },
+    {
+      "type": "range",
+      "id": "dropdown_text_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "dropdown_text_color",
+      "label": "Text color",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "dropdown_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "dropdown_border_color",
+      "label": "Border color",
+      "default": "#cccccc"
+    },
+    {
+      "type": "color",
+      "id": "dropdown_hover_border_color",
+      "label": "Hover border color",
+      "default": "#121212"
+    },
+    {
+      "type": "range",
+      "id": "dropdown_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "apply_label",
+      "label": "Apply button label",
+      "default": "Apply filters"
+    },
+    {
+      "type": "text",
+      "id": "clear_label",
+      "label": "Clear button label",
+      "default": "Clear all"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_apply",
+      "label": "Auto-apply on selection",
+      "default": false,
+      "info": "Apply filters immediately when dropdown changes"
+    },
+    {
+      "type": "range",
+      "id": "button_text_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Button text size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Button border radius",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "apply_button_bg",
+      "label": "Apply button background",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "apply_button_color",
+      "label": "Apply button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "apply_button_hover_bg",
+      "label": "Apply hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "clear_button_bg",
+      "label": "Clear button background",
+      "default": "#f3f3f3"
+    },
+    {
+      "type": "color",
+      "id": "clear_button_color",
+      "label": "Clear button text",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "clear_button_hover_bg",
+      "label": "Clear hover background",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "min": 8,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "label": "Spacing",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection filters"
+    }
+  ]
+}
+{% endschema %}
