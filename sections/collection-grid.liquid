@@ -1,6 +1,6 @@
 <section class="page-width">
   <div class="collection-banner" style="padding-top:2rem;">
-    <h1>{{ collection.title }}</h1>
+    <h1>{{ collection.title | escape }}</h1>
     {%- if collection.description != blank -%}
       <p>{{ collection.description | strip_html | truncate: 220 }}</p>
     {%- endif -%}
@@ -10,7 +10,7 @@
     {%- if collection.filters.size > 0 -%}
       <aside class="facets" data-facets>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
-          <div class="facets__title">{{ 'collections.filters' | t }}</div>
+          <div class="facets__title">Filters</div>
           <button type="button" class="icon-btn facets-mobile-btn" data-close-facets aria-label="Close">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" width="20" height="20">
               <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
@@ -21,7 +21,7 @@
         <form>
           {%- for filter in collection.filters -%}
             <details class="facet-group" open>
-              <summary>{{ filter.label }}</summary>
+              <summary>{{ filter.label | escape }}</summary>
               <div class="facet-list">
                 {%- case filter.type -%}
                   {%- when 'list', 'boolean' -%}
@@ -35,7 +35,7 @@
                           {% if value.count == 0 and value.active == false %}disabled{% endif %}
                           onchange="this.form.submit()"
                         >
-                        <span>{{ value.label }} ({{ value.count }})</span>
+                        <span>{{ value.label | escape }} ({{ value.count }})</span>
                       </label>
                     {%- endfor -%}
                   {%- when 'price_range' -%}
@@ -55,15 +55,13 @@
                         style="width:100%;min-height:42px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.5rem;"
                       >
                     </div>
-                    <button type="submit" class="button button--secondary button--full" style="margin-top:0.65rem;">{{ 'collections.apply' | t }}</button>
+                    <button type="submit" class="button button--secondary button--full" style="margin-top:0.65rem;">Apply</button>
                 {%- endcase -%}
               </div>
             </details>
           {%- endfor -%}
 
-          {%- if collection.filters.size > 0 -%}
-            <a class="section-link" href="{{ collection.url }}" style="display:inline-block;margin-top:1rem;">{{ 'collections.clear' | t }}</a>
-          {%- endif -%}
+          <a class="section-link" href="{{ collection.url }}" style="display:inline-block;margin-top:1rem;">Clear all</a>
         </form>
       </aside>
     {%- endif -%}
@@ -71,16 +69,16 @@
     <div>
       <div class="collection-toolbar">
         <div style="color:var(--muted);font-size:0.88rem;">
-          {{ 'collections.product_count' | t: count: collection.products_count }}
+          {{ collection.products_count }} products
         </div>
         <div style="display:flex;gap:0.5rem;align-items:center;">
           {%- if collection.filters.size > 0 -%}
             <button type="button" class="button button--secondary facets-mobile-btn" data-open-facets>
-              {{ 'collections.filters' | t }}
+              Filters
             </button>
           {%- endif -%}
 
-          <label class="visually-hidden" for="SortBy">{{ 'collections.sort_by' | t }}</label>
+          <label class="visually-hidden" for="SortBy">Sort by</label>
           <select id="SortBy" name="sort_by" onchange="window.location.href=this.value">
             {%- for option in collection.sort_options -%}
               <option
@@ -98,8 +96,8 @@
         {%- paginate collection.products by section.settings.products_per_page -%}
           {%- for product in collection.products -%}
             {%- liquid
-              assign featured = product.selected_or_first_available_variant
-              assign stock = featured.inventory_quantity
+              assign variant = product.selected_or_first_available_variant
+              assign stock = variant.inventory_quantity
               assign low = false
               if stock != blank and stock > 0 and stock <= 5
                 assign low = true
@@ -108,12 +106,13 @@
             -%}
             <a class="card" href="{{ product.url }}">
               <div class="card__media">
-                {%- unless product.available -%}
+                {%- if product.available == false -%}
                   <span class="card__badge card__badge--sold">Sold out</span>
                 {%- elsif product.tags contains 'preorder' or product.tags contains 'Preorder' or product.tags contains 'pre-order' -%}
                   <span class="card__badge">Pre-order</span>
                 {%- endif -%}
-                {%- if product.featured_image -%}
+
+                {%- if product.featured_image != blank -%}
                   <img
                     src="{{ product.featured_image | image_url: width: 480 }}"
                     srcset="
@@ -186,7 +185,9 @@
 
 {% schema %}
 {
-  "name": "Collection",
+  "name": "Collection grid",
+  "tag": "section",
+  "class": "section-collection-grid",
   "settings": [
     {
       "type": "range",

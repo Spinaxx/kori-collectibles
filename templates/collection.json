@@ -1,7 +1,7 @@
 {
   "sections": {
     "main": {
-      "type": "main-collection",
+      "type": "collection-grid",
       "settings": {
         "products_per_page": 24
       }

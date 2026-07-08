@@ -25,20 +25,14 @@
           {%- if item.object_type == 'product' -%}
             {%- liquid
               assign product = item
-              assign featured = product.selected_or_first_available_variant
-              assign stock = featured.inventory_quantity
-              assign low = false
-              if stock != blank and stock > 0 and stock <= 5
-                assign low = true
-              endif
               assign image_alt = product.featured_image.alt | default: product.title
             -%}
             <a class="card" href="{{ product.url }}">
               <div class="card__media">
-                {%- unless product.available -%}
+                {%- if product.available == false -%}
                   <span class="card__badge card__badge--sold">Sold out</span>
                 {%- endif -%}
-                {%- if product.featured_image -%}
+                {%- if product.featured_image != blank -%}
                   <img
                     src="{{ product.featured_image | image_url: width: 480 }}"
                     srcset="
@@ -79,7 +73,9 @@
 
 {% schema %}
 {
-  "name": "Search",
+  "name": "Search results",
+  "tag": "section",
+  "class": "section-search-results",
   "settings": []
 }
 {% endschema %}
