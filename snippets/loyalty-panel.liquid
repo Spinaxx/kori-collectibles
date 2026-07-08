@@ -23,9 +23,12 @@
   if customer and balance >= redeem_points
     assign can_redeem = true
   endif
-
+-%}
+{%- if customer -%}
+  {%- include 'loyalty-redeem-code-lookup' -%}
+{%- endif -%}
+{%- liquid
   if customer
-    include 'loyalty-redeem-code-lookup'
     assign active_redeem_code = loyalty_redeem_code
   endif
 
