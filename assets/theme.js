@@ -258,7 +258,8 @@
     document.addEventListener(
       'click',
       (e) => {
-        const opener = e.target.closest('[data-open-cart]');
+        const target = e.target instanceof Element ? e.target : e.target.parentElement;
+        const opener = target && target.closest('[data-open-cart]');
         if (!opener) return;
         e.preventDefault();
         e.stopPropagation();
@@ -268,18 +269,21 @@
     );
 
     drawer.addEventListener('click', (e) => {
-      if (e.target.closest('[data-close-cart]')) {
+      const target = e.target instanceof Element ? e.target : e.target.parentElement;
+      if (!target) return;
+
+      if (target.closest('[data-close-cart]')) {
         setOpen(false);
         return;
       }
 
-      const remove = e.target.closest('[data-cart-remove]');
+      const remove = target.closest('[data-cart-remove]');
       if (remove) {
         changeLine(remove.getAttribute('data-key'), 0).catch(() => {});
         return;
       }
 
-      const qtyBtn = e.target.closest('[data-cart-qty]');
+      const qtyBtn = target.closest('[data-cart-qty]');
       if (qtyBtn) {
         const key = qtyBtn.getAttribute('data-key');
         const delta = Number(qtyBtn.getAttribute('data-cart-qty'));
@@ -291,7 +295,8 @@
     });
 
     drawer.addEventListener('change', (e) => {
-      const input = e.target.closest('[data-cart-qty-input]');
+      const target = e.target instanceof Element ? e.target : null;
+      const input = target && target.closest('[data-cart-qty-input]');
       if (!input) return;
       const qty = Math.max(0, Number(input.value) || 0);
       changeLine(input.getAttribute('data-key'), qty).catch(() => {});
@@ -651,12 +656,24 @@
   };
 
   const boot = () => {
-    initDrawers();
-    initCartDrawer();
-    initNavDropdowns();
-    initHeroTilt();
-    initPredictiveSearch();
-    initSearchPageFallback();
+    try {
+      initDrawers();
+    } catch (err) {
+      console.error('initDrawers failed', err);
+    }
+    try {
+      initCartDrawer();
+    } catch (err) {
+      console.error('initCartDrawer failed', err);
+    }
+    try {
+      initNavDropdowns();
+      initHeroTilt();
+      initPredictiveSearch();
+      initSearchPageFallback();
+    } catch (err) {
+      console.error('theme boot extras failed', err);
+    }
   };
 
   if (document.readyState === 'loading') {
