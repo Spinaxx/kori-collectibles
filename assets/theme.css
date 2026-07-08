@@ -1003,6 +1003,8 @@ ul {
   border-radius: var(--radius);
   transition: border-color 0.15s, transform 0.15s, background 0.15s;
   min-height: 126px;
+  position: relative;
+  overflow: hidden;
 }
 
 .game-tile:hover {
@@ -1011,6 +1013,41 @@ ul {
   background:
     linear-gradient(160deg, rgba(45, 212, 191, 0.14), transparent 50%),
     var(--surface);
+}
+
+.game-tile--coming-soon {
+  opacity: 0.95;
+}
+
+.game-tile--coming-soon .game-tile__logo,
+.game-tile--coming-soon .game-tile__label,
+.game-tile--coming-soon .game-tile__meta {
+  opacity: 0.55;
+}
+
+.game-tile__banner {
+  position: absolute;
+  top: 0.85rem;
+  right: -2.75rem;
+  z-index: 2;
+  width: 9.5rem;
+  padding: 0.28rem 0;
+  background: linear-gradient(90deg, var(--accent-2), #ffcf70);
+  color: #1a1205;
+  text-align: center;
+  transform: rotate(32deg);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+}
+
+.game-tile__banner-text {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .game-tile__logo {

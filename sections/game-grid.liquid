@@ -44,11 +44,25 @@
               assign logo_asset = 'logo-accessories.svg'
           endcase
         -%}
+        {%- liquid
+          assign coming_soon = block.settings.coming_soon
+          assign banner_text = block.settings.coming_soon_text | default: 'Coming soon'
+          assign tile_href = routes.collections_url
+          if block.settings.link != blank
+            assign tile_href = block.settings.link
+          endif
+        -%}
         <a
-          class="game-tile"
-          href="{% if block.settings.link != blank %}{{ block.settings.link }}{% else %}{{ routes.collections_url }}{% endif %}"
+          class="game-tile{% if coming_soon %} game-tile--coming-soon{% endif %}"
+          href="{{ tile_href }}"
+          {% if coming_soon %}aria-label="{{ block.settings.title | escape }} — {{ banner_text | escape }}"{% endif %}
           {{ block.shopify_attributes }}
         >
+          {%- if coming_soon -%}
+            <span class="game-tile__banner" aria-hidden="true">
+              <span class="game-tile__banner-text">{{ banner_text | escape }}</span>
+            </span>
+          {%- endif -%}
           <span class="game-tile__logo" aria-hidden="true">
             {%- if block.settings.logo != blank -%}
               <img
@@ -127,6 +141,19 @@
           "type": "url",
           "id": "link",
           "label": "Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "coming_soon",
+          "label": "Show coming soon banner",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "coming_soon_text",
+          "label": "Banner text",
+          "default": "Coming soon",
+          "info": "Shown as a diagonal banner across the tile when enabled."
         },
         {
           "type": "image_picker",
