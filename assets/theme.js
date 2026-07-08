@@ -798,11 +798,31 @@
     });
   };
 
+  const initMoreTcgsExpand = () => {
+    qsa('[data-more-tcgs]').forEach((group) => {
+      const toggle = qs('[data-more-tcgs-toggle]', group);
+      const panel = qs('[data-more-tcgs-panel]', group);
+      if (!toggle || !panel) return;
+
+      toggle.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!open));
+        panel.hidden = open;
+        group.classList.toggle('is-open', !open);
+      });
+    });
+  };
+
   const boot = () => {
     try {
       initAnnouncementMarquee();
     } catch (err) {
       console.error('initAnnouncementMarquee failed', err);
+    }
+    try {
+      initMoreTcgsExpand();
+    } catch (err) {
+      console.error('initMoreTcgsExpand failed', err);
     }
     try {
       initDrawers();

@@ -10,109 +10,30 @@
     </div>
     <div class="game-grid">
       {%- for block in section.blocks -%}
-        {%- liquid
-          assign logo_key = block.settings.logo_key | default: 'auto'
-          if logo_key == 'auto'
-            assign title_key = block.settings.title | downcase | strip
-            if title_key contains 'japanese' and title_key contains 'pokemon'
-              assign logo_key = 'japanese_pokemon'
-            elsif title_key contains 'pokemon' or title_key contains 'pokémon'
-              assign logo_key = 'pokemon'
-            elsif title_key contains 'more tcg'
-              assign logo_key = 'more_tcgs'
-            elsif title_key contains 'yu-gi' or title_key contains 'yugioh' or title_key contains 'yu gi'
-              assign logo_key = 'yugioh'
-            elsif title_key contains 'magic' or title_key contains 'mtg'
-              assign logo_key = 'magic'
-            elsif title_key contains 'one piece'
-              assign logo_key = 'onepiece'
-            elsif title_key contains 'lorcana'
-              assign logo_key = 'lorcana'
-            else
-              assign logo_key = 'accessories'
-            endif
-          endif
+        {%- if block.type == 'tcg_sub' -%}
+          {%- continue -%}
+        {%- endif -%}
 
-          case logo_key
-            when 'pokemon'
-              assign logo_asset = 'logo-pokemon.svg'
-            when 'japanese_pokemon'
-              assign logo_asset = 'logo-pokemon.svg'
-            when 'yugioh'
-              assign logo_asset = 'logo-yugioh.png'
-            when 'magic'
-              assign logo_asset = 'logo-magic.svg'
-            when 'onepiece'
-              assign logo_asset = 'logo-onepiece.svg'
-            when 'lorcana'
-              assign logo_asset = 'logo-lorcana.svg'
-            when 'more_tcgs'
-              assign logo_asset = 'logo-more-tcgs.svg'
-            else
-              assign logo_asset = 'logo-accessories.svg'
-          endcase
-        -%}
-        {%- liquid
-          assign coming_soon = block.settings.coming_soon
-          assign banner_text = block.settings.coming_soon_text | default: 'Coming soon'
-          assign tile_href = routes.collections_url
-          if block.settings.link != blank
-            assign tile_href = block.settings.link
-          endif
-        -%}
-        {%- capture tile_inner -%}
-          {%- if coming_soon -%}
-            <span class="game-tile__banner" aria-hidden="true">
-              <span class="game-tile__banner-text">{{ banner_text | escape }}</span>
-            </span>
-          {%- endif -%}
-          <span class="game-tile__logo" aria-hidden="true">
-            {%- if block.settings.logo != blank -%}
-              <img
-                src="{{ block.settings.logo | image_url: width: 360 }}"
-                srcset="{{ block.settings.logo | image_url: width: 180 }} 180w, {{ block.settings.logo | image_url: width: 280 }} 280w, {{ block.settings.logo | image_url: width: 360 }} 360w"
-                sizes="120px"
-                alt=""
-                width="120"
-                height="48"
-                loading="lazy"
-              >
-            {%- else -%}
-              <img
-                src="{{ logo_asset | asset_url }}"
-                alt=""
-                width="120"
-                height="48"
-                loading="lazy"
-              >
-            {%- endif -%}
-          </span>
-          {%- if block.settings.show_title -%}
-            <span class="game-tile__label">{{ block.settings.title | escape }}</span>
-          {%- endif -%}
-          {%- if block.settings.meta != blank -%}
-            <span class="game-tile__meta">{{ block.settings.meta | escape }}</span>
-          {%- endif -%}
-          <span class="visually-hidden">{{ block.settings.title | escape }}</span>
-        {%- endcapture -%}
-
-        {%- if coming_soon -%}
-          <div
-            class="game-tile game-tile--coming-soon"
-            aria-disabled="true"
-            aria-label="{{ block.settings.title | escape }} — {{ banner_text | escape }}"
-            {{ block.shopify_attributes }}
-          >
-            {{ tile_inner }}
+        {%- if block.type == 'more_tcgs' -%}
+          <div class="game-tile-expand" data-more-tcgs>
+            {%- render 'game-tile', block: block, tile_mode: 'toggle' -%}
+            <div
+              class="game-tile-expand__panel"
+              id="MoreTcgs-{{ section.id }}"
+              data-more-tcgs-panel
+              hidden
+            >
+              <div class="game-tile-expand__subs">
+                {%- for sub in section.blocks -%}
+                  {%- if sub.type == 'tcg_sub' -%}
+                    {%- render 'game-tile', block: sub -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </div>
           </div>
         {%- else -%}
-          <a
-            class="game-tile"
-            href="{{ tile_href }}"
-            {{ block.shopify_attributes }}
-          >
-            {{ tile_inner }}
-          </a>
+          {%- render 'game-tile', block: block -%}
         {%- endif -%}
       {%- endfor -%}
     </div>
@@ -211,6 +132,118 @@
           ]
         }
       ]
+    },
+    {
+      "type": "more_tcgs",
+      "name": "More TCGs expander",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "More TCGs"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_title",
+          "label": "Show title under logo",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "meta",
+          "label": "Meta",
+          "default": "Magic · One Piece · More"
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Override logo"
+        },
+        {
+          "type": "select",
+          "id": "logo_key",
+          "label": "Built-in logo",
+          "default": "more_tcgs",
+          "options": [
+            { "value": "more_tcgs", "label": "More TCGs" },
+            { "value": "auto", "label": "Auto from title" }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": "Add TCG sub-tile blocks below this one in the section. They appear when this tile is clicked."
+        }
+      ]
+    },
+    {
+      "type": "tcg_sub",
+      "name": "TCG sub-tile",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Coming soon"
+        },
+        {
+          "type": "checkbox",
+          "id": "coming_soon",
+          "label": "Show coming soon banner",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "coming_soon_text",
+          "label": "Banner text",
+          "default": "Coming soon"
+        },
+        {
+          "type": "header",
+          "content": "Tile content"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Magic"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_title",
+          "label": "Show title under logo",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "meta",
+          "label": "Meta",
+          "default": "Singles · Sealed"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Ignored while Coming soon is enabled."
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Override logo"
+        },
+        {
+          "type": "select",
+          "id": "logo_key",
+          "label": "Built-in logo",
+          "default": "auto",
+          "options": [
+            { "value": "auto", "label": "Auto from title" },
+            { "value": "magic", "label": "Magic" },
+            { "value": "onepiece", "label": "One Piece" },
+            { "value": "lorcana", "label": "Lorcana" },
+            { "value": "yugioh", "label": "Yu-Gi-Oh!" }
+          ]
+        }
+      ]
     }
   ],
   "presets": [
@@ -221,8 +254,10 @@
         { "type": "game", "settings": { "title": "Japanese Pokemon", "meta": "Singles · Sealed", "logo_key": "japanese_pokemon", "show_title": true, "coming_soon": false } },
         { "type": "game", "settings": { "title": "Yu-Gi-Oh!", "meta": "Singles · Sealed", "logo_key": "yugioh", "show_title": false, "coming_soon": false } },
         { "type": "game", "settings": { "title": "Lorcana", "meta": "Sealed", "logo_key": "lorcana", "show_title": false, "coming_soon": false } },
-        { "type": "game", "settings": { "title": "More TCGs", "meta": "Magic · One Piece · More", "logo_key": "more_tcgs", "show_title": false, "coming_soon": false } },
-        { "type": "game", "settings": { "title": "Accessories", "meta": "Sleeves · Binders", "logo_key": "accessories", "show_title": false, "coming_soon": false } }
+        { "type": "game", "settings": { "title": "Accessories", "meta": "Sleeves · Binders", "logo_key": "accessories", "show_title": false, "coming_soon": false } },
+        { "type": "more_tcgs", "settings": { "title": "More TCGs", "meta": "Magic · One Piece · More", "logo_key": "more_tcgs", "show_title": false } },
+        { "type": "tcg_sub", "settings": { "title": "Magic", "meta": "Singles · Sealed", "logo_key": "magic", "show_title": false, "coming_soon": true } },
+        { "type": "tcg_sub", "settings": { "title": "One Piece", "meta": "Sealed", "logo_key": "onepiece", "show_title": false, "coming_soon": true } }
       ]
     }
   ]

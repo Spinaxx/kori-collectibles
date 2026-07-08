@@ -113,23 +113,44 @@
           "settings": {
             "coming_soon": false,
             "coming_soon_text": "Coming soon",
-            "title": "More TCGs",
-            "show_title": false,
-            "meta": "Magic · One Piece · More",
-            "link": "",
-            "logo_key": "more_tcgs"
-          }
-        },
-        "g6": {
-          "type": "game",
-          "settings": {
-            "coming_soon": false,
-            "coming_soon_text": "Coming soon",
             "title": "Accessories",
             "show_title": false,
             "meta": "Sleeves · Binders",
             "link": "",
             "logo_key": "accessories"
+          }
+        },
+        "g6": {
+          "type": "more_tcgs",
+          "settings": {
+            "title": "More TCGs",
+            "show_title": false,
+            "meta": "Magic · One Piece · More",
+            "logo_key": "more_tcgs"
+          }
+        },
+        "g7": {
+          "type": "tcg_sub",
+          "settings": {
+            "coming_soon": true,
+            "coming_soon_text": "Coming soon",
+            "title": "Magic",
+            "show_title": false,
+            "meta": "Singles · Sealed",
+            "link": "",
+            "logo_key": "magic"
+          }
+        },
+        "g8": {
+          "type": "tcg_sub",
+          "settings": {
+            "coming_soon": true,
+            "coming_soon_text": "Coming soon",
+            "title": "One Piece",
+            "show_title": false,
+            "meta": "Sealed",
+            "link": "",
+            "logo_key": "onepiece"
           }
         }
       },
@@ -139,7 +160,9 @@
         "g3",
         "g4",
         "g5",
-        "g6"
+        "g6",
+        "g7",
+        "g8"
       ],
       "settings": {
         "heading": "Shop by game",

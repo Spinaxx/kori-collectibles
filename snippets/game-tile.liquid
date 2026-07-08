@@ -1,0 +1,117 @@
+{%- liquid
+  assign logo_key = block.settings.logo_key | default: 'auto'
+  if logo_key == 'auto'
+    assign title_key = block.settings.title | downcase | strip
+    if title_key contains 'japanese' and title_key contains 'pokemon'
+      assign logo_key = 'japanese_pokemon'
+    elsif title_key contains 'pokemon' or title_key contains 'pokémon'
+      assign logo_key = 'pokemon'
+    elsif title_key contains 'more tcg'
+      assign logo_key = 'more_tcgs'
+    elsif title_key contains 'yu-gi' or title_key contains 'yugioh' or title_key contains 'yu gi'
+      assign logo_key = 'yugioh'
+    elsif title_key contains 'magic' or title_key contains 'mtg'
+      assign logo_key = 'magic'
+    elsif title_key contains 'one piece'
+      assign logo_key = 'onepiece'
+    elsif title_key contains 'lorcana'
+      assign logo_key = 'lorcana'
+    else
+      assign logo_key = 'accessories'
+    endif
+  endif
+
+  case logo_key
+    when 'pokemon'
+      assign logo_asset = 'logo-pokemon.svg'
+    when 'japanese_pokemon'
+      assign logo_asset = 'logo-pokemon.svg'
+    when 'yugioh'
+      assign logo_asset = 'logo-yugioh.png'
+    when 'magic'
+      assign logo_asset = 'logo-magic.svg'
+    when 'onepiece'
+      assign logo_asset = 'logo-onepiece.svg'
+    when 'lorcana'
+      assign logo_asset = 'logo-lorcana.svg'
+    when 'more_tcgs'
+      assign logo_asset = 'logo-more-tcgs.svg'
+    else
+      assign logo_asset = 'logo-accessories.svg'
+  endcase
+
+  assign coming_soon = block.settings.coming_soon
+  assign banner_text = block.settings.coming_soon_text | default: 'Coming soon'
+  assign tile_href = routes.collections_url
+  if block.settings.link != blank
+    assign tile_href = block.settings.link
+  endif
+-%}
+
+{%- capture tile_inner -%}
+  {%- if coming_soon -%}
+    <span class="game-tile__banner" aria-hidden="true">
+      <span class="game-tile__banner-text">{{ banner_text | escape }}</span>
+    </span>
+  {%- endif -%}
+  <span class="game-tile__logo" aria-hidden="true">
+    {%- if block.settings.logo != blank -%}
+      <img
+        src="{{ block.settings.logo | image_url: width: 360 }}"
+        srcset="{{ block.settings.logo | image_url: width: 180 }} 180w, {{ block.settings.logo | image_url: width: 280 }} 280w, {{ block.settings.logo | image_url: width: 360 }} 360w"
+        sizes="120px"
+        alt=""
+        width="120"
+        height="48"
+        loading="lazy"
+      >
+    {%- else -%}
+      <img
+        src="{{ logo_asset | asset_url }}"
+        alt=""
+        width="120"
+        height="48"
+        loading="lazy"
+      >
+    {%- endif -%}
+  </span>
+  {%- if block.settings.show_title -%}
+    <span class="game-tile__label">{{ block.settings.title | escape }}</span>
+  {%- endif -%}
+  {%- if block.settings.meta != blank -%}
+    <span class="game-tile__meta">{{ block.settings.meta | escape }}</span>
+  {%- endif -%}
+  <span class="visually-hidden">{{ block.settings.title | escape }}</span>
+{%- endcapture -%}
+
+{%- if tile_mode == 'toggle' -%}
+  <button
+    type="button"
+    class="game-tile game-tile--toggle"
+    data-more-tcgs-toggle
+    aria-expanded="false"
+    aria-controls="MoreTcgs-{{ section.id }}"
+    {{ block.shopify_attributes }}
+  >
+    {{ tile_inner }}
+    <span class="game-tile__chevron" aria-hidden="true"></span>
+    <span class="visually-hidden">Show more trading card games</span>
+  </button>
+{%- elsif coming_soon -%}
+  <div
+    class="game-tile game-tile--coming-soon"
+    aria-disabled="true"
+    aria-label="{{ block.settings.title | escape }} — {{ banner_text | escape }}"
+    {{ block.shopify_attributes }}
+  >
+    {{ tile_inner }}
+  </div>
+{%- else -%}
+  <a
+    class="game-tile"
+    href="{{ tile_href }}"
+    {{ block.shopify_attributes }}
+  >
+    {{ tile_inner }}
+  </a>
+{%- endif -%}
