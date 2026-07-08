@@ -97,17 +97,7 @@
 
         <section class="loyalty-panel__section">
           <h3>Ways to redeem</h3>
-          <div class="loyalty-reward{% if can_redeem %} loyalty-reward--ready{% endif %}">
-            <div class="loyalty-reward__value">£{{ redeem_value }} off</div>
-            <div class="loyalty-reward__cost">{{ redeem_points }} points</div>
-            {%- if can_redeem -%}
-              <a class="button button--full loyalty-reward__cta" href="mailto:{{ redeem_email | escape }}?subject=Redeem%20{{ redeem_points }}%20points">
-                Email to redeem
-              </a>
-            {%- else -%}
-              <p class="loyalty-reward__locked">{{ points_needed }} more points needed</p>
-            {%- endif -%}
-          </div>
+          {%- render 'loyalty-redeem-card', balance: balance, compact: true -%}
         </section>
 
         <a class="loyalty-panel__link" href="{{ rewards_url }}">Full program details</a>

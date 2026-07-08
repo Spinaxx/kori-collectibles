@@ -977,6 +977,104 @@
     });
   };
 
+  const initLoyaltyRedeem = () => {
+    const showCode = (root, payload) => {
+      const ready = qs('[data-loyalty-redeem-ready]', root);
+      const success = qs('[data-loyalty-redeem-success]', root);
+      const codeEl = qs('[data-loyalty-redeem-code]', root);
+      const applyBtn = qs('[data-loyalty-redeem-apply]', root);
+      const errorEl = qs('[data-loyalty-redeem-error]', root);
+      const loadingEl = qs('[data-loyalty-redeem-loading]', root);
+
+      if (loadingEl) loadingEl.hidden = true;
+      if (errorEl) errorEl.hidden = true;
+      if (ready) ready.hidden = true;
+      if (success) success.hidden = false;
+      if (codeEl) codeEl.textContent = payload.code;
+      if (applyBtn) applyBtn.href = payload.applyUrl || `/discount/${encodeURIComponent(payload.code)}`;
+
+      if (payload.balance !== undefined) {
+        qsa('[data-loyalty-balance]').forEach((el) => {
+          el.textContent = String(payload.balance);
+        });
+        document.body.dataset.loyaltyBalance = String(payload.balance);
+      }
+    };
+
+    qsa('[data-loyalty-redeem]').forEach((root) => {
+      const proxyUrl = root.dataset.proxyUrl;
+      const fallbackEmail = root.dataset.fallbackEmail;
+      const redeemPoints = root.dataset.redeemPoints || '100';
+      const activeCode = root.dataset.activeCode;
+
+      if (activeCode) {
+        showCode(root, {
+          code: activeCode,
+          applyUrl: `/discount/${encodeURIComponent(activeCode)}`,
+        });
+      }
+
+      const trigger = qs('[data-loyalty-redeem-trigger]', root);
+      const copyBtn = qs('[data-loyalty-redeem-copy]', root);
+      const errorEl = qs('[data-loyalty-redeem-error]', root);
+      const loadingEl = qs('[data-loyalty-redeem-loading]', root);
+
+      if (trigger && proxyUrl) {
+        trigger.addEventListener('click', async () => {
+          if (loadingEl) loadingEl.hidden = false;
+          if (errorEl) errorEl.hidden = true;
+          trigger.disabled = true;
+
+          try {
+            const response = await fetch(proxyUrl, {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: { Accept: 'application/json' },
+            });
+            const payload = await response.json();
+
+            if (!response.ok) {
+              throw new Error(payload.error || 'Could not redeem points right now.');
+            }
+
+            showCode(root, payload);
+          } catch (err) {
+            if (loadingEl) loadingEl.hidden = true;
+            if (errorEl) {
+              const message = err instanceof Error ? err.message : 'Redemption failed.';
+              if (fallbackEmail) {
+                const subject = encodeURIComponent(`Redeem ${redeemPoints} loyalty points`);
+                const body = encodeURIComponent('Hi, I would like to redeem my loyalty points please.');
+                errorEl.innerHTML = `${message} <a href="mailto:${fallbackEmail}?subject=${subject}&body=${body}">Email us instead</a>.`;
+              } else {
+                errorEl.textContent = message;
+              }
+              errorEl.hidden = false;
+            }
+            trigger.disabled = false;
+          }
+        });
+      }
+
+      if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+          const codeEl = qs('[data-loyalty-redeem-code]', root);
+          const code = codeEl ? codeEl.textContent.trim() : '';
+          if (!code) return;
+          try {
+            await navigator.clipboard.writeText(code);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+              copyBtn.textContent = 'Copy code';
+            }, 2000);
+          } catch {
+            copyBtn.textContent = 'Copy failed';
+          }
+        });
+      }
+    });
+  };
+
   const initLoyaltyBalanceSync = () => {
     const raw = document.body.dataset.loyaltyBalance;
     if (raw === undefined || raw === '') return;
@@ -993,6 +1091,11 @@
   };
 
   const boot = () => {
+    try {
+      initLoyaltyRedeem();
+    } catch (err) {
+      console.error('initLoyaltyRedeem failed', err);
+    }
     try {
       initLoyaltyBalanceSync();
     } catch (err) {

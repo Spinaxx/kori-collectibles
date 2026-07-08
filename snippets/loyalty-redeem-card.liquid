@@ -1,0 +1,63 @@
+{%- liquid
+  assign balance = balance | default: 0 | plus: 0
+  assign redeem_points = redeem_points | default: settings.loyalty_redeem_points | default: 100
+  assign redeem_value = redeem_value | default: settings.loyalty_redeem_value_gbp | default: 5
+  assign redeem_email = settings.loyalty_redeem_email | default: shop.email
+  assign proxy_url = settings.loyalty_redeem_proxy_url | default: '/apps/kori-loyalty/redeem'
+  assign points_needed = redeem_points
+  assign can_redeem = false
+  assign active_code = blank
+
+  if customer
+    assign active_code = customer.metafields.custom.loyalty_redeem_code.value
+    if balance < redeem_points
+      assign points_needed = redeem_points | minus: balance
+    endif
+    if balance >= redeem_points
+      assign can_redeem = true
+    endif
+  endif
+-%}
+
+<div
+  class="loyalty-redeem{% if can_redeem %} loyalty-redeem--ready{% endif %}{% if compact %} loyalty-redeem--compact{% endif %}"
+  data-loyalty-redeem
+  data-redeem-points="{{ redeem_points }}"
+  data-redeem-value="{{ redeem_value }}"
+  data-proxy-url="{{ proxy_url | escape }}"
+  data-fallback-email="{{ redeem_email | escape }}"
+  {% if active_code != blank %}data-active-code="{{ active_code | escape }}"{% endif %}
+>
+  <div class="loyalty-redeem__offer">
+    <div class="loyalty-redeem__value">£{{ redeem_value }} off</div>
+    <div class="loyalty-redeem__cost">{{ redeem_points }} points</div>
+  </div>
+
+  {%- if customer -%}
+    {%- if can_redeem -%}
+      <div class="loyalty-redeem__ready" data-loyalty-redeem-ready>
+        <p class="loyalty-redeem__hint">Redeem {{ redeem_points }} points for a single-use discount code at checkout.</p>
+        <button type="button" class="button button--full" data-loyalty-redeem-trigger>
+          Redeem {{ redeem_points }} points
+        </button>
+      </div>
+
+      <div class="loyalty-redeem__success" data-loyalty-redeem-success hidden>
+        <p class="loyalty-redeem__success-label">Your discount code</p>
+        <p class="loyalty-redeem__code" data-loyalty-redeem-code></p>
+        <p class="loyalty-redeem__hint">Single use. Apply at checkout or tap below to add it to your cart.</p>
+        <div class="loyalty-redeem__actions">
+          <a class="button button--full" href="#" data-loyalty-redeem-apply>Apply to cart</a>
+          <button type="button" class="button button--secondary button--full" data-loyalty-redeem-copy>Copy code</button>
+        </div>
+      </div>
+
+      <p class="loyalty-redeem__error" data-loyalty-redeem-error hidden role="alert"></p>
+      <p class="loyalty-redeem__loading" data-loyalty-redeem-loading hidden>Creating your code…</p>
+    {%- else -%}
+      <p class="loyalty-redeem__locked">{{ points_needed }} more points needed</p>
+    {%- endif -%}
+  {%- else -%}
+    <p class="loyalty-redeem__locked">Sign in to redeem points</p>
+  {%- endif -%}
+</div>

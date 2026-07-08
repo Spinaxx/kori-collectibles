@@ -57,6 +57,11 @@
           <a class="button" href="{{ routes.all_products_collection_url }}">Shop to earn</a>
         </div>
       </div>
+
+      <div class="rewards__redeem-panel">
+        <h2 class="rewards__redeem-title">Redeem your points</h2>
+        {%- render 'loyalty-redeem-card', balance: balance -%}
+      </div>
     {%- else -%}
       <div class="rewards__balance-card rewards__balance-card--guest">
         <div class="rewards__balance-main">
@@ -105,7 +110,7 @@
             <span class="rewards__list-num">01</span>
             <div>
               <strong>{{ redeem_points }} points = £{{ redeem_value }} off</strong>
-              <p>Redeem from the rewards panel or email us when you have enough points.</p>
+              <p>Redeem instantly on the rewards page when you have enough points.</p>
             </div>
           </li>
           {%- for block in section.blocks -%}

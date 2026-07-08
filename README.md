@@ -153,22 +153,36 @@ The code does: `new balance = current balance - round(order total)`, minimum 0. 
 
 Or import `shopify-flow/Deduct loyalty points on order cancelled.flow` directly in Flow, then re-check the `loyaltyPoints` mapping in Run code inputs.
 
-### 4. Theme settings
+### 4. Redeem points (instant discount codes)
+
+Customers redeem from the **rewards page** or **loyalty panel** when they have enough points. The theme calls a small app proxy that:
+
+1. Verifies the signed-in customer
+2. Creates a single-use £5 off discount code (default)
+3. Deducts 100 points from `custom.loyalty_points`
+4. Shows the code with **Apply to cart** / **Copy code**
+
+**One-time setup:** follow [`loyalty-redeem/README.md`](loyalty-redeem/README.md) to deploy the handler and connect a Shopify custom app proxy at `/apps/kori-loyalty/redeem`.
+
+Optional customer metafield for active codes:
+
+- Namespace and key: `custom.loyalty_redeem_code`
+- Type: **Single line text**
+- Storefront API access: read
+
+### 5. Theme settings
 
 **Theme settings → Loyalty rewards**
 
 - Enable rewards program
 - Show floating rewards button
 - Set redeem threshold (default 100 points = £5 off)
-- Redemption email (where customers claim rewards)
+- Redemption app proxy URL (default `/apps/kori-loyalty/redeem`)
+- Redemption email (fallback if instant redeem is unavailable)
 
-### 5. Optional rewards page
+### 6. Optional rewards page
 
 Create a page with the **rewards** template for full program details.
-
-### Redemption
-
-When a customer has enough points, the panel shows **Email to redeem**. Send them a discount code manually (or build a second Flow later to automate it).
 
 ### Testing
 
@@ -176,7 +190,8 @@ When a customer has enough points, the panel shows **Email to redeem**. Send the
 2. Place an order while signed in
 3. After payment, check the customer metafield and `loyalty_points_awarded` on the order in admin
 4. Cancel the order — customer points should drop by the awarded amount
-5. Sign in on the storefront — balance should show in the account drawer and rewards panel
+5. Sign in on the storefront — balance should show in the account drawer and rewards page
+6. Redeem 100 points — confirm discount code works and balance drops by 100
 
 ### Troubleshooting: two different point balances
 

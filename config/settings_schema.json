@@ -262,7 +262,14 @@
         "type": "text",
         "id": "loyalty_redeem_email",
         "label": "Redemption email",
-        "info": "Customers email here to claim rewards. Defaults to your shop email."
+        "info": "Fallback if instant redemption is unavailable. Defaults to your shop email."
+      },
+      {
+        "type": "text",
+        "id": "loyalty_redeem_proxy_url",
+        "label": "Redemption app proxy URL",
+        "default": "/apps/kori-loyalty/redeem",
+        "info": "See loyalty-redeem/README.md for one-time app proxy setup."
       },
       {
         "type": "paragraph",

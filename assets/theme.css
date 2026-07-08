@@ -686,6 +686,102 @@ ul {
   border-color: rgba(45, 212, 191, 0.45);
 }
 
+.rewards__redeem-panel {
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.rewards__redeem-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin: 0 0 1rem;
+}
+
+.loyalty-redeem {
+  padding: 1rem;
+  border: 1px dashed var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  background: rgba(12, 14, 20, 0.35);
+}
+
+.loyalty-redeem--ready {
+  border-style: solid;
+  border-color: rgba(45, 212, 191, 0.45);
+}
+
+.loyalty-redeem--compact {
+  padding: 0.85rem;
+}
+
+.loyalty-redeem__offer {
+  margin-bottom: 0.75rem;
+}
+
+.loyalty-redeem__value {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+
+.loyalty-redeem__cost {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.loyalty-redeem__hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.loyalty-redeem__locked {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.loyalty-redeem__loading,
+.loyalty-redeem__error {
+  margin: 0.75rem 0 0;
+  font-size: 0.84rem;
+}
+
+.loyalty-redeem__error {
+  color: var(--danger);
+}
+
+.loyalty-redeem__error a {
+  color: var(--accent);
+}
+
+.loyalty-redeem__success-label {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.loyalty-redeem__code {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.loyalty-redeem__actions {
+  display: grid;
+  gap: 0.5rem;
+}
+
 .loyalty-reward__value {
   font-family: var(--font-display);
   font-size: 1.35rem;

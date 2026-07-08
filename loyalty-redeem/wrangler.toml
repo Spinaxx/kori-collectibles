@@ -1,0 +1,7 @@
+name = "kori-loyalty-redeem"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+LOYALTY_REDEEM_POINTS = "100"
+LOYALTY_REDEEM_VALUE_GBP = "5"
