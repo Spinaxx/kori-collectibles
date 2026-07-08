@@ -76,11 +76,13 @@
 
       {%- unless compact -%}
         <div class="loyalty-redeem__form-slot" id="loyalty-redeem-form">
-          <p class="loyalty-redeem__form-note">
-            {%- if redeem_method == 'flow' -%}
+          {%- if form_content != blank -%}
+            {{ form_content }}
+          {%- elsif redeem_method == 'flow' -%}
+            <p class="loyalty-redeem__form-note">
               Add your <strong>Redeem loyalty points</strong> Shopify Form block here in the theme editor.
-            {%- endif -%}
-          </p>
+            </p>
+          {%- endif -%}
         </div>
       {%- endunless -%}
     {%- else -%}

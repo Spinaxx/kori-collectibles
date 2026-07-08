@@ -60,7 +60,14 @@
 
       <div class="rewards__redeem-panel">
         <h2 class="rewards__redeem-title">Redeem your points</h2>
-        {%- render 'loyalty-redeem-card', balance: balance -%}
+        {%- capture redeem_form_blocks -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == '@app' -%}
+              {%- render block -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endcapture -%}
+        {%- render 'loyalty-redeem-card', balance: balance, form_content: redeem_form_blocks -%}
       </div>
     {%- else -%}
       <div class="rewards__balance-card rewards__balance-card--guest">
@@ -187,6 +194,9 @@
     }
   ],
   "blocks": [
+    {
+      "type": "@app"
+    },
     {
       "type": "earn_rule",
       "name": "Earn rule",
