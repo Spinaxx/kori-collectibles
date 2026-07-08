@@ -678,6 +678,15 @@ ul {
   background: var(--surface-2);
   transform-style: preserve-3d;
   transition: transform 0.12s ease-out;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: grab;
+}
+
+.hero-card.is-tilting {
+  cursor: grabbing;
+  transition: none;
 }
 
 .hero-card__image {
@@ -689,6 +698,7 @@ ul {
   object-fit: cover;
   object-position: center;
   z-index: 0;
+  pointer-events: none;
 }
 
 .hero-card__placeholder {
@@ -699,6 +709,7 @@ ul {
   justify-content: center;
   background: linear-gradient(145deg, #253045, #171b26);
   z-index: 0;
+  pointer-events: none;
 }
 
 .hero-card__placeholder svg {
@@ -718,6 +729,7 @@ ul {
   z-index: 2;
 }
 
+.hero-card.is-tilting .hero-card__shine,
 .hero-card:hover .hero-card__shine {
   opacity: 1;
 }
