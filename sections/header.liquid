@@ -26,20 +26,22 @@
       aria-controls="MenuDrawer"
       aria-label="Open menu"
     >
-      {% render 'icon-menu' %}
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.5 5.5h13M3.5 10h13M3.5 14.5h13"/>
+      </svg>
     </button>
 
     <a class="header__logo" href="{{ routes.root_url }}">
       {%- if settings.logo != blank -%}
-        {{
-          settings.logo
-          | image_url: width: 400
-          | image_tag:
-            widths: '120, 180, 240, 320, 400',
-            sizes: '(max-width: 749px) 140px, 180px',
-            alt: shop.name,
-            loading: 'eager'
-        }}
+        <img
+          src="{{ settings.logo | image_url: width: 280 }}"
+          srcset="{{ settings.logo | image_url: width: 140 }} 140w, {{ settings.logo | image_url: width: 280 }} 280w, {{ settings.logo | image_url: width: 400 }} 400w"
+          sizes="(max-width: 749px) 140px, 180px"
+          alt="{{ shop.name | escape }}"
+          width="{{ settings.logo.width }}"
+          height="{{ settings.logo.height }}"
+          loading="eager"
+        >
       {%- else -%}
         <span class="logo-mark" aria-hidden="true"></span>
         <span>{{ section.settings.logo_text | default: shop.name }}</span>
@@ -93,10 +95,15 @@
 
     <div class="header__actions">
       <button type="button" class="icon-btn" data-open-search aria-label="Search">
-        {% render 'icon-search' %}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.5 13.5a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM14.5 14.5 12 12"/>
+        </svg>
       </button>
       <a href="{{ routes.cart_url }}" class="icon-btn" aria-label="Cart">
-        {% render 'icon-cart' %}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M3.4 6.9h13.2v8c0 .57-.22 1.11-.62 1.51-.4.4-.94.63-1.51.63H5.53c-.57 0-1.11-.23-1.51-.63a2.14 2.14 0 0 1-.62-1.51zM8.8 3h2.4c.62 0 1.21.25 1.65.68.43.44.68 1.03.68 1.66v1.56H6.5V5.34c0-.63.24-1.22.68-1.66A2.3 2.3 0 0 1 8.8 3z"/>
+        </svg>
         {%- if cart.item_count > 0 -%}
           <span class="cart-count">{{ cart.item_count }}</span>
         {%- endif -%}
@@ -111,7 +118,9 @@
     <div class="drawer__top">
       <span class="drawer__title">Menu</span>
       <button type="button" class="icon-btn" data-close-menu aria-label="Close">
-        {% render 'icon-close' %}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
+        </svg>
       </button>
     </div>
     <nav class="drawer-nav" aria-label="Mobile">
@@ -156,12 +165,14 @@
         class="search-modal__input"
         type="search"
         name="q"
-        placeholder="{{ 'search.placeholder' | t }}"
+        placeholder="Search cards, sets, sealed..."
         aria-label="Search"
       >
-      <button type="submit" class="button">{{ 'search.submit' | t }}</button>
+      <button type="submit" class="button">Search</button>
       <button type="button" class="icon-btn" data-close-search aria-label="Close">
-        {% render 'icon-close' %}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
+        </svg>
       </button>
     </form>
   </div>
@@ -170,6 +181,7 @@
 {% schema %}
 {
   "name": "Header",
+  "tag": "div",
   "class": "section-header",
   "settings": [
     {
@@ -216,9 +228,6 @@
         }
       ]
     }
-  ],
-  "enabled_on": {
-    "groups": ["header"]
-  }
+  ]
 }
 {% endschema %}

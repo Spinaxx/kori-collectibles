@@ -3,18 +3,18 @@
     "hero": {
       "type": "hero",
       "blocks": {
-        "s1": {"type": "stat", "settings": {"label": "Free UK delivery", "text": "Over £40"}},
+        "s1": {"type": "stat", "settings": {"label": "Free UK delivery", "text": "Over GBP 40"}},
         "s2": {"type": "stat", "settings": {"label": "Condition first", "text": "Checked under lamp"}},
         "s3": {"type": "stat", "settings": {"label": "Real stock", "text": "Live inventory counts"}}
       },
       "block_order": ["s1", "s2", "s3"],
       "settings": {
-        "eyebrow": "UK Pokémon & TCG shop",
+        "eyebrow": "UK Pokemon & TCG shop",
         "heading_line_1": "The hunt is",
         "heading_line_2": "half the ",
         "heading_em": "foil",
         "heading_after": ".",
-        "text": "Singles and sealed, priced for collectors. Condition-checked under lamp — no mystery packs, no guesswork on stock.",
+        "text": "Singles and sealed, priced for collectors. Condition-checked under lamp - no mystery packs, no guesswork on stock.",
         "primary_label": "Shop singles",
         "secondary_label": "Browse sealed",
         "min_price": 5,
@@ -24,7 +24,7 @@
     "games": {
       "type": "game-grid",
       "blocks": {
-        "g1": {"type": "game", "settings": {"title": "Pokémon", "meta": "Singles · Sealed"}},
+        "g1": {"type": "game", "settings": {"title": "Pokemon", "meta": "Singles · Sealed"}},
         "g2": {"type": "game", "settings": {"title": "Yu-Gi-Oh!", "meta": "Singles · Sealed"}},
         "g3": {"type": "game", "settings": {"title": "Magic", "meta": "Singles · Sealed"}},
         "g4": {"type": "game", "settings": {"title": "One Piece", "meta": "Sealed"}},
@@ -41,7 +41,7 @@
       "type": "featured-collection",
       "settings": {
         "heading": "New in the binder",
-        "subheading": "Fresh stock with live counts — what you see is what’s available.",
+        "subheading": "Fresh stock with live counts - what you see is what is available.",
         "products_to_show": 8,
         "show_view_all": true
       }
@@ -63,9 +63,9 @@
       "type": "trust",
       "blocks": {
         "t1": {"type": "item", "settings": {"number": "01", "heading": "Condition checked", "text": "Every single is inspected under lamp against our reference sheet."}},
-        "t2": {"type": "item", "settings": {"number": "02", "heading": "Live inventory", "text": "Stock counts update with the till — no ghost listings."}},
+        "t2": {"type": "item", "settings": {"number": "02", "heading": "Live inventory", "text": "Stock counts update with the till - no ghost listings."}},
         "t3": {"type": "item", "settings": {"number": "03", "heading": "Fast UK dispatch", "text": "Orders before cut-off leave the same week."}},
-        "t4": {"type": "item", "settings": {"number": "04", "heading": "Collector advice", "text": "Not sure on a set or grade path? Ask — we actually play."}}
+        "t4": {"type": "item", "settings": {"number": "04", "heading": "Collector advice", "text": "Not sure on a set or grade path? Ask - we actually play."}}
       },
       "block_order": ["t1", "t2", "t3", "t4"],
       "settings": {}

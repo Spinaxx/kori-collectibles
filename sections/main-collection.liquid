@@ -11,8 +11,10 @@
       <aside class="facets" data-facets>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
           <div class="facets__title">{{ 'collections.filters' | t }}</div>
-          <button type="button" class="icon-btn facets-mobile-btn" data-close-facets aria-label="{{ 'general.accessibility.close' | t }}">
-            {% render 'icon-close' %}
+          <button type="button" class="icon-btn facets-mobile-btn" data-close-facets aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" width="20" height="20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
+            </svg>
           </button>
         </div>
 
@@ -95,15 +97,74 @@
       <div class="product-grid">
         {%- paginate collection.products by section.settings.products_per_page -%}
           {%- for product in collection.products -%}
-            {% render 'product-card', product: product %}
+            {%- liquid
+              assign featured = product.selected_or_first_available_variant
+              assign stock = featured.inventory_quantity
+              assign low = false
+              if stock != blank and stock > 0 and stock <= 5
+                assign low = true
+              endif
+              assign image_alt = product.featured_image.alt | default: product.title
+            -%}
+            <a class="card" href="{{ product.url }}">
+              <div class="card__media">
+                {%- unless product.available -%}
+                  <span class="card__badge card__badge--sold">Sold out</span>
+                {%- elsif product.tags contains 'preorder' or product.tags contains 'Preorder' or product.tags contains 'pre-order' -%}
+                  <span class="card__badge">Pre-order</span>
+                {%- endif -%}
+                {%- if product.featured_image -%}
+                  <img
+                    src="{{ product.featured_image | image_url: width: 480 }}"
+                    srcset="
+                      {{ product.featured_image | image_url: width: 240 }} 240w,
+                      {{ product.featured_image | image_url: width: 360 }} 360w,
+                      {{ product.featured_image | image_url: width: 480 }} 480w,
+                      {{ product.featured_image | image_url: width: 700 }} 700w
+                    "
+                    sizes="(max-width: 749px) 45vw, 23vw"
+                    alt="{{ image_alt | escape }}"
+                    width="{{ product.featured_image.width }}"
+                    height="{{ product.featured_image.height }}"
+                    loading="lazy"
+                  >
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag }}
+                {%- endif -%}
+              </div>
+              <div class="card__body">
+                {%- if product.vendor != blank -%}
+                  <div class="card__vendor">{{ product.vendor | escape }}</div>
+                {%- endif -%}
+                <div class="card__title">{{ product.title | escape }}</div>
+                <div class="card__footer">
+                  <span class="card__price">
+                    {%- if product.price_varies -%}
+                      From {{ product.price_min | money }}
+                    {%- else -%}
+                      {{ product.price | money }}
+                    {%- endif -%}
+                  </span>
+                  {%- if settings.show_stock_count -%}
+                    {%- if stock != blank and stock > 0 -%}
+                      <span class="card__stock{% if low %} is-low{% endif %}">
+                        {%- if low -%}{{ stock }} left{%- else -%}In stock{%- endif -%}
+                      </span>
+                    {%- elsif product.available == false -%}
+                      <span class="card__stock is-low">Sold out</span>
+                    {%- endif -%}
+                  {%- endif -%}
+                </div>
+              </div>
+            </a>
           {%- else -%}
-            <div class="empty-state" style="grid-column:1/-1">{{ 'collections.empty' | t }}</div>
+            <div class="empty-state" style="grid-column:1/-1">No products in this collection yet.</div>
           {%- endfor -%}
 
           {%- if paginate.pages > 1 -%}
             <div class="pagination" style="grid-column:1/-1">
               {%- if paginate.previous -%}
-                <a href="{{ paginate.previous.url }}">{{ 'general.pagination.previous' | t }}</a>
+                <a href="{{ paginate.previous.url }}">Previous</a>
               {%- endif -%}
               {%- for part in paginate.parts -%}
                 {%- if part.is_link -%}
@@ -113,7 +174,7 @@
                 {%- endif -%}
               {%- endfor -%}
               {%- if paginate.next -%}
-                <a href="{{ paginate.next.url }}">{{ 'general.pagination.next' | t }}</a>
+                <a href="{{ paginate.next.url }}">Next</a>
               {%- endif -%}
             </div>
           {%- endif -%}
