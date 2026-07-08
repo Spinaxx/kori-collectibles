@@ -37,8 +37,8 @@
         "subheading": "Jump straight into the catalogue collectors actually browse."
       }
     },
-    "featured": {
-      "type": "featured-collection",
+    "showcase": {
+      "type": "product-showcase",
       "settings": {
         "heading": "New in the binder",
         "subheading": "Fresh stock with live counts - what you see is what is available.",
@@ -71,5 +71,5 @@
       "settings": {}
     }
   },
-  "order": ["hero", "games", "featured", "promos", "trust"]
+  "order": ["hero", "games", "showcase", "promos", "trust"]
 }
