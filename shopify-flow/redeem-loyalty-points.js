@@ -1,25 +1,26 @@
 // Redeem flow — paste into Shopify Flow → Run code
 //
-// Use with trigger: Metaobject entry created (your "Redeem loyalty points" Shopify Form)
-// OR after Get customer data when customer requests redemption another way.
+// Trigger: Metaobject entry created (your "Redeem loyalty points" Shopify Form)
 //
-// Select inputs (GraphQL) — adjust field aliases to match your metafield mappings:
+// Input (GraphQL) — NO aliases, NO root "customer". Use field names only:
 // query {
-//   customer {
-//     id
-//     email
-//     loyaltyPoints: metafield(namespace: "custom", key: "loyalty_points") {
-//       value
-//     }
-//     loyaltyRedeemCode: metafield(namespace: "custom", key: "loyalty_redeem_code") {
-//       value
+//   metaobject {
+//     formSubmittedBy {
+//       id
+//       email
+//       loyaltyPoints {
+//         value
+//       }
+//       loyaltyRedeemCode {
+//         value
+//       }
 //     }
 //   }
 // }
 //
-// Map in Flow input picker:
-//   loyaltyPoints      → custom.loyalty_points
-//   loyaltyRedeemCode  → custom.loyalty_redeem_code
+// After pasting the query, use the input mapper (do not type metafield() in the query):
+//   loyaltyPoints      → Customer metafield custom.loyalty_points
+//   loyaltyRedeemCode  → Customer metafield custom.loyalty_redeem_code
 //
 // Define outputs (GraphQL):
 // type Output {
@@ -35,11 +36,10 @@
 //
 // Next steps in Flow (after Run code):
 // 1. Condition: discountCode is not empty
-// 2. Condition: reused is not "true"  (skip discount create if reusing)
-// 3. Send Admin API request → discountCodeBasicCreate (see README)
+// 2. Condition: reused equals false
+// 3. Send Admin API request → discountCodeBasicCreate (see REDEEM-SETUP.md)
 // 4. Update customer metafield → custom.loyalty_points = newLoyaltyPoints
 // 5. Update customer metafield → custom.loyalty_redeem_code = discountCode
-// 6. Send email to customer with discountCode (optional)
 
 const REDEEM_POINTS = 100;
 const REDEEM_VALUE_GBP = 5;

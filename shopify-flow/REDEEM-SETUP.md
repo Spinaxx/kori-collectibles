@@ -52,7 +52,7 @@ You should already have `custom.loyalty_points`. Also add:
 - On the **Yes** branch: **Then → Run code**
 - Paste the full contents of `shopify-flow/redeem-loyalty-points.js` (from `const REDEEM_POINTS` through the closing `}`)
 
-**Input (GraphQL)** — paste this, then map metafields in the picker:
+**Input (GraphQL)** — paste exactly this (no `customer` at root, no `metafield()` aliases):
 
 ```graphql
 query {
@@ -71,9 +71,12 @@ query {
 }
 ```
 
-In the input mapper connect:
+Then use the **input mapper** below the query (same as your working award/cancel flows — do not write `loyaltyPoints: metafield(...)` in the query):
+
 - `loyaltyPoints` → **Customer metafield** `custom.loyalty_points`
 - `loyaltyRedeemCode` → **Customer metafield** `custom.loyalty_redeem_code`
+
+If Flow shows *"Cannot query field customer"* or *"alias is not allowed"*, delete the query and paste the block above again.
 
 **Outputs** — Flow should detect these from the script; if prompted, define:
 
@@ -170,6 +173,7 @@ Check **Flow → Run history** if anything fails.
 |-------|-----|
 | `.flow` import fails | Expected — build manually (section 3). Forms workflows are store-specific. |
 | Flow never runs | Wrong form on trigger; workflow not turned on; customer not signed in |
+| Run code GraphQL errors | No root `customer`; no aliases like `loyaltyPoints: metafield(...)`. Use query above + input mapper |
 | Run code shows 0 points | Map `loyaltyPoints` to `loyalty_points` key, not `custom_loyalty_points` |
 | `newLoyaltyPoints` not in metafield step | Pick it from **Run code** outputs in the variable picker — do not type it |
 | Discount create fails | Store needs discount permissions; try hardcoded `"amount": "5.00"` |
