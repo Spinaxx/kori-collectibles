@@ -1,62 +1,58 @@
 # Redeem loyalty points with Shopify Flow (no custom app)
 
-Shopify Flow can **create the discount code** and **deduct points**. It cannot listen for a theme button click on its own — you need a **Flow trigger** such as a **Shopify Form submission**.
+Shopify Flow creates the discount, deducts points, and saves the code to `custom.loyalty_redeem_code`. The theme form button only submits your **Shopify Form** — Flow does the rest.
 
-This is the recommended setup if you do not want to deploy the `loyalty-redeem/` app proxy.
+> **Note:** `.flow` file import does **not** work for Shopify Forms workflows (they contain store-specific metaobject IDs). Build the workflow in the Flow editor — takes about 10 minutes. The cancel-points flow imports fine because it uses a standard order trigger; Forms workflows do not.
 
 ## How it works
 
-1. Customer has ≥ 100 points and clicks **Get my discount code** on the rewards page.
-2. They submit a one-field **Shopify Form** (no typing needed if signed in).
-3. Flow runs on **Metaobject entry created** → creates a single-use code → deducts points → saves code to `custom.loyalty_redeem_code`.
-4. Customer refreshes the rewards page (or checks email if you add a Flow email step) and taps **Apply to cart**.
+1. Customer with ≥ 100 points clicks **Get my discount code** on `/pages/rewards`.
+2. They submit your **Redeem loyalty points** Shopify Form (must be signed in).
+3. Flow runs → creates a single-use £5 code → deducts 100 points → saves code to `custom.loyalty_redeem_code`.
+4. Customer refreshes the rewards page → **Apply to cart** shows the code.
 
-## 1. Customer metafields
+---
+
+## 1. Metafields
 
 You should already have `custom.loyalty_points`. Also add:
 
-| Name | Namespace.key | Type | Storefront read |
-|------|----------------|------|-----------------|
-| Loyalty redeem code | `custom.loyalty_redeem_code` | Single line text | Yes |
+| Name | Key | Type | Storefront read |
+|------|-----|------|-----------------|
+| Loyalty redeem code | `custom.loyalty_redeem_code` | Single line text | **Yes** |
 
-## 2. Create the Shopify Form
+---
 
-1. Install **Shopify Forms** (free) if needed.
-2. Create a form named **Redeem loyalty points**.
-   - One field is enough (e.g. hidden or a simple “Confirm” message).
-   - Success message: “Your code is being generated — refresh this page in a few seconds.”
-3. On the **rewards page** in the theme editor, add the **Shopify Forms** app block inside the redeem section (below the offer card).
+## 2. Shopify Form
 
-The theme includes a `#loyalty-redeem-form` anchor — point the form block there.
+1. **Settings → Apps → Shopify Forms** (install if needed).
+2. Create form **Redeem loyalty points** — one confirm field is enough.
+3. Success message: *"Your code is being generated — refresh this page in a few seconds."*
+4. In the **theme editor**, on the rewards page, add the **Shopify Forms** block at `#loyalty-redeem-form`.
 
-## 3. Import or build the Flow workflow
+---
 
-Shopify Forms workflows are picky about import format. Try these in order:
+## 3. Build the Flow workflow (manual)
 
-### Option A — import `Redeem loyalty points.flow`
+**Apps → Flow → Create workflow**
 
-**Apps → Flow → Import** → `shopify-flow/Redeem loyalty points.flow`
+### Step 1 — Trigger
 
-Built from Shopify’s published Forms template structure with form type `app--6171699--shopify-forms1063387`.
+- Search **Metaobject entry created**
+- In **Metaobject definition**, select **Redeem loyalty points** (your form)
 
-### Option B — import `Redeem loyalty points (minimal).flow`
+### Step 2 — Condition (signed-in only)
 
-Same trigger + Run code, but only 3 steps (mirrors the working cancel flow export shape). Try this if Option A fails.
+- **Then → Condition**
+- Variable: **Metaobject → formSubmittedBy → id**
+- Operator: **is not empty**
 
-### Option C — build manually in Flow (most reliable)
+### Step 3 — Run code
 
-If both imports fail, create the workflow in the Flow editor:
+- On the **Yes** branch: **Then → Run code**
+- Paste the full contents of `shopify-flow/redeem-loyalty-points.js` (from `const REDEEM_POINTS` through the closing `}`)
 
-1. **Trigger:** Metaobject entry created → select **Redeem loyalty points** form  
-2. **Condition:** `metaobject.formSubmittedBy.id` is not empty  
-3. **Run code** — paste `shopify-flow/redeem-loyalty-points.js`  
-4. **Condition:** `runCode.discountCode` is not empty  
-5. **Condition:** `runCode.reused` equals `false`  
-6. **Send Admin API request** → `discountCodeBasicCreate` (JSON below)  
-7. **Update customer metafield** → `custom.loyalty_points` = `newLoyaltyPoints`  
-8. **Update customer metafield** → `custom.loyalty_redeem_code` = `discountCode`  
-
-Run code **GraphQL input** (map metafields in the picker):
+**Input (GraphQL)** — paste this, then map metafields in the picker:
 
 ```graphql
 query {
@@ -75,70 +71,32 @@ query {
 }
 ```
 
-Map `loyaltyPoints` → `custom.loyalty_points` and `loyaltyRedeemCode` → `custom.loyalty_redeem_code`.
+In the input mapper connect:
+- `loyaltyPoints` → **Customer metafield** `custom.loyalty_points`
+- `loyaltyRedeemCode` → **Customer metafield** `custom.loyalty_redeem_code`
 
-### After import (Options A or B)
+**Outputs** — Flow should detect these from the script; if prompted, define:
 
-1. Open the trigger and confirm **Redeem loyalty points** is selected (re-select if needed).  
-2. Open **Run code** and confirm the metafield mappings above.  
-3. If you used the minimal file, add the two extra conditions plus steps 6–8 from Option C.  
-4. Turn the workflow **on** only when discount creation + metafield updates are wired.
+- `discountCode` (String)
+- `newLoyaltyPoints` (String)
+- `redeemValueGbp` (String)
+- `reused` (String)
 
-**Import tip:** Do not import macOS duplicates like `Redeem loyalty points (1).flow` — they often have a broken checksum. Regenerate with `python3 shopify-flow/build-redeem-flow.py` if needed.
+### Step 4 — Condition (has a code)
 
-**Manual path details** (same as Option C):
+- **Then → Condition**
+- **Run code → discountCode** → **is not empty**
 
-### Trigger
+### Step 5 — Condition (not reusing old code)
 
-**Metaobject entry created** → select the metaobject definition for your **Redeem loyalty points** form.
+- On **Yes** from step 4: **Then → Condition**
+- **Run code → reused** → **equals** → `false`
 
-### Condition (recommended)
+### Step 6 — Create discount
 
-- **formSubmittedBy** (or customer on the metaobject) **is not empty**  
-  So only signed-in customers can redeem.
-
-- Optional: add a **Get customer data** step first, then check `loyalty_points` ≥ 100.
-
-### Run code
-
-Paste `shopify-flow/redeem-loyalty-points.js`.
-
-**GraphQL inputs** — map metafields in the picker:
-
-```graphql
-query {
-  customer {
-    id
-    email
-    loyaltyPoints {
-      value
-    }
-    loyaltyRedeemCode {
-      value
-    }
-  }
-}
-```
-
-Map `loyaltyPoints` → `custom.loyalty_points` and `loyaltyRedeemCode` → `custom.loyalty_redeem_code`.
-
-Pass **customer** from the metaobject trigger (`formSubmittedBy` / customer reference).
-
-**Outputs:** `discountCode`, `newLoyaltyPoints`, `redeemValueGbp`, `reused`
-
-### Condition
-
-`reused` **equals** `false`  
-(and `discountCode` **is not empty**)
-
-Skip discount creation if the customer already has an unused code.
-
-### Send Admin API request
-
-Action: **Send Admin API request**  
-Mutation: `discountCodeBasicCreate`
-
-Use **Run code → discountCode** for the code and **redeemValueGbp** for the amount. Example mutation inputs (adjust Liquid variables to match your step names):
+- On **Yes** from step 5: **Then → Send Admin API request**
+- Mutation: **discountCodeBasicCreate**
+- Mutation inputs:
 
 ```json
 {
@@ -149,13 +107,13 @@ Use **Run code → discountCode** for the code and **redeemValueGbp** for the am
     "endsAt": "{{ 'now' | date: '%s' | plus: 172800 | date: '%Y-%m-%dT%H:%M:%SZ' }}",
     "customerSelection": {
       "customers": {
-        "add": ["gid://shopify/Customer/{{ customer.legacyResourceId }}"]
+        "add": ["{{ metaobject.formSubmittedBy.id }}"]
       }
     },
     "customerGets": {
       "value": {
         "discountAmount": {
-          "amount": "{{ runCode.redeemValueGbp }}",
+          "amount": "5.00",
           "appliesOnEachItem": false
         }
       },
@@ -167,45 +125,63 @@ Use **Run code → discountCode** for the code and **redeemValueGbp** for the am
 }
 ```
 
-If Liquid in the mutation JSON is awkward, hardcode `"amount": "5.00"` to match theme settings.
+Use the variable picker for Liquid fields if typing `{{ }}` is awkward. Hardcode `"5.00"` to match theme settings (`loyalty_redeem_value_gbp`).
 
-### Update customer metafields
+### Step 7 — Deduct points
 
-1. `custom.loyalty_points` = **Run code → newLoyaltyPoints**
-2. `custom.loyalty_redeem_code` = **Run code → discountCode**
+- **Then → Update customer metafield**
+- Customer: **Metaobject → formSubmittedBy → id**
+- Metafield: `custom.loyalty_points`
+- Value: **Run code → newLoyaltyPoints**
 
-### Optional: email the code
+### Step 8 — Save code for storefront
 
-Add **Send internal email** or a transactional email app action with the discount code in the body.
+- **Then → Update customer metafield**
+- Customer: **Metaobject → formSubmittedBy → id**
+- Metafield: `custom.loyalty_redeem_code`
+- Value: **Run code → discountCode**
+
+### Turn on
+
+**Save** → **Turn on workflow**.
+
+---
 
 ## 4. Theme settings
 
 **Theme settings → Loyalty rewards → Redemption method** → **Shopify Flow (form)**
 
-No app proxy required. The redeem button scrolls to your embedded form.
+---
 
 ## 5. Test
 
-1. Customer with ≥ 100 points, signed in.
-2. Open `/pages/rewards` → **Get my discount code** → submit the form.
-3. Wait a few seconds, refresh — code should appear with **Apply to cart**.
-4. Confirm `loyalty_points` dropped by 100 in admin.
+1. Sign in as a customer with ≥ 100 points.
+2. Go to `/pages/rewards` → **Get my discount code** → submit the form.
+3. Wait ~10 seconds, refresh the page — code should appear.
+4. In admin, confirm `loyalty_points` dropped by 100.
 
-## Flow vs app proxy
+Check **Flow → Run history** if anything fails.
 
-| | Shopify Flow + Form | App proxy (`loyalty-redeem/`) |
-|--|---------------------|-------------------------------|
-| Extra deploy | No | Yes (worker + custom app) |
-| Instant code on screen | No — refresh or email | Yes |
-| Uses Flow app only | Yes | Flow for earn/cancel; proxy for redeem |
-| Customer must be signed in | Yes (form submitter) | Yes |
+---
 
 ## Troubleshooting
 
 | Issue | Fix |
 |-------|-----|
-| Flow never runs | Form metaobject trigger not selected; workflow not turned on |
-| Points not deducted | Update metafield step uses `newLoyaltyPoints` from Run code |
-| No code on storefront | `loyalty_redeem_code` metafield missing storefront read access |
-| Discount create fails | Check `write_discounts` scope on the Flow app / API permissions |
-| `loyaltyPoints` reads 0 in Run code | Map to `loyalty_points` key, not `custom_loyalty_points` |
+| `.flow` import fails | Expected — build manually (section 3). Forms workflows are store-specific. |
+| Flow never runs | Wrong form on trigger; workflow not turned on; customer not signed in |
+| Run code shows 0 points | Map `loyaltyPoints` to `loyalty_points` key, not `custom_loyalty_points` |
+| `newLoyaltyPoints` not in metafield step | Pick it from **Run code** outputs in the variable picker — do not type it |
+| Discount create fails | Store needs discount permissions; try hardcoded `"amount": "5.00"` |
+| No code on storefront | Add `loyalty_redeem_code` metafield with storefront read access |
+| Customer not signed in | `formSubmittedBy` is empty — form must be submitted while logged in |
+
+---
+
+## Flow vs app proxy
+
+| | Flow + Form | App proxy (`loyalty-redeem/`) |
+|--|-------------|-------------------------------|
+| Setup | Manual Flow (~10 min) | Deploy worker + custom app |
+| Instant code on screen | No — refresh page | Yes |
+| Customer must be signed in | Yes | Yes |
