@@ -72,7 +72,10 @@
       {%- assign main_menu = linklists['main-menu'] -%}
     {%- endif -%}
 
-    {%- render 'loyalty-balance' -%}
+    {%- capture loyalty_balance -%}
+      {%- render 'loyalty-balance' -%}
+    {%- endcapture -%}
+    {%- assign loyalty_balance = loyalty_balance | strip | plus: 0 -%}
 
     {%- liquid
       assign rewards_url = pages.rewards.url | default: '/pages/rewards'

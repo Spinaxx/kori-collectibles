@@ -9,4 +9,4 @@
   if customer and points_ns != blank and points_id != blank
     assign loyalty_balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
   endif
--%}
+-%}{{- loyalty_balance -}}

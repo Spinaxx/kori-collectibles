@@ -1,9 +1,12 @@
+{%- capture loyalty_balance -%}
+  {%- render 'loyalty-balance' -%}
+{%- endcapture -%}
+{%- assign loyalty_balance = loyalty_balance | strip | plus: 0 -%}
+
 {%- liquid
   unless settings.loyalty_enable
     break
   endif
-
-  render 'loyalty-balance'
 
   assign points_rate = settings.loyalty_points_per_gbp | default: 1
   assign redeem_points = settings.loyalty_redeem_points | default: 100

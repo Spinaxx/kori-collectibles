@@ -1,6 +1,9 @@
-{%- liquid
-  render 'loyalty-balance'
+{%- capture loyalty_balance -%}
+  {%- render 'loyalty-balance' -%}
+{%- endcapture -%}
+{%- assign loyalty_balance = loyalty_balance | strip | plus: 0 -%}
 
+{%- liquid
   assign points_rate = section.settings.points_per_gbp | default: settings.loyalty_points_per_gbp | default: 1
   assign redeem_points = section.settings.redeem_points | default: settings.loyalty_redeem_points | default: 100
   assign redeem_value = section.settings.redeem_value_gbp | default: settings.loyalty_redeem_value_gbp | default: 5

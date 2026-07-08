@@ -4,9 +4,10 @@
   data-account-drawer
   hidden
 >
-  {%- liquid
-    render 'loyalty-balance'
-  -%}
+  {%- capture loyalty_balance -%}
+    {%- render 'loyalty-balance' -%}
+  {%- endcapture -%}
+  {%- assign loyalty_balance = loyalty_balance | strip | plus: 0 -%}
   <div class="account-drawer__backdrop" data-close-account></div>
   <div class="account-drawer__panel" role="dialog" aria-modal="true" aria-label="Account">
     <div class="account-drawer__top">
