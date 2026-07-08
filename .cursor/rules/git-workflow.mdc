@@ -1,0 +1,12 @@
+---
+description: Git push workflow for this project
+alwaysApply: true
+---
+
+# Git workflow
+
+After making code changes, commit and push to `origin` without asking the user for confirmation.
+
+- Do not end responses with "Want me to commit/push?"
+- Only skip pushing when the user explicitly says not to, or when there are no changes to commit
+- If push is rejected, pull/rebase and push again before reporting done
