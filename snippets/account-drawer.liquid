@@ -4,6 +4,19 @@
   data-account-drawer
   hidden
 >
+  {%- liquid
+    assign loyalty_balance = 0
+    if settings.loyalty_enable and customer
+      assign points_key = settings.loyalty_points_metafield | default: 'custom.loyalty_points'
+      assign points_parts = points_key | split: '.'
+      assign points_ns = points_parts[0]
+      assign points_id = points_parts[1]
+
+      if points_ns != blank and points_id != blank
+        assign loyalty_balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
+      endif
+    endif
+  -%}
   <div class="account-drawer__backdrop" data-close-account></div>
   <div class="account-drawer__panel" role="dialog" aria-modal="true" aria-label="Account">
     <div class="account-drawer__top">
@@ -25,10 +38,9 @@
         </div>
 
         {%- if settings.loyalty_enable -%}
-          {%- render 'loyalty-points' -%}
           <button type="button" class="account-drawer__rewards" data-open-loyalty-panel>
             <span class="account-drawer__rewards-label">Rewards balance</span>
-            <span class="account-drawer__rewards-value"><span data-loyalty-balance>{{ balance }}</span> pts</span>
+            <span class="account-drawer__rewards-value"><span data-loyalty-balance>{{ loyalty_balance }}</span> pts</span>
           </button>
         {%- endif -%}
 

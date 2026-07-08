@@ -72,9 +72,19 @@
       {%- assign main_menu = linklists['main-menu'] -%}
     {%- endif -%}
 
-    {%- if settings.loyalty_enable -%}
-      {%- render 'loyalty-points' -%}
-    {%- endif -%}
+    {%- liquid
+      assign loyalty_balance = 0
+      if settings.loyalty_enable and customer
+        assign points_key = settings.loyalty_points_metafield | default: 'custom.loyalty_points'
+        assign points_parts = points_key | split: '.'
+        assign points_ns = points_parts[0]
+        assign points_id = points_parts[1]
+
+        if points_ns != blank and points_id != blank
+          assign loyalty_balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
+        endif
+      endif
+    -%}
 
     {% sections 'header-group' %}
 
@@ -165,7 +175,7 @@
               aria-controls="LoyaltyPanel"
               aria-label="Rewards points"
             >
-              <span class="header__loyalty-value" data-loyalty-balance>{{ balance }}</span>
+              <span class="header__loyalty-value" data-loyalty-balance>{{ loyalty_balance }}</span>
               <span class="header__loyalty-label">pts</span>
             </button>
           {%- endif -%}
@@ -251,7 +261,7 @@
               <li class="drawer-nav__loyalty">
                 {%- if customer -%}
                   <button type="button" data-open-loyalty-panel>
-                    Rewards · <span data-loyalty-balance>{{ balance }}</span> pts
+                    Rewards · <span data-loyalty-balance>{{ loyalty_balance }}</span> pts
                   </button>
                 {%- else -%}
                   <button type="button" data-open-loyalty-panel>Sign in for rewards</button>
@@ -350,8 +360,8 @@
               {%- assign earn_preview = cart.total_price | times: settings.loyalty_points_per_gbp | divided_by: 100 -%}
               <div class="cart-drawer__loyalty" data-cart-loyalty data-points-rate="{{ settings.loyalty_points_per_gbp }}">
                 You'll earn <strong data-cart-loyalty-earn>{{ earn_preview }}</strong> points on this order
-                {%- if balance > 0 -%}
-                  · Balance: <strong data-loyalty-balance>{{ balance }}</strong> pts
+                {%- if loyalty_balance > 0 -%}
+                  · Balance: <strong data-loyalty-balance>{{ loyalty_balance }}</strong> pts
                 {%- endif -%}
                 <button type="button" class="cart-drawer__loyalty-link" data-open-loyalty-panel>Rewards</button>
               </div>
