@@ -696,6 +696,60 @@
     })();
   };
 
+  const initProductForm = () => {
+    const form = qs('[data-product-form]');
+    if (!form) return;
+
+    const variantsEl = qs('[data-product-variants]', form);
+    const priceEl = qs('[data-product-price]');
+    const submit = qs('[data-product-submit]', form);
+    const pills = qsa('.product-form__pill-input', form);
+    if (!variantsEl || !pills.length) return;
+
+    const addToCartLabel = form.getAttribute('data-add-to-cart') || 'Add to cart';
+    const soldOutLabel = form.getAttribute('data-sold-out') || 'Sold out';
+
+    let variants = [];
+    try {
+      variants = JSON.parse(variantsEl.textContent);
+    } catch (err) {
+      return;
+    }
+
+    const formatVariantPrice = (cents) => {
+      const moneyFormat = (window.Shopify && Shopify.money_format) || '£{{amount}}';
+      return formatMoney(cents, moneyFormat);
+    };
+
+    const updateVariant = (variantId) => {
+      const variant = variants.find((item) => String(item.id) === String(variantId));
+      if (!variant) return;
+
+      qsa('.product-form__pill', form).forEach((pill) => {
+        const input = qs('input', pill);
+        pill.classList.toggle('is-selected', input && input.checked);
+      });
+
+      if (priceEl) {
+        priceEl.textContent = formatVariantPrice(variant.price);
+      }
+
+      if (submit) {
+        submit.disabled = !variant.available;
+        submit.textContent = variant.available ? addToCartLabel : soldOutLabel;
+      }
+    };
+
+    pills.forEach((input) => {
+      input.addEventListener('change', () => {
+        if (input.checked) updateVariant(input.value);
+      });
+    });
+
+    const checked = pills.find((input) => input.checked);
+    if (checked) updateVariant(checked.value);
+  };
+
   const boot = () => {
     try {
       initDrawers();
@@ -712,6 +766,7 @@
       initHeroTilt();
       initPredictiveSearch();
       initSearchPageFallback();
+      initProductForm();
     } catch (err) {
       console.error('theme boot extras failed', err);
     }

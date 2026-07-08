@@ -24,7 +24,7 @@
         {{ product.type | default: product.vendor | default: 'Kori Collectibles' | escape }}
       </p>
       <h1 class="product__title">{{ product.title | escape }}</h1>
-      <div class="product__price">
+      <div class="product__price" data-product-price>
         {%- if product.price_varies -%}
           {{ 'products.from' | t }} {{ product.price_min | money }}
         {%- else -%}
@@ -36,36 +36,41 @@
         <div class="product__desc">{{ product.description }}</div>
       {%- endif -%}
 
-      {% form 'product', product, class: 'product-form' %}
+      {% form 'product', product, class: 'product-form', data-product-form: '', data-add-to-cart: 'products.add_to_cart' | t, data-sold-out: 'products.sold_out' | t %}
         {%- assign current = product.selected_or_first_available_variant -%}
 
         {%- unless product.has_only_default_variant -%}
-          <div>
-            <label for="Variant-{{ section.id }}">Variant</label>
-            <select id="Variant-{{ section.id }}" name="id">
+          <div class="product-form__field">
+            <span class="product-form__label" id="VariantLabel-{{ section.id }}">Variant</span>
+            <div class="product-form__pills" role="radiogroup" aria-labelledby="VariantLabel-{{ section.id }}">
               {%- for variant in product.variants -%}
-                <option
-                  value="{{ variant.id }}"
-                  {% if variant == current %}selected{% endif %}
-                  {% unless variant.available %}disabled{% endunless %}
-                >
-                  {{ variant.title }} — {{ variant.price | money }}
-                </option>
+                <label class="product-form__pill{% if variant == current %} is-selected{% endif %}{% unless variant.available %} is-unavailable{% endunless %}">
+                  <input
+                    type="radio"
+                    name="id"
+                    value="{{ variant.id }}"
+                    class="product-form__pill-input"
+                    {% if variant == current %}checked{% endif %}
+                    {% unless variant.available %}disabled{% endunless %}
+                  >
+                  <span class="product-form__pill-text">{{ variant.title | escape }}</span>
+                </label>
               {%- endfor -%}
-            </select>
+            </div>
           </div>
         {%- else -%}
           <input type="hidden" name="id" value="{{ current.id }}">
         {%- endunless -%}
 
-        <div>
-          <label for="Quantity-{{ section.id }}">{{ 'products.quantity' | t }}</label>
+        <div class="product-form__field">
+          <label class="product-form__label" for="Quantity-{{ section.id }}">{{ 'products.quantity' | t }}</label>
           <input id="Quantity-{{ section.id }}" type="number" name="quantity" min="1" value="1">
         </div>
 
         <button
           type="submit"
           class="button button--full"
+          data-product-submit
           {% unless current.available %}disabled{% endunless %}
         >
           {%- if current.available -%}
@@ -74,6 +79,10 @@
             {{ 'products.sold_out' | t }}
           {%- endif -%}
         </button>
+
+        <script type="application/json" data-product-variants>
+          {{ product.variants | json }}
+        </script>
       {% endform %}
 
       <div class="product__meta">

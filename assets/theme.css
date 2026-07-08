@@ -1951,13 +1951,81 @@ ul {
   max-width: 26rem;
 }
 
-.product-form label {
+.product-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.product-form__label {
   font-size: 0.8rem;
   color: var(--muted);
   font-family: var(--font-mono);
 }
 
-.product-form select,
+.product-form__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.product-form__pill {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.product-form__pill-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+
+.product-form__pill-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 550;
+  line-height: 1.2;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.product-form__pill:hover .product-form__pill-text {
+  border-color: rgba(45, 212, 191, 0.35);
+  color: var(--text);
+}
+
+.product-form__pill-input:focus-visible + .product-form__pill-text {
+  outline: 2px solid rgba(45, 212, 191, 0.55);
+  outline-offset: 2px;
+}
+
+.product-form__pill-input:checked + .product-form__pill-text,
+.product-form__pill.is-selected .product-form__pill-text {
+  border-color: rgba(45, 212, 191, 0.55);
+  background: rgba(45, 212, 191, 0.12);
+  color: var(--text);
+}
+
+.product-form__pill.is-unavailable .product-form__pill-text {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.product-form__pill-input:disabled + .product-form__pill-text {
+  cursor: not-allowed;
+}
+
 .product-form input[type='number'] {
   width: 100%;
   min-height: 46px;
