@@ -27,18 +27,21 @@
                 {% endunless %}
               </td>
               <td>
+                <label class="cart-item__qty-label" for="Updates-{{ item.key }}">Qty</label>
                 <input
+                  id="Updates-{{ item.key }}"
+                  class="cart-qty"
                   type="number"
                   name="updates[]"
                   value="{{ item.quantity }}"
                   min="0"
+                  inputmode="numeric"
                   aria-label="Quantity"
-                  style="width:72px;background:var(--ink-2);border:1px solid rgba(255,255,255,0.12);color:var(--text-light);padding:8px;border-radius:8px;"
                 >
               </td>
-              <td class="mono">{{ item.final_line_price | money }}</td>
+              <td class="mono cart-item__price">{{ item.final_line_price | money }}</td>
               <td>
-                <a href="{{ item.url_to_remove }}">{{ 'cart.remove' | t }}</a>
+                <a class="cart-item__remove" href="{{ item.url_to_remove }}">{{ 'cart.remove' | t }}</a>
               </td>
             </tr>
           {% endfor %}

@@ -34,6 +34,7 @@
     const tiltCard = document.getElementById('tiltCard');
     const tiltShine = document.getElementById('tiltShine');
     if (!tiltCard || !tiltShine) return;
+    if (window.matchMedia('(hover: none)').matches) return;
 
     tiltCard.addEventListener('mousemove', (e) => {
       const r = tiltCard.getBoundingClientRect();
