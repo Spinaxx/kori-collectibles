@@ -1596,7 +1596,7 @@ ul {
 .collection-layout--with-filters {
   grid-template-columns: 260px minmax(0, 1fr);
   grid-template-areas:
-    'toolbar toolbar'
+    '. toolbar'
     'facets products';
   align-items: start;
 }
