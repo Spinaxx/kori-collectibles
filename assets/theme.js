@@ -197,15 +197,17 @@
     });
   };
 
-  const formatMoney = (cents) => {
-    const value = Number(cents || 0) / 100;
+  // Predictive search returns decimal currency strings (e.g. "1400.00"), not cents.
+  const formatMoney = (amount) => {
+    const value = Number(amount);
+    const safe = Number.isFinite(value) ? value : 0;
     try {
-      return new Intl.NumberFormat(undefined, {
+      return new Intl.NumberFormat('en-GB', {
         style: 'currency',
         currency: (window.Shopify && Shopify.currency && Shopify.currency.active) || 'GBP',
-      }).format(value);
+      }).format(safe);
     } catch (err) {
-      return `£${value.toFixed(2)}`;
+      return `£${safe.toFixed(2)}`;
     }
   };
 
@@ -249,7 +251,11 @@
               product.image ||
               (product.featured_image && (product.featured_image.url || product.featured_image)) ||
               '';
-            const price = formatMoney(product.price);
+            const priceValue =
+              product.price_min != null && product.price_min !== ''
+                ? product.price_min
+                : product.price;
+            const price = formatMoney(priceValue);
             const vendor = product.vendor
               ? `<div class="predictive__meta">${escapeHtml(product.vendor)}</div>`
               : '';
