@@ -1575,17 +1575,20 @@ ul {
 .collection-layout--with-filters {
   grid-template-columns: 260px minmax(0, 1fr);
   grid-template-areas:
-    'facets toolbar'
+    'toolbar toolbar'
     'facets products';
   align-items: start;
 }
 
 .collection-layout--with-filters .facets {
   grid-area: facets;
+  align-self: start;
+  margin-top: 0;
 }
 
 .collection-layout--with-filters .collection-toolbar {
   grid-area: toolbar;
+  margin-bottom: 0;
 }
 
 .collection-layout--with-filters .product-grid {
@@ -1800,6 +1803,24 @@ ul {
       'toolbar'
       'facets'
       'products';
+  }
+
+  .collection-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .collection-toolbar__actions {
+    order: 1;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .collection-toolbar__count {
+    order: 2;
+    width: 100%;
   }
 
   .facets {
