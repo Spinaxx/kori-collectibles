@@ -99,7 +99,9 @@
 
 {% schema %}
 {
-  "name": "Game grid",
+  "name": "Shop by game",
+  "tag": "section",
+  "class": "section-shop-by-game",
   "settings": [
     {
       "type": "text",
@@ -117,8 +119,28 @@
   "blocks": [
     {
       "type": "game",
-      "name": "Game",
+      "name": "Game tile",
       "settings": [
+        {
+          "type": "header",
+          "content": "Coming soon"
+        },
+        {
+          "type": "checkbox",
+          "id": "coming_soon",
+          "label": "Show coming soon banner",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "coming_soon_text",
+          "label": "Banner text",
+          "default": "Coming soon"
+        },
+        {
+          "type": "header",
+          "content": "Tile content"
+        },
         {
           "type": "text",
           "id": "title",
@@ -141,19 +163,6 @@
           "type": "url",
           "id": "link",
           "label": "Link"
-        },
-        {
-          "type": "checkbox",
-          "id": "coming_soon",
-          "label": "Show coming soon banner",
-          "default": false
-        },
-        {
-          "type": "text",
-          "id": "coming_soon_text",
-          "label": "Banner text",
-          "default": "Coming soon",
-          "info": "Shown as a diagonal banner across the tile when enabled."
         },
         {
           "type": "image_picker",
@@ -181,14 +190,14 @@
   ],
   "presets": [
     {
-      "name": "Game grid",
+      "name": "Shop by game",
       "blocks": [
-        { "type": "game", "settings": { "title": "Pokemon", "meta": "Singles · Sealed", "logo_key": "pokemon", "show_title": false } },
-        { "type": "game", "settings": { "title": "Yu-Gi-Oh!", "meta": "Singles · Sealed", "logo_key": "yugioh", "show_title": false } },
-        { "type": "game", "settings": { "title": "Magic", "meta": "Singles · Sealed", "logo_key": "magic", "show_title": false } },
-        { "type": "game", "settings": { "title": "One Piece", "meta": "Sealed", "logo_key": "onepiece", "show_title": false } },
-        { "type": "game", "settings": { "title": "Lorcana", "meta": "Sealed", "logo_key": "lorcana", "show_title": false } },
-        { "type": "game", "settings": { "title": "Accessories", "meta": "Sleeves · Binders", "logo_key": "accessories", "show_title": false } }
+        { "type": "game", "settings": { "title": "Pokemon", "meta": "Singles · Sealed", "logo_key": "pokemon", "show_title": false, "coming_soon": false } },
+        { "type": "game", "settings": { "title": "Yu-Gi-Oh!", "meta": "Singles · Sealed", "logo_key": "yugioh", "show_title": false, "coming_soon": false } },
+        { "type": "game", "settings": { "title": "Magic", "meta": "Singles · Sealed", "logo_key": "magic", "show_title": false, "coming_soon": false } },
+        { "type": "game", "settings": { "title": "One Piece", "meta": "Sealed", "logo_key": "onepiece", "show_title": false, "coming_soon": false } },
+        { "type": "game", "settings": { "title": "Lorcana", "meta": "Sealed", "logo_key": "lorcana", "show_title": false, "coming_soon": false } },
+        { "type": "game", "settings": { "title": "Accessories", "meta": "Sleeves · Binders", "logo_key": "accessories", "show_title": false, "coming_soon": false } }
       ]
     }
   ]

@@ -56,7 +56,7 @@
       }
     },
     "games": {
-      "type": "game-grid",
+      "type": "shop-by-game",
       "blocks": {
         "g1": {
           "type": "game",
@@ -66,7 +66,9 @@
             "link": "shopify://collections/pokemon",
             "logo": "shopify://shop_images/Pokemon_Trading_Card_Game_logo_svg.webp",
             "logo_key": "pokemon",
-            "show_title": false
+            "show_title": false,
+            "coming_soon": false,
+            "coming_soon_text": "Coming soon"
           }
         },
         "g2": {
@@ -76,7 +78,9 @@
             "meta": "Singles · Sealed",
             "link": "",
             "logo_key": "yugioh",
-            "show_title": false
+            "show_title": false,
+            "coming_soon": false,
+            "coming_soon_text": "Coming soon"
           }
         },
         "g3": {
@@ -86,7 +90,9 @@
             "meta": "Singles · Sealed",
             "link": "",
             "logo_key": "magic",
-            "show_title": false
+            "show_title": false,
+            "coming_soon": false,
+            "coming_soon_text": "Coming soon"
           }
         },
         "g4": {
@@ -96,7 +102,9 @@
             "meta": "Sealed",
             "link": "",
             "logo_key": "onepiece",
-            "show_title": false
+            "show_title": false,
+            "coming_soon": false,
+            "coming_soon_text": "Coming soon"
           }
         },
         "g5": {
@@ -106,7 +114,9 @@
             "meta": "Sealed",
             "link": "",
             "logo_key": "lorcana",
-            "show_title": false
+            "show_title": false,
+            "coming_soon": false,
+            "coming_soon_text": "Coming soon"
           }
         },
         "g6": {
@@ -116,7 +126,9 @@
             "meta": "Sleeves · Binders",
             "link": "",
             "logo_key": "accessories",
-            "show_title": false
+            "show_title": false,
+            "coming_soon": false,
+            "coming_soon_text": "Coming soon"
           }
         }
       },
