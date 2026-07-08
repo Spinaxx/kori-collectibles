@@ -64,7 +64,10 @@
     {{ content_for_header }}
   </head>
 
-  <body{% if customer %} data-loyalty-balance="{{ loyalty_balance | default: 0 }}"{% endif %}>
+  <body
+    {% if customer %}data-loyalty-balance="{{ loyalty_balance | default: 0 }}"{% endif %}
+    data-rewards-url="{{ rewards_url }}"
+  >
     <a class="skip-link" href="#MainContent">Skip to content</a>
 
     {%- assign main_menu = linklists[settings.menu] -%}
@@ -478,7 +481,7 @@
       </div>
     </footer>
 
-    {%- render 'account-drawer', loyalty_balance: loyalty_balance -%}
+    {%- render 'account-drawer', loyalty_balance: loyalty_balance, rewards_url: rewards_url -%}
 
     {%- if settings.loyalty_enable -%}
       {%- render 'loyalty-panel', loyalty_balance: loyalty_balance -%}

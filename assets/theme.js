@@ -925,16 +925,16 @@
 
   const initLoyaltyPanel = () => {
     const widget = qs('[data-loyalty-widget]');
-    if (!widget) return;
-
-    const modal = qs('[data-loyalty-modal]', widget);
-    const panel = qs('[data-loyalty-panel]', widget);
+    const modal = widget ? qs('[data-loyalty-modal]', widget) : null;
+    const panel = widget ? qs('[data-loyalty-panel]', widget) : null;
+    const rewardsUrl = document.body.dataset.rewardsUrl || '/pages/rewards';
     let open = false;
 
     const setOpen = (next) => {
+      if (!widget || !modal) return;
       open = next;
       widget.classList.toggle('is-open', open);
-      if (modal) modal.hidden = !open;
+      modal.hidden = !open;
       document.documentElement.style.overflow = open ? 'hidden' : '';
       qsa('[data-open-loyalty-panel]').forEach((btn) => {
         btn.setAttribute('aria-expanded', String(open));
@@ -945,15 +945,27 @@
       }
     };
 
-    qsa('[data-open-loyalty-panel]').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const accountDrawer = qs('[data-account-drawer]');
-        if (accountDrawer && typeof accountDrawer._closeAccountDrawer === 'function') {
-          accountDrawer._closeAccountDrawer();
-        }
+    const openFromTrigger = (btn) => {
+      const accountDrawer = qs('[data-account-drawer]');
+      if (accountDrawer && typeof accountDrawer._closeAccountDrawer === 'function') {
+        accountDrawer._closeAccountDrawer();
+      }
+
+      if (widget && modal) {
         setOpen(true);
-      });
+        return;
+      }
+
+      const targetUrl = btn instanceof Element ? btn.getAttribute('data-rewards-url') || rewardsUrl : rewardsUrl;
+      window.location.assign(targetUrl);
+    };
+
+    document.addEventListener('click', (e) => {
+      const target = e.target instanceof Element ? e.target : null;
+      const btn = target && target.closest('[data-open-loyalty-panel]');
+      if (!btn) return;
+      e.preventDefault();
+      openFromTrigger(btn);
     });
 
     qsa('[data-close-loyalty-panel]').forEach((btn) => {

@@ -5,6 +5,10 @@
   hidden
 >
   {%- assign loyalty_balance = loyalty_balance | default: 0 | plus: 0 -%}
+  {%- assign rewards_url = rewards_url | default: pages.rewards.url | default: '/pages/rewards' -%}
+  {%- if rewards_url == blank -%}
+    {%- assign rewards_url = '/pages/rewards' -%}
+  {%- endif -%}
   <div class="account-drawer__backdrop" data-close-account></div>
   <div class="account-drawer__panel" role="dialog" aria-modal="true" aria-label="Account">
     <div class="account-drawer__top">
@@ -26,10 +30,10 @@
         </div>
 
         {%- if settings.loyalty_enable -%}
-          <button type="button" class="account-drawer__rewards" data-open-loyalty-panel>
+          <a class="account-drawer__rewards" href="{{ rewards_url }}">
             <span class="account-drawer__rewards-label">Rewards balance</span>
             <span class="account-drawer__rewards-value"><span data-loyalty-balance>{{ loyalty_balance | default: 0 }}</span> pts</span>
-          </button>
+          </a>
         {%- endif -%}
 
         <section class="account-drawer__section">
@@ -82,9 +86,9 @@
             <a class="button button--secondary button--full" href="{{ routes.account_register_url }}">Create account</a>
           </div>
           {%- if settings.loyalty_enable -%}
-            <button type="button" class="account-drawer__rewards account-drawer__rewards--guest" data-open-loyalty-panel>
+            <a class="account-drawer__rewards account-drawer__rewards--guest" href="{{ rewards_url }}">
               View rewards program
-            </button>
+            </a>
           {%- endif -%}
         </div>
       {%- endif -%}

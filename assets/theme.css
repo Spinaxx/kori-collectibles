@@ -1141,6 +1141,7 @@ ul {
     var(--surface);
   color: inherit;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
 }
 
