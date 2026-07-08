@@ -64,6 +64,7 @@
             "title": "Pokemon",
             "meta": "Singles · Sealed",
             "link": "shopify://collections/pokemon",
+            "logo": "shopify://shop_images/Pokemon_Trading_Card_Game_logo_svg.webp",
             "logo_key": "pokemon"
           }
         },
