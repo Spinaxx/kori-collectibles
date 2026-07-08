@@ -81,84 +81,122 @@
 
   const initHeroTilt = () => {
     const card = qs('[data-hero-card]');
-    const shine = qs('[data-hero-shine]', card || document);
-    if (!card || !shine) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!card) return;
 
-    let active = false;
+    const shine = qs('[data-hero-shine]', card);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const productUrl = card.getAttribute('data-hero-url');
+    let dragging = false;
     let moved = false;
     let startX = 0;
     let startY = 0;
-    let pointerId = null;
 
     const applyTilt = (clientX, clientY) => {
+      if (reduceMotion) return;
       const r = card.getBoundingClientRect();
       const x = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
       const y = Math.min(1, Math.max(0, (clientY - r.top) / r.height));
-      const rotX = (0.5 - y) * 22;
-      const rotY = (x - 0.5) * 28;
-      card.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.04)`;
-      shine.style.opacity = '1';
-      shine.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(255,255,255,0.45), transparent 55%)`;
+      card.style.transform = `rotateX(${(0.5 - y) * 24}deg) rotateY(${(x - 0.5) * 30}deg) scale(1.04)`;
+      if (shine) {
+        shine.style.opacity = '1';
+        shine.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(255,255,255,0.5), transparent 55%)`;
+      }
     };
 
     const resetTilt = () => {
-      card.style.transform = 'rotateX(0) rotateY(0) scale(1)';
-      shine.style.opacity = '';
+      card.style.transform = '';
+      if (shine) shine.style.opacity = '';
       card.classList.remove('is-tilting');
     };
 
-    const onPointerDown = (e) => {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      active = true;
-      moved = false;
-      startX = e.clientX;
-      startY = e.clientY;
-      pointerId = e.pointerId;
+    // Desktop hover follow
+    card.addEventListener('mousemove', (e) => {
+      if (dragging) return;
       card.classList.add('is-tilting');
-      card.setPointerCapture?.(e.pointerId);
       applyTilt(e.clientX, e.clientY);
-    };
-
-    const onPointerMove = (e) => {
-      if (!active || (pointerId != null && e.pointerId !== pointerId)) return;
-      if (Math.abs(e.clientX - startX) > 6 || Math.abs(e.clientY - startY) > 6) {
-        moved = true;
-      }
-      if (e.pointerType === 'touch') {
-        e.preventDefault();
-      }
-      applyTilt(e.clientX, e.clientY);
-    };
-
-    const onPointerUp = (e) => {
-      if (!active || (pointerId != null && e.pointerId !== pointerId)) return;
-      active = false;
-      pointerId = null;
-      resetTilt();
-    };
-
-    card.addEventListener('pointerdown', onPointerDown);
-    card.addEventListener('pointermove', onPointerMove, { passive: false });
-    card.addEventListener('pointerup', onPointerUp);
-    card.addEventListener('pointercancel', onPointerUp);
-    card.addEventListener('pointerleave', (e) => {
-      if (e.pointerType === 'mouse') onPointerUp(e);
+    });
+    card.addEventListener('mouseleave', () => {
+      if (!dragging) resetTilt();
     });
 
-    // If the user dragged the card, don't follow the product link.
-    card.addEventListener('click', (e) => {
-      if (moved) {
+    // Touch / drag
+    const onStart = (clientX, clientY) => {
+      dragging = true;
+      moved = false;
+      startX = clientX;
+      startY = clientY;
+      card.classList.add('is-tilting');
+      applyTilt(clientX, clientY);
+    };
+
+    const onMove = (clientX, clientY, evt) => {
+      if (!dragging) return;
+      if (Math.abs(clientX - startX) > 8 || Math.abs(clientY - startY) > 8) moved = true;
+      if (evt) evt.preventDefault();
+      applyTilt(clientX, clientY);
+    };
+
+    const onEnd = () => {
+      if (!dragging) return;
+      dragging = false;
+      resetTilt();
+      if (!moved && productUrl) {
+        window.location.assign(productUrl);
+      }
+      moved = false;
+    };
+
+    card.addEventListener(
+      'touchstart',
+      (e) => {
+        if (!e.touches[0]) return;
+        onStart(e.touches[0].clientX, e.touches[0].clientY);
+      },
+      { passive: true }
+    );
+    card.addEventListener(
+      'touchmove',
+      (e) => {
+        if (!e.touches[0]) return;
+        onMove(e.touches[0].clientX, e.touches[0].clientY, e);
+      },
+      { passive: false }
+    );
+    card.addEventListener('touchend', onEnd);
+    card.addEventListener('touchcancel', () => {
+      dragging = false;
+      resetTilt();
+      moved = false;
+    });
+
+    card.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      onStart(e.clientX, e.clientY);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      onMove(e.clientX, e.clientY);
+    });
+    window.addEventListener('mouseup', onEnd);
+
+    card.addEventListener('keydown', (e) => {
+      if (!productUrl) return;
+      if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        e.stopPropagation();
-        moved = false;
+        window.location.assign(productUrl);
       }
     });
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
+  const boot = () => {
     initDrawers();
     initNavDropdowns();
     initHeroTilt();
-  });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 })();

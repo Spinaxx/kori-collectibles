@@ -110,11 +110,13 @@
 
     <div class="hero__stage">
       {%- if hero_product != blank and hero_product.featured_image -%}
-        <a
+        <div
           class="hero-card"
-          href="{{ hero_product.url }}"
-          aria-label="{{ hero_product.title | escape }}"
           data-hero-card
+          data-hero-url="{{ hero_product.url }}"
+          role="link"
+          tabindex="0"
+          aria-label="{{ hero_product.title | escape }}"
         >
           <span class="hero-card__shine" data-hero-shine></span>
           {%- assign hero_alt = hero_product.featured_image.alt | default: hero_product.title -%}
@@ -134,12 +136,13 @@
             alt="{{ hero_alt | escape }}"
             loading="eager"
             fetchpriority="high"
+            draggable="false"
           >
           <span class="hero-card__holo" aria-hidden="true"></span>
-        </a>
+        </div>
       {%- elsif section.settings.fallback_image != blank -%}
-        <div class="hero-card" aria-hidden="true">
-          <span class="hero-card__shine"></span>
+        <div class="hero-card" data-hero-card aria-hidden="true">
+          <span class="hero-card__shine" data-hero-shine></span>
           {{
             section.settings.fallback_image
             | image_url: width: 900
@@ -148,7 +151,8 @@
           <span class="hero-card__holo"></span>
         </div>
       {%- else -%}
-        <div class="hero-card" aria-hidden="true">
+        <div class="hero-card" data-hero-card aria-hidden="true">
+          <span class="hero-card__shine" data-hero-shine></span>
           <div class="hero-card__placeholder">
             {{ 'product-1' | placeholder_svg_tag }}
           </div>

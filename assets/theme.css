@@ -192,35 +192,27 @@ ul {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.02em;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  overscroll-behavior-x: contain;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-.announcement::-webkit-scrollbar {
-  display: none;
+.announcement__track {
+  display: flex;
+  width: max-content;
+  animation: announcement-scroll 32s linear infinite;
+}
+
+.announcement:hover .announcement__track {
+  animation-play-state: paused;
 }
 
 .announcement__inner {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: 1.5rem;
-  width: max-content;
-  min-width: 100%;
-  padding: 0.55rem 1rem;
+  padding: 0.55rem 0;
   color: var(--muted);
-  flex-wrap: nowrap;
-  box-sizing: border-box;
-}
-
-@media (min-width: 990px) {
-  .announcement__inner {
-    justify-content: center;
-    padding-inline: 1.5rem;
-  }
+  flex: 0 0 auto;
 }
 
 .announcement__inner span {
@@ -231,6 +223,38 @@ ul {
 .announcement__inner b {
   color: var(--accent-2);
   font-weight: 500;
+}
+
+@keyframes announcement-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement__track {
+    animation: none;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .announcement__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .announcement__inner[aria-hidden='true'] {
+    display: none;
+  }
+
+  .announcement__inner {
+    padding-inline: 1rem;
+  }
 }
 
 /* Header */
@@ -665,6 +689,7 @@ ul {
   perspective: 1200px;
   display: flex;
   justify-content: center;
+  touch-action: pan-y;
 }
 
 .hero-card {
@@ -677,16 +702,23 @@ ul {
   box-shadow: var(--shadow);
   background: var(--surface-2);
   transform-style: preserve-3d;
-  transition: transform 0.12s ease-out;
+  transform: rotateX(0) rotateY(0) scale(1);
+  will-change: transform;
+  transition: transform 0.18s ease-out;
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
   cursor: grab;
+  outline: none;
 }
 
 .hero-card.is-tilting {
   cursor: grabbing;
   transition: none;
+}
+
+.hero-card:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
 }
 
 .hero-card__image {

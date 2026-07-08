@@ -74,12 +74,23 @@
 
     {%- if settings.show_announcement -%}
       <div class="announcement" aria-label="Announcements">
-        <div class="announcement__inner">
-          <span>Free UK delivery over <b>GBP 40</b></span>
-          <span aria-hidden="true">·</span>
-          <span>Singles condition-checked under lamp</span>
-          <span aria-hidden="true">·</span>
-          <span>New sealed drops weekly</span>
+        <div class="announcement__track">
+          <div class="announcement__inner">
+            <span>Free UK delivery over <b>GBP 40</b></span>
+            <span aria-hidden="true">·</span>
+            <span>Singles condition-checked under lamp</span>
+            <span aria-hidden="true">·</span>
+            <span>New sealed drops weekly</span>
+            <span aria-hidden="true">·</span>
+          </div>
+          <div class="announcement__inner" aria-hidden="true">
+            <span>Free UK delivery over <b>GBP 40</b></span>
+            <span aria-hidden="true">·</span>
+            <span>Singles condition-checked under lamp</span>
+            <span aria-hidden="true">·</span>
+            <span>New sealed drops weekly</span>
+            <span aria-hidden="true">·</span>
+          </div>
         </div>
       </div>
     {%- endif -%}
