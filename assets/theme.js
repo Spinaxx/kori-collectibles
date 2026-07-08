@@ -48,16 +48,13 @@
     const facets = qs('[data-facets]');
     const facetsOpen = qs('[data-open-facets]');
     if (facets && facetsOpen) {
-      const setFacets = (open) => {
+      const activeBadge = facetsOpen.querySelector('.facet-group__count');
+      facetsOpen.addEventListener('click', () => {
+        const open = !facets.classList.contains('is-open');
         facets.classList.toggle('is-open', open);
-        document.documentElement.style.overflow = open ? 'hidden' : '';
-      };
-      facetsOpen.addEventListener('click', () => setFacets(true));
-      qsa('[data-close-facets]', facets).forEach((el) =>
-        el.addEventListener('click', () => setFacets(false))
-      );
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && facets.classList.contains('is-open')) setFacets(false);
+        facetsOpen.setAttribute('aria-expanded', String(open));
+        facetsOpen.textContent = open ? 'Hide filters' : 'Filters';
+        if (!open && activeBadge) facetsOpen.appendChild(activeBadge);
       });
     }
 
