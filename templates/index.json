@@ -74,13 +74,13 @@
         "g2": {
           "type": "game",
           "settings": {
-            "coming_soon": true,
+            "coming_soon": false,
             "coming_soon_text": "Coming soon",
             "title": "Japanese Pokemon",
             "show_title": true,
             "meta": "Singles · Sealed",
             "link": "",
-            "logo_key": "japanese_pokemon"
+            "logo_key": "pokemon"
           }
         },
         "g3": {
