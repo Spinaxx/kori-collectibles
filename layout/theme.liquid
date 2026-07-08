@@ -178,14 +178,19 @@
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.5 13.5a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM14.5 14.5 12 12"/>
             </svg>
           </button>
-          <a href="{{ routes.cart_url }}" class="icon-btn" aria-label="Cart">
+          <a
+            href="{{ routes.cart_url }}"
+            class="icon-btn"
+            data-open-cart
+            aria-label="Cart"
+            aria-expanded="false"
+            aria-controls="CartDrawer"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                 d="M3.4 6.9h13.2v8c0 .57-.22 1.11-.62 1.51-.4.4-.94.63-1.51.63H5.53c-.57 0-1.11-.23-1.51-.63a2.14 2.14 0 0 1-.62-1.51zM8.8 3h2.4c.62 0 1.21.25 1.65.68.43.44.68 1.03.68 1.66v1.56H6.5V5.34c0-.63.24-1.22.68-1.66A2.3 2.3 0 0 1 8.8 3z"/>
             </svg>
-            {%- if cart.item_count > 0 -%}
-              <span class="cart-count">{{ cart.item_count }}</span>
-            {%- endif -%}
+            <span class="cart-count" data-cart-count {% if cart.item_count == 0 %}hidden{% endif %}>{{ cart.item_count }}</span>
           </a>
         </div>
       </div>
@@ -229,10 +234,107 @@
             {%- else -%}
               <li><a href="{{ routes.all_products_collection_url }}">Shop</a></li>
               <li><a href="{{ routes.collections_url }}">Collections</a></li>
-              <li><a href="{{ routes.cart_url }}">Cart</a></li>
+              <li><a href="{{ routes.cart_url }}" data-open-cart>Cart</a></li>
             {%- endif -%}
           </ul>
         </nav>
+      </div>
+    </div>
+
+    {%- liquid
+      assign cart_threshold_cents = settings.cart_free_shipping_threshold | times: 100
+    -%}
+    <div
+      class="cart-drawer"
+      id="CartDrawer"
+      data-cart-drawer
+      hidden
+      data-money-format="{{ shop.money_format | escape }}"
+      data-cart-url="{{ routes.cart_url }}"
+      data-checkout-url="{{ routes.cart_url }}?checkout"
+      data-free-shipping-threshold="{{ cart_threshold_cents }}"
+      data-empty-message="{{ settings.empty_cart_message | escape }}"
+    >
+      <div class="cart-drawer__backdrop" data-close-cart></div>
+      <div class="cart-drawer__panel" role="dialog" aria-modal="true" aria-label="Cart">
+        <div class="cart-drawer__top">
+          <span class="cart-drawer__title">Your cart</span>
+          <button type="button" class="icon-btn" data-close-cart aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="cart-drawer__body" data-cart-contents>
+          {%- if cart.item_count == 0 -%}
+            <div class="cart-drawer__empty">
+              <p>{{ settings.empty_cart_message }}</p>
+              <button type="button" class="button" data-close-cart style="margin-top:1rem;">Continue shopping</button>
+            </div>
+          {%- else -%}
+            <ul class="cart-drawer__items" role="list">
+              {%- for item in cart.items -%}
+                <li class="cart-drawer__item" data-key="{{ item.key }}">
+                  <a class="cart-drawer__media" href="{{ item.url }}">
+                    {%- if item.image -%}
+                      {{ item.image | image_url: width: 160 | image_tag: loading: 'lazy', alt: item.product.title }}
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </a>
+                  <div class="cart-drawer__details">
+                    <a class="cart-drawer__name" href="{{ item.url }}">{{ item.product.title | escape }}</a>
+                    {%- unless item.product.has_only_default_variant -%}
+                      <div class="cart-drawer__meta">{{ item.variant.title | escape }}</div>
+                    {%- endunless -%}
+                    <div class="cart-drawer__meta">{{ item.original_price | money }}</div>
+                    <div class="cart-drawer__row">
+                      <div class="cart-drawer__qty">
+                        <button type="button" data-cart-qty="-1" data-key="{{ item.key }}" aria-label="Decrease quantity">-</button>
+                        <input
+                          type="number"
+                          min="0"
+                          value="{{ item.quantity }}"
+                          aria-label="Quantity"
+                          data-cart-qty-input
+                          data-key="{{ item.key }}"
+                        >
+                        <button type="button" data-cart-qty="1" data-key="{{ item.key }}" aria-label="Increase quantity">+</button>
+                      </div>
+                      <div class="cart-drawer__line mono">{{ item.final_line_price | money }}</div>
+                    </div>
+                    <button type="button" class="cart-drawer__remove" data-cart-remove data-key="{{ item.key }}">Remove</button>
+                  </div>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+
+        <div class="cart-drawer__footer" data-cart-footer {% if cart.item_count == 0 %}hidden{% endif %}>
+          {%- if settings.cart_free_shipping_threshold != blank -%}
+            <div class="cart-drawer__shipping" data-cart-shipping>
+              {%- if cart.total_price >= cart_threshold_cents -%}
+                You've unlocked free UK delivery
+              {%- else -%}
+                {%- assign remaining = cart_threshold_cents | minus: cart.total_price -%}
+                Spend {{ remaining | money }} more for free UK delivery
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+          <div class="cart-drawer__subtotal">
+            <span>Subtotal</span>
+            <strong data-cart-subtotal>{{ cart.total_price | money }}</strong>
+          </div>
+          <p class="cart-drawer__note">Taxes and shipping calculated at checkout</p>
+          <div class="cart-drawer__actions">
+            <a class="button button--secondary button--full" href="{{ routes.cart_url }}">View cart</a>
+            <form action="{{ routes.cart_url }}" method="post">
+              <button type="submit" name="checkout" class="button button--full">Checkout</button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
 

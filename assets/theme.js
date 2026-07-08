@@ -58,6 +58,8 @@
       });
     }
 
+    initCartDrawer();
+
     const sort = qs('[data-sort-by]');
     if (sort) {
       sort.addEventListener('change', () => {
@@ -92,6 +94,228 @@
         window.location.assign(`${base}/${encodeURIComponent(tag)}`);
       });
     }
+  };
+
+  const formatMoney = (cents, format) => {
+    if (typeof cents === 'string') cents = cents.replace('.', '');
+    const value = (Number(cents) || 0) / 100;
+    const formatted = value.toLocaleString('en-GB', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    const plain = String(format || '£{{amount}}').replace(/<[^>]*>/g, '');
+    if (/\{\{\s*amount/.test(plain)) {
+      return plain
+        .replace(/\{\{\s*amount_with_comma_separator\s*\}\}/, formatted.replace('.', ','))
+        .replace(/\{\{\s*amount_no_decimals_with_comma_separator\s*\}\}/, String(Math.round(value)))
+        .replace(/\{\{\s*amount_no_decimals\s*\}\}/, String(Math.round(value)))
+        .replace(/\{\{\s*amount\s*\}\}/, formatted);
+    }
+    return `£${formatted}`;
+  };
+
+  const initCartDrawer = () => {
+    const drawer = qs('[data-cart-drawer]');
+    if (!drawer) return;
+
+    const moneyFormat = drawer.getAttribute('data-money-format') || '£{{amount}}';
+    const emptyMessage =
+      drawer.getAttribute('data-empty-message') || 'Your cart is empty.';
+    const threshold = Number(drawer.getAttribute('data-free-shipping-threshold') || 0);
+    const cartUrl = drawer.getAttribute('data-cart-url') || '/cart';
+    const contents = qs('[data-cart-contents]', drawer);
+    const footer = qs('[data-cart-footer]', drawer);
+    const openers = qsa('[data-open-cart]');
+
+    const setOpen = (open) => {
+      drawer.hidden = !open;
+      openers.forEach((btn) => btn.setAttribute('aria-expanded', String(open)));
+      document.documentElement.style.overflow = open ? 'hidden' : '';
+    };
+
+    const updateCountBadge = (count) => {
+      qsa('[data-cart-count]').forEach((badge) => {
+        badge.textContent = String(count);
+        badge.hidden = count <= 0;
+      });
+    };
+
+    const renderShipping = (totalPrice) => {
+      const el = qs('[data-cart-shipping]', drawer);
+      if (!el || !threshold) return;
+      if (totalPrice >= threshold) {
+        el.textContent = "You've unlocked free UK delivery";
+      } else {
+        el.textContent = `Spend ${formatMoney(threshold - totalPrice, moneyFormat)} more for free UK delivery`;
+      }
+    };
+
+    const escapeHtml = (str) =>
+      String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+    const itemImage = (item) => {
+      const src =
+        item.featured_image && item.featured_image.url
+          ? item.featured_image.url
+          : item.image;
+      if (!src) return '';
+      const url = src.startsWith('//') ? `https:${src}` : src;
+      return `<img src="${escapeHtml(url)}" alt="" width="72" height="96" loading="lazy">`;
+    };
+
+    const renderCart = (cart) => {
+      updateCountBadge(cart.item_count || 0);
+      const subtotal = qs('[data-cart-subtotal]', drawer);
+      if (subtotal) subtotal.textContent = formatMoney(cart.total_price, moneyFormat);
+      renderShipping(cart.total_price || 0);
+
+      if (!cart.item_count) {
+        contents.innerHTML = `
+          <div class="cart-drawer__empty">
+            <p>${escapeHtml(emptyMessage)}</p>
+            <button type="button" class="button" data-close-cart style="margin-top:1rem;">Continue shopping</button>
+          </div>`;
+        if (footer) footer.hidden = true;
+        return;
+      }
+
+      if (footer) footer.hidden = false;
+      contents.innerHTML = `<ul class="cart-drawer__items" role="list">${cart.items
+        .map((item) => {
+          const variant =
+            item.variant_title && item.variant_title !== 'Default Title'
+              ? `<div class="cart-drawer__meta">${escapeHtml(item.variant_title)}</div>`
+              : '';
+          return `
+            <li class="cart-drawer__item" data-key="${escapeHtml(item.key)}">
+              <a class="cart-drawer__media" href="${escapeHtml(item.url)}">${itemImage(item)}</a>
+              <div class="cart-drawer__details">
+                <a class="cart-drawer__name" href="${escapeHtml(item.url)}">${escapeHtml(item.product_title)}</a>
+                ${variant}
+                <div class="cart-drawer__meta">${formatMoney(item.original_price, moneyFormat)}</div>
+                <div class="cart-drawer__row">
+                  <div class="cart-drawer__qty">
+                    <button type="button" data-cart-qty="-1" data-key="${escapeHtml(item.key)}" aria-label="Decrease quantity">-</button>
+                    <input type="number" min="0" value="${item.quantity}" aria-label="Quantity" data-cart-qty-input data-key="${escapeHtml(item.key)}">
+                    <button type="button" data-cart-qty="1" data-key="${escapeHtml(item.key)}" aria-label="Increase quantity">+</button>
+                  </div>
+                  <div class="cart-drawer__line mono">${formatMoney(item.final_line_price, moneyFormat)}</div>
+                </div>
+                <button type="button" class="cart-drawer__remove" data-cart-remove data-key="${escapeHtml(item.key)}">Remove</button>
+              </div>
+            </li>`;
+        })
+        .join('')}</ul>`;
+    };
+
+    const fetchCart = async () => {
+      const res = await fetch(`${cartUrl}.js`, {
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) throw new Error('Cart fetch failed');
+      return res.json();
+    };
+
+    const changeLine = async (key, quantity) => {
+      drawer.classList.add('is-loading');
+      try {
+        const res = await fetch(`${cartUrl}/change.js`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: key, quantity }),
+        });
+        if (!res.ok) throw new Error('Cart update failed');
+        const cart = await res.json();
+        renderCart(cart);
+      } finally {
+        drawer.classList.remove('is-loading');
+      }
+    };
+
+    const refresh = async () => {
+      const cart = await fetchCart();
+      renderCart(cart);
+      return cart;
+    };
+
+    openers.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const menu = qs('[data-drawer="menu"]');
+        if (menu && !menu.hidden) {
+          menu.hidden = true;
+          const menuBtn = qs('[data-open-menu]');
+          if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+        }
+        setOpen(true);
+        refresh().catch(() => {});
+      });
+    });
+
+    drawer.addEventListener('click', (e) => {
+      if (e.target.closest('[data-close-cart]')) {
+        setOpen(false);
+        return;
+      }
+
+      const remove = e.target.closest('[data-cart-remove]');
+      if (remove) {
+        changeLine(remove.getAttribute('data-key'), 0).catch(() => {});
+        return;
+      }
+
+      const qtyBtn = e.target.closest('[data-cart-qty]');
+      if (qtyBtn) {
+        const key = qtyBtn.getAttribute('data-key');
+        const delta = Number(qtyBtn.getAttribute('data-cart-qty'));
+        const input = qs(`[data-cart-qty-input][data-key="${CSS.escape(key)}"]`, drawer);
+        const next = Math.max(0, Number(input?.value || 0) + delta);
+        changeLine(key, next).catch(() => {});
+      }
+    });
+
+    drawer.addEventListener('change', (e) => {
+      const input = e.target.closest('[data-cart-qty-input]');
+      if (!input) return;
+      const qty = Math.max(0, Number(input.value) || 0);
+      changeLine(input.getAttribute('data-key'), qty).catch(() => {});
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !drawer.hidden) setOpen(false);
+    });
+
+    // AJAX add-to-cart on product forms opens the drawer.
+    qsa('form[action*="/cart/add"]').forEach((form) => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submit = form.querySelector('[type="submit"]');
+        if (submit) submit.disabled = true;
+        try {
+          const res = await fetch(`${cartUrl}/add.js`, {
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            body: new FormData(form),
+          });
+          if (!res.ok) throw new Error('Add to cart failed');
+          await refresh();
+          setOpen(true);
+        } catch (err) {
+          form.submit();
+        } finally {
+          if (submit) submit.disabled = false;
+        }
+      });
+    });
+
+    window.KoriCart = { open: () => setOpen(true), refresh, setOpen };
   };
 
   const initNavDropdowns = () => {
