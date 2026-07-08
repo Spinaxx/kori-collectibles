@@ -61,74 +61,74 @@
         "g1": {
           "type": "game",
           "settings": {
+            "coming_soon": false,
+            "coming_soon_text": "Coming soon",
             "title": "Pokemon",
+            "show_title": false,
             "meta": "Singles · Sealed",
             "link": "shopify://collections/pokemon",
             "logo": "shopify://shop_images/Pokemon_Trading_Card_Game_logo_svg.webp",
-            "logo_key": "pokemon",
-            "show_title": false,
-            "coming_soon": false,
-            "coming_soon_text": "Coming soon"
+            "logo_key": "pokemon"
           }
         },
         "g2": {
           "type": "game",
           "settings": {
+            "coming_soon": true,
+            "coming_soon_text": "Coming soon",
             "title": "Yu-Gi-Oh!",
+            "show_title": false,
             "meta": "Singles · Sealed",
             "link": "",
-            "logo_key": "yugioh",
-            "show_title": false,
-            "coming_soon": false,
-            "coming_soon_text": "Coming soon"
+            "logo_key": "yugioh"
           }
         },
         "g3": {
           "type": "game",
           "settings": {
+            "coming_soon": true,
+            "coming_soon_text": "Coming soon",
             "title": "Magic",
+            "show_title": false,
             "meta": "Singles · Sealed",
             "link": "",
-            "logo_key": "magic",
-            "show_title": false,
-            "coming_soon": false,
-            "coming_soon_text": "Coming soon"
+            "logo_key": "magic"
           }
         },
         "g4": {
           "type": "game",
           "settings": {
+            "coming_soon": true,
+            "coming_soon_text": "Coming soon",
             "title": "One Piece",
+            "show_title": false,
             "meta": "Sealed",
             "link": "",
-            "logo_key": "onepiece",
-            "show_title": false,
-            "coming_soon": false,
-            "coming_soon_text": "Coming soon"
+            "logo_key": "onepiece"
           }
         },
         "g5": {
           "type": "game",
           "settings": {
+            "coming_soon": true,
+            "coming_soon_text": "Coming soon",
             "title": "Lorcana",
+            "show_title": false,
             "meta": "Sealed",
             "link": "",
-            "logo_key": "lorcana",
-            "show_title": false,
-            "coming_soon": false,
-            "coming_soon_text": "Coming soon"
+            "logo_key": "lorcana"
           }
         },
         "g6": {
           "type": "game",
           "settings": {
+            "coming_soon": false,
+            "coming_soon_text": "Coming soon",
             "title": "Accessories",
+            "show_title": false,
             "meta": "Sleeves · Binders",
             "link": "",
-            "logo_key": "accessories",
-            "show_title": false,
-            "coming_soon": false,
-            "coming_soon_text": "Coming soon"
+            "logo_key": "accessories"
           }
         }
       },
