@@ -49,9 +49,10 @@ type Output {
 ```
 
 4. **Update customer metafield**  
-   - Customer: `order.customer`  
-   - Metafield: `custom.loyalty_points`  
-   - Value: **Run code → newLoyaltyPoints**
+   - Customer: **Order → Customer** (from variable picker)  
+   - Metafield: pick **Loyalty points** definition — namespace `custom`, key **`loyalty_points`**  
+   - **NOT** `custom_loyalty_points` (wrong field; causes failures)  
+   - Value: click **Add variable** → **Run code → newLoyaltyPoints** only — do not type `{{ }}` or paste liquid with blank lines
 
 5. **Remove customer tags**  
    - Customer: `order.customer`  
@@ -119,9 +120,10 @@ type Output {
 ```
 
 4. **Update customer metafield**  
-   - Customer: `order.customer`  
-   - Metafield: `custom.loyalty_points`  
-   - Value: **Run code → newLoyaltyPoints**
+   - Customer: **Order → Customer** (from variable picker)  
+   - Metafield: pick **Loyalty points** definition — namespace `custom`, key **`loyalty_points`**  
+   - **NOT** `custom_loyalty_points` (wrong field; causes failures)  
+   - Value: click **Add variable** → **Run code → newLoyaltyPoints** only — do not type `{{ }}` or paste liquid with blank lines
 
 5. **Remove customer tags** → **Run code → loyaltyPointsTagRemove**
 
@@ -159,3 +161,5 @@ Refresh `/pages/rewards`.
 | Balance correct in admin, 0 on site | Missing tag sync steps, or no `loyalty-points:XXX` tag on customer |
 | `loyaltyPointsTagRemove` not in picker | Paste Define outputs block; save; re-paste JS |
 | Two different balances in admin | Duplicate metafields `loyalty_points` vs `custom_loyalty_points` — use only `loyalty_points` |
+| `Value must be an integer` / value is `\n\n\n728` | Wrong key `custom_loyalty_points`; value field has typed liquid or blank lines — use variable picker **Run code → newLoyaltyPoints** only |
+| Flow writes unstructured metafield | Recreate Update metafield step; pick **Loyalty points** definition from list, not free-typed namespace/key |

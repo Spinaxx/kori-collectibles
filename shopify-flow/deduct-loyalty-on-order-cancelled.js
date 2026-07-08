@@ -66,7 +66,7 @@ export default function main(input) {
     };
   }
 
-  const raw = customer.loyaltyPoints ? customer.loyaltyPoints.value : null;
+  const raw = String(customer.loyaltyPoints?.value ?? '').trim();
   const current = parseInt(raw, 10) || 0;
   const earned = earnedPoints(order);
 
