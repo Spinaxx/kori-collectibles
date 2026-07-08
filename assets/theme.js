@@ -69,6 +69,32 @@
         window.location.assign(url.toString());
       });
     }
+
+    qsa('[data-facet-select]').forEach((select) => {
+      select.addEventListener('change', () => {
+        const form = select.form;
+        if (!form) return;
+        // Drop empty selects so "All" clears that filter group.
+        qsa('select[data-facet-select]', form).forEach((field) => {
+          if (!field.value) field.disabled = true;
+        });
+        form.requestSubmit ? form.requestSubmit() : form.submit();
+      });
+    });
+
+    const tagSelect = qs('[data-tag-select]');
+    if (tagSelect) {
+      tagSelect.addEventListener('change', () => {
+        const base = tagSelect.getAttribute('data-collection-url') || window.location.pathname;
+        const option = tagSelect.options[tagSelect.selectedIndex];
+        const tag = option && option.getAttribute('data-tag');
+        if (!tagSelect.value || !tag) {
+          window.location.assign(base);
+          return;
+        }
+        window.location.assign(`${base}/${encodeURIComponent(tag)}`);
+      });
+    }
   };
 
   const initNavDropdowns = () => {

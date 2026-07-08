@@ -67,79 +67,96 @@
             <input type="hidden" name="sort_by" value="{{ sort_by }}">
 
             {%- for filter in collection.filters -%}
-              <details class="facet-group" {% if filter.active_values.size > 0 or filter.type == 'price_range' %}open{% elsif forloop.index <= 3 %}open{% endif %}>
-                <summary>
-                  <span>{{ filter.label | escape }}</span>
-                  {%- if filter.active_values.size > 0 -%}
-                    <span class="facet-group__count">{{ filter.active_values.size }}</span>
-                  {%- endif -%}
-                </summary>
-
-                <div class="facet-list">
-                  {%- case filter.type -%}
-                    {%- when 'list', 'boolean' -%}
+              <div class="facet-group">
+                {%- case filter.type -%}
+                  {%- when 'list', 'boolean' -%}
+                    {%- liquid
+                      assign filter_param = blank
+                      assign active_value = blank
+                      for value in filter.values
+                        if filter_param == blank
+                          assign filter_param = value.param_name
+                        endif
+                        if value.active
+                          assign active_value = value.value
+                        endif
+                      endfor
+                    -%}
+                    <label class="facet-label" for="Filter-{{ section.id }}-{{ forloop.index }}">
+                      {{ filter.label | escape }}
+                    </label>
+                    <select
+                      class="facet-select"
+                      id="Filter-{{ section.id }}-{{ forloop.index }}"
+                      name="{{ filter_param }}"
+                      data-facet-select
+                    >
+                      <option value="">All</option>
                       {%- for value in filter.values -%}
-                        <label class="facet-option{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
-                          <input
-                            type="checkbox"
-                            name="{{ value.param_name }}"
-                            value="{{ value.value }}"
-                            {% if value.active %}checked{% endif %}
-                            {% if value.count == 0 and value.active == false %}disabled{% endif %}
-                            onchange="this.form.submit()"
-                          >
-                          <span class="facet-option__label">{{ value.label | escape }}</span>
-                          <span class="facet-option__count">{{ value.count }}</span>
-                        </label>
+                        <option
+                          value="{{ value.value | escape }}"
+                          {% if value.active or value.value == active_value %}selected{% endif %}
+                          {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                        >
+                          {{ value.label | escape }}{% if value.count %} ({{ value.count }}){% endif %}
+                        </option>
                       {%- endfor -%}
+                    </select>
 
-                    {%- when 'price_range' -%}
-                      <div class="facet-price">
-                        <label>
-                          <span class="visually-hidden">Min price</span>
-                          <input
-                            type="number"
-                            name="{{ filter.min_value.param_name }}"
-                            {% if filter.min_value.value %}value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"{% endif %}
-                            placeholder="{{ filter.range_min | money_without_currency | replace: ',', '' }}"
-                            min="0"
-                            inputmode="decimal"
-                          >
-                        </label>
-                        <span class="facet-price__sep">to</span>
-                        <label>
-                          <span class="visually-hidden">Max price</span>
-                          <input
-                            type="number"
-                            name="{{ filter.max_value.param_name }}"
-                            {% if filter.max_value.value %}value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"{% endif %}
-                            placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
-                            min="0"
-                            inputmode="decimal"
-                          >
-                        </label>
-                      </div>
-                      <button type="submit" class="button button--secondary button--full">Apply price</button>
-                  {%- endcase -%}
-                </div>
-              </details>
+                  {%- when 'price_range' -%}
+                    <div class="facet-label">{{ filter.label | escape }}</div>
+                    <div class="facet-price">
+                      <label>
+                        <span class="visually-hidden">Min price</span>
+                        <input
+                          type="number"
+                          name="{{ filter.min_value.param_name }}"
+                          {% if filter.min_value.value %}value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"{% endif %}
+                          placeholder="{{ filter.range_min | money_without_currency | replace: ',', '' }}"
+                          min="0"
+                          inputmode="decimal"
+                        >
+                      </label>
+                      <span class="facet-price__sep">to</span>
+                      <label>
+                        <span class="visually-hidden">Max price</span>
+                        <input
+                          type="number"
+                          name="{{ filter.max_value.param_name }}"
+                          {% if filter.max_value.value %}value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"{% endif %}
+                          placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                          min="0"
+                          inputmode="decimal"
+                        >
+                      </label>
+                    </div>
+                    <button type="submit" class="button button--secondary button--full">Apply price</button>
+                {%- endcase -%}
+              </div>
             {%- endfor -%}
           </form>
         {%- else -%}
-          {%- comment -%} Tag filters work without Search & Discovery; price/vendor need that app {%- endcomment -%}
           {%- if collection.all_tags.size > 0 -%}
-            <details class="facet-group" open>
-              <summary><span>Tags</span></summary>
-              <div class="facet-list facet-list--tags">
+            <div class="facet-group">
+              <label class="facet-label" for="Filter-{{ section.id }}-tag">Tag</label>
+              <select
+                class="facet-select"
+                id="Filter-{{ section.id }}-tag"
+                data-tag-select
+                data-collection-url="{{ collection.url }}"
+              >
+                <option value="">All</option>
                 {%- for tag in collection.all_tags limit: 48 -%}
-                  {%- if current_tags contains tag -%}
-                    {{ tag | link_to_remove_tag: tag | replace: '<a ', '<a class="facet-tag is-active" ' }}
-                  {%- else -%}
-                    {{ tag | link_to_add_tag: tag | replace: '<a ', '<a class="facet-tag" ' }}
-                  {%- endif -%}
+                  <option
+                    value="{{ tag | handle | escape }}"
+                    data-tag="{{ tag | escape }}"
+                    {% if current_tags contains tag %}selected{% endif %}
+                  >
+                    {{ tag | escape }}
+                  </option>
                 {%- endfor -%}
-              </div>
-            </details>
+              </select>
+            </div>
           {%- else -%}
             <p class="facets__hint">
               No product tags yet. Add tags on products, or enable filters in the

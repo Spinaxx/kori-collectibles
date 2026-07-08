@@ -1432,19 +1432,21 @@ ul {
   border-top: 1px solid var(--border);
 }
 
-.facet-group summary {
-  list-style: none;
-  cursor: pointer;
+.facet-label {
+  display: block;
   font-weight: 600;
-  margin-bottom: 0.55rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+  font-size: 0.9rem;
 }
 
-.facet-group summary::-webkit-details-marker {
-  display: none;
+.facet-select {
+  width: 100%;
+  min-height: 42px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.75rem;
+  color: var(--text);
 }
 
 .facet-group__count {
@@ -1460,42 +1462,6 @@ ul {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 650;
-}
-
-.facet-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.facet-option {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.55rem;
-  color: var(--muted);
-  font-size: 0.88rem;
-  cursor: pointer;
-  padding: 0.2rem 0;
-}
-
-.facet-option.is-disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.facet-option input {
-  accent-color: var(--accent);
-}
-
-.facet-option__label {
-  color: var(--text);
-}
-
-.facet-option__count {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--muted);
 }
 
 .facet-price {
