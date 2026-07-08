@@ -208,33 +208,34 @@
     "name": "Loyalty rewards",
     "settings": [
       {
-        "type": "select",
-        "id": "loyalty_provider",
-        "label": "Loyalty provider",
-        "default": "smile",
-        "options": [
-          { "value": "smile", "label": "Smile.io" },
-          { "value": "metafield", "label": "Customer metafield (manual / Flow)" }
-        ]
+        "type": "checkbox",
+        "id": "loyalty_enable",
+        "label": "Enable rewards program",
+        "default": true
       },
       {
         "type": "checkbox",
-        "id": "loyalty_enable",
-        "label": "Show rewards in header and cart",
+        "id": "loyalty_show_launcher",
+        "label": "Show floating rewards button",
         "default": true
+      },
+      {
+        "type": "text",
+        "id": "loyalty_program_name",
+        "label": "Program name",
+        "default": "Kori Collectors Club"
       },
       {
         "type": "page",
         "id": "loyalty_page",
-        "label": "Rewards page",
-        "info": "Optional info page. Smile handles earn, redeem, and balance."
+        "label": "Rewards info page (optional)"
       },
       {
         "type": "text",
         "id": "loyalty_points_metafield",
         "label": "Customer points metafield",
         "default": "custom.loyalty_points",
-        "info": "Only used when provider is Customer metafield."
+        "info": "Integer customer metafield updated by Shopify Flow."
       },
       {
         "type": "range",
@@ -242,13 +243,30 @@
         "min": 1,
         "max": 20,
         "step": 1,
-        "label": "Points earned per £1 spent (display only)",
-        "default": 1,
-        "info": "Only used when provider is Customer metafield."
+        "label": "Points earned per £1 spent",
+        "default": 1
+      },
+      {
+        "type": "number",
+        "id": "loyalty_redeem_points",
+        "label": "Points needed to redeem",
+        "default": 100
+      },
+      {
+        "type": "number",
+        "id": "loyalty_redeem_value_gbp",
+        "label": "Redemption value (GBP)",
+        "default": 5
+      },
+      {
+        "type": "text",
+        "id": "loyalty_redeem_email",
+        "label": "Redemption email",
+        "info": "Customers email here to claim rewards. Defaults to your shop email."
       },
       {
         "type": "paragraph",
-        "content": "Smile.io: enable the app embed in the theme editor, turn on JavaScript SDK in Smile Admin (Settings → Developer tools), then click Apply Smile if the launcher is missing."
+        "content": "Points are awarded by Shopify Flow on paid orders. See README for setup steps."
       }
     ]
   },

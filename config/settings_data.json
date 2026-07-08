@@ -20,8 +20,11 @@
     "color_danger": "#ff6b5a",
     "color_button": "#f2f0eb",
     "color_button_text": "#0c0e14",
-    "loyalty_provider": "smile",
     "loyalty_enable": true,
+    "loyalty_show_launcher": true,
+    "loyalty_program_name": "Kori Collectors Club",
+    "loyalty_redeem_points": 100,
+    "loyalty_redeem_value_gbp": 5,
     "logo_text": "Kori Collectibles",
     "menu": "main-menu",
     "footer_brand_name": "Kori Collectibles",
@@ -32,13 +35,6 @@
     "currency_note": "Prices in GBP",
     "empty_cart_message": "Your cart is empty - the binder awaits.",
     "cart_free_shipping_threshold": "40",
-    "content_for_index": [],
-    "blocks": {
-      "6174324309569838175": {
-        "type": "shopify://apps/smile-io/blocks/smile-shopify-app/2fae4e25-1841-4ea2-bc02-bd548478c4f6",
-        "disabled": false,
-        "settings": {}
-      }
-    }
+    "content_for_index": []
   }
 }

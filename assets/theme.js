@@ -823,70 +823,43 @@
     });
   };
 
-  const initSmileLoyalty = () => {
-    const openPanel = (e) => {
-      if (!window.SmileUI?.openPanel) return;
-      e.preventDefault();
-      window.SmileUI.ready()
-        .then(() => window.SmileUI.openPanel())
-        .catch(() => {});
+  const initLoyaltyPanel = () => {
+    const widget = qs('[data-loyalty-widget]');
+    if (!widget) return;
+
+    const panel = qs('[data-loyalty-panel]', widget);
+    const backdrop = qs('[data-loyalty-backdrop]', widget);
+    let open = false;
+
+    const setOpen = (next) => {
+      open = next;
+      widget.classList.toggle('is-open', open);
+      if (panel) panel.hidden = !open;
+      if (backdrop) backdrop.hidden = !open;
+      document.documentElement.style.overflow = open ? 'hidden' : '';
+      qsa('[data-open-loyalty-panel]').forEach((btn) => {
+        btn.setAttribute('aria-expanded', String(open));
+      });
+      if (open && panel) {
+        const focusable = qs('[data-close-loyalty-panel]', panel);
+        if (focusable) focusable.focus();
+      }
     };
 
-    qsa('[data-open-smile-panel]').forEach((el) => {
-      el.addEventListener('click', openPanel);
+    qsa('[data-open-loyalty-panel]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        setOpen(true);
+      });
     });
 
-    const balanceEls = qsa('[data-smile-loyalty-balance]');
-    const vipEl = qs('[data-smile-vip-tier]');
-    if (!balanceEls.length && !vipEl) return;
+    qsa('[data-close-loyalty-panel]').forEach((btn) => {
+      btn.addEventListener('click', () => setOpen(false));
+    });
 
-    const walletPoints = (wallet) =>
-      wallet?.balance ?? wallet?.points_balance ?? wallet?.pointsBalance ?? 0;
-
-    const formatPoints = (points) => {
-      if (window.Smile?.formatPoints) {
-        try {
-          return window.Smile.formatPoints(points);
-        } catch {
-          return String(points);
-        }
-      }
-      return String(points);
-    };
-
-    const render = async () => {
-      if (!window.Smile?.customerPointsWallet?.get) return;
-      try {
-        const wallet = await window.Smile.customerPointsWallet.get();
-        const text = formatPoints(walletPoints(wallet));
-        balanceEls.forEach((el) => {
-          el.textContent = text;
-        });
-      } catch {
-        balanceEls.forEach((el) => {
-          if (el.textContent.trim() === '…') el.textContent = '0';
-        });
-      }
-
-      if (vipEl && window.Smile?.customerVipStatus?.get) {
-        try {
-          const vip = await window.Smile.customerVipStatus.get();
-          const name = vip?.vip_tier?.name || vip?.name;
-          if (name) {
-            vipEl.textContent = `VIP tier: ${name}`;
-            vipEl.hidden = false;
-          }
-        } catch {
-          vipEl.hidden = true;
-        }
-      }
-    };
-
-    if (window.Smile?.customerPointsWallet) {
-      render();
-    } else {
-      document.addEventListener('smile-js-initialized', render, { once: true });
-    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && open) setOpen(false);
+    });
   };
 
   const boot = () => {
@@ -896,9 +869,9 @@
       console.error('initAnnouncementMarquee failed', err);
     }
     try {
-      initSmileLoyalty();
+      initLoyaltyPanel();
     } catch (err) {
-      console.error('initSmileLoyalty failed', err);
+      console.error('initLoyaltyPanel failed', err);
     }
     try {
       initMoreTcgsExpand();

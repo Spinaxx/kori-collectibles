@@ -1,23 +1,16 @@
 {%- liquid
-  assign use_smile = false
-  if settings.loyalty_provider == 'smile'
-    assign use_smile = true
-  endif
-
-  assign points_rate = section.settings.points_per_gbp | default: 1
-  assign redeem_points = section.settings.redeem_points | default: 100
-  assign redeem_value = section.settings.redeem_value_gbp | default: 5
+  assign points_key = section.settings.points_metafield | default: settings.loyalty_points_metafield | default: 'custom.loyalty_points'
+  assign points_parts = points_key | split: '.'
+  assign points_ns = points_parts[0]
+  assign points_id = points_parts[1]
+  assign points_rate = section.settings.points_per_gbp | default: settings.loyalty_points_per_gbp | default: 1
+  assign redeem_points = section.settings.redeem_points | default: settings.loyalty_redeem_points | default: 100
+  assign redeem_value = section.settings.redeem_value_gbp | default: settings.loyalty_redeem_value_gbp | default: 5
 
   assign balance = 0
-  unless use_smile
-    assign points_key = section.settings.points_metafield | default: 'custom.loyalty_points'
-    assign points_parts = points_key | split: '.'
-    assign points_ns = points_parts[0]
-    assign points_id = points_parts[1]
-    if customer and points_ns != blank and points_id != blank
-      assign balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
-    endif
-  endunless
+  if customer and points_ns != blank and points_id != blank
+    assign balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
+  endif
 
   assign redeem_blocks = balance | divided_by: redeem_points | floor
   assign redeemable_gbp = redeem_blocks | times: redeem_value
@@ -38,15 +31,10 @@
         <div class="rewards__balance-main">
           <span class="rewards__balance-label">Your balance</span>
           <p class="rewards__balance-value">
-            <span {% if use_smile %}data-smile-loyalty-balance{% else %}data-loyalty-balance{% endif %}>
-              {%- if use_smile -%}…{%- else -%}{{ balance }}{%- endif -%}
-            </span>
+            <span data-loyalty-balance>{{ balance }}</span>
             <span class="rewards__balance-unit">points</span>
           </p>
-          {%- if use_smile -%}
-            <p class="rewards__balance-redeem" data-smile-vip-tier hidden></p>
-            <p class="rewards__balance-redeem">Redeem rewards in the Smile panel — use the button below or the launcher on any page.</p>
-          {%- elsif redeemable_gbp > 0 -%}
+          {%- if redeemable_gbp > 0 -%}
             <p class="rewards__balance-redeem">
               Worth up to {{ redeemable_gbp | times: 100 | money }} off your next order
             </p>
@@ -57,13 +45,8 @@
           {%- endif -%}
         </div>
         <div class="rewards__balance-actions">
-          {%- if use_smile -%}
-            <button type="button" class="button" data-open-smile-panel>Open rewards panel</button>
-            <a class="button button--secondary" href="{{ routes.all_products_collection_url }}">Shop to earn</a>
-          {%- else -%}
-            <a class="button" href="{{ routes.all_products_collection_url }}">Shop to earn</a>
-            <a class="button button--secondary" href="{{ routes.account_url }}">Account</a>
-          {%- endif -%}
+          <button type="button" class="button" data-open-loyalty-panel>Open rewards</button>
+          <a class="button button--secondary" href="{{ routes.all_products_collection_url }}">Shop to earn</a>
         </div>
       </div>
     {%- else -%}
@@ -80,10 +63,6 @@
           <a class="button button--secondary" href="{{ routes.account_register_url }}">Create account</a>
         </div>
       </div>
-    {%- endif -%}
-
-    {%- if use_smile and section.settings.smile_note != blank -%}
-      <p class="rewards__smile-note">{{ section.settings.smile_note | escape }}</p>
     {%- endif -%}
 
     <div class="rewards__grid">
@@ -118,7 +97,7 @@
             <span class="rewards__list-num">01</span>
             <div>
               <strong>{{ redeem_points }} points = £{{ redeem_value }} off</strong>
-              <p>{%- if use_smile -%}Choose a reward in the Smile panel and apply your discount at checkout.{%- else -%}Redeem your balance for money off future orders. Contact us or use your reward code at checkout.{%- endif -%}</p>
+              <p>Redeem from the rewards panel or email us when you have enough points.</p>
             </div>
           </li>
           {%- for block in section.blocks -%}
@@ -171,7 +150,7 @@
       "id": "points_metafield",
       "label": "Customer points metafield",
       "default": "custom.loyalty_points",
-      "info": "Must match the customer metafield used by Shopify Flow or your loyalty app."
+      "info": "Must match the customer metafield used by Shopify Flow."
     },
     {
       "type": "range",
@@ -193,13 +172,6 @@
       "id": "redeem_value_gbp",
       "label": "Reward value (GBP)",
       "default": 5
-    },
-    {
-      "type": "text",
-      "id": "smile_note",
-      "label": "Smile note",
-      "default": "Earn rates and rewards are managed in Smile.io — keep this page copy aligned with your program there.",
-      "info": "Shown when Theme settings → Loyalty provider is Smile.io."
     },
     {
       "type": "richtext",
@@ -224,7 +196,7 @@
       "settings": [
         { "type": "text", "id": "number", "label": "Number", "default": "02" },
         { "type": "text", "id": "heading", "label": "Heading", "default": "At checkout" },
-        { "type": "textarea", "id": "text", "label": "Text", "default": "Apply your discount code or contact us to redeem points on larger orders." }
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Email us from the rewards panel to claim your discount code." }
       ]
     }
   ],
@@ -244,8 +216,8 @@
           "type": "redeem_rule",
           "settings": {
             "number": "02",
-            "heading": "At checkout",
-            "text": "Apply your discount code or contact us to redeem points on larger orders."
+            "heading": "Redeem",
+            "text": "Open the rewards panel and email us when you have enough points."
           }
         }
       ]
