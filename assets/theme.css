@@ -1982,6 +1982,11 @@ ul {
   object-fit: cover;
 }
 
+.product--sealed .product__frame img {
+  object-fit: contain;
+  object-position: center;
+}
+
 .product__eyebrow {
   font-family: var(--font-mono);
   font-size: 0.75rem;

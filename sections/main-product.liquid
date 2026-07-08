@@ -1,5 +1,25 @@
+{%- liquid
+  assign type_lc = product.type | downcase | strip
+  assign tags_lc = product.tags | join: ',' | downcase
+  assign sealed = false
+  if type_lc contains 'sealed' or type_lc contains 'booster' or type_lc contains 'etb' or type_lc contains 'elite trainer' or tags_lc contains 'sealed'
+    assign sealed = true
+  endif
+
+  assign product_desc = product.description
+  if sealed and product_desc != blank
+    if product_desc contains '<p><small>Catalog ID:'
+      assign product_desc = product_desc | split: '<p><small>Catalog ID:' | first
+    elsif product_desc contains '<p><small>catalog id:'
+      assign product_desc = product_desc | split: '<p><small>catalog id:' | first
+    elsif product_desc contains 'Catalog ID:'
+      assign product_desc = product_desc | split: 'Catalog ID:' | first
+    endif
+  endif
+-%}
+
 <section class="page-width">
-  <div class="product">
+  <div class="product{% if sealed %} product--sealed{% endif %}">
     <div class="product__media">
       <div class="product__frame">
         {%- if product.featured_media -%}
@@ -32,8 +52,8 @@
         {%- endif -%}
       </div>
 
-      {%- if product.description != blank -%}
-        <div class="product__desc">{{ product.description }}</div>
+      {%- if product_desc != blank -%}
+        <div class="product__desc">{{ product_desc }}</div>
       {%- endif -%}
 
       {%- assign product_add_label = 'products.add_to_cart' | t -%}
