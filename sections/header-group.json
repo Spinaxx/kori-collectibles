@@ -23,7 +23,7 @@
         "message_2": {
           "type": "message",
           "settings": {
-            "text": ""
+            "text": "Next day dispatch on orders placed before 2pm"
           }
         },
         "message_3": {
