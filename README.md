@@ -95,11 +95,27 @@ Awards **1 point per £1** of subtotal (`Math.round(subtotal)`). Match the rate 
 
 ### 3. Deduct points (order cancelled)
 
-Create a second workflow:
+**Recommended — no Run code (avoids the `newLoyaltyPoints` variable error):**
 
 1. **Trigger:** Order cancelled
-2. **Condition:** Customer is not null (`order.customer.id` is not empty)
-3. **Action:** Run code — paste `shopify-flow/deduct-loyalty-on-order-cancelled.js`
+2. **Condition:** `order.customer.id` is not empty
+3. **Log output** (registers the customer metafield with Flow)
+   - Message: click **Add variable** → Customer → Metafield → `loyalty_points`
+4. **Update customer metafield**
+   - Customer: `order.customer.id`
+   - Metafield: namespace `custom`, key `loyalty_points`
+   - Value: paste from `shopify-flow/cancel-loyalty-metafield-value.liquid`
+
+That liquid does: `current balance - round(order subtotal)`, minimum 0.
+
+---
+
+**Alternative — with Run code:**
+
+1. **Trigger:** Order cancelled
+2. **Condition:** `order.customer.id` is not empty
+3. **Log output** — add Customer → Metafield → `loyalty_points` (required before Run code can read it)
+4. **Run code** — paste `shopify-flow/deduct-loyalty-on-order-cancelled.js`
 
    **Select inputs** (GraphQL):
 
@@ -111,23 +127,7 @@ Create a second workflow:
            amount
          }
        }
-       currentSubtotalPriceSet {
-         shopMoney {
-           amount
-         }
-       }
-       totalPriceSet {
-         shopMoney {
-           amount
-         }
-       }
-       totalRefundedSet {
-         shopMoney {
-           amount
-         }
-       }
        customer {
-         id
          loyaltyPoints {
            value
          }
@@ -136,26 +136,26 @@ Create a second workflow:
    }
    ```
 
-   Map `loyaltyPoints` → customer metafield **`custom.loyalty_points`** (key: `loyalty_points`, not `custom_loyalty_points`).
+   Map `loyaltyPoints` → customer metafield **`loyalty_points`**.
 
    **Define outputs** (GraphQL):
 
    ```graphql
+   "The output of Run Code"
    type Output {
-     "The customer's new loyalty points balance after deduction"
+     "The new loyalty points total"
      newLoyaltyPoints: String!
    }
    ```
 
-   The code mirrors the award flow: `earned = Math.round(order total)`, then `new balance = current - earned` (minimum 0). It tries subtotal first, then falls back to other order totals because cancelled orders often report `0` subtotal.
+5. **Update customer metafield**
+   - Customer: `order.customer.id`
+   - Metafield: `custom.loyalty_points`
+   - Value: click **Add variable** → **Run code** → **newLoyaltyPoints**
 
-4. **Action:** Update customer metafield → `custom.loyalty_points` = **Run code → newLoyaltyPoints**
-
-   Important: the key must be `loyalty_points` to match the award flow and theme.
+   Do **not** type `{{ runCode.newLoyaltyPoints }}` by hand. Use **Add variable** so Flow inserts the correct reference. If **Run code** does not appear in the list, save/fix step 4 (Run code) first — a GraphQL error there blocks the output variable.
 
 Or import `shopify-flow/Deduct loyalty points on order cancelled.flow` directly in Flow.
-
-**Import tip:** Shopify `.flow` files include a SHA256 checksum prefix. If import fails, use the file from the repo as-is (do not edit it by hand), or run `python3 shopify-flow/build-flow.py` to regenerate it. Import the file named `Deduct loyalty points on order cancelled.flow` (not a copy with `(1)` in the name).
 
 ### 4. Theme settings
 

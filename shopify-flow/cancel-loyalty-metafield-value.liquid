@@ -1,0 +1,4 @@
+{% assign current = order.customer.loyaltyPoints.value | default: 0 | plus: 0 %}
+{% assign earned = order.subtotalPriceSet.shopMoney.amount | round %}
+{% assign new_balance = current | minus: earned %}
+{% if new_balance < 0 %}0{% else %}{{ new_balance }}{% endif %}

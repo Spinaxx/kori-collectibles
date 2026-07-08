@@ -7,25 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 
-SCRIPT = """function orderAmount(order) {
-  const candidates = [
-    order?.subtotalPriceSet?.shopMoney?.amount,
-    order?.currentSubtotalPriceSet?.shopMoney?.amount,
-    order?.totalPriceSet?.shopMoney?.amount,
-    order?.totalRefundedSet?.shopMoney?.amount,
-  ];
-
-  for (const value of candidates) {
-    const amount = Number(value);
-    if (Number.isFinite(amount) && amount > 0) {
-      return amount;
-    }
-  }
-
-  return 0;
-}
-
-export default function main(input) {
+SCRIPT = """export default function main(input) {
   const order = input.order;
   const customer = order?.customer;
 
@@ -34,7 +16,8 @@ export default function main(input) {
   }
 
   const current = Number(customer.loyaltyPoints?.value ?? 0);
-  const earned = Math.round(orderAmount(order));
+  const subtotal = Number(order.subtotalPriceSet?.shopMoney?.amount ?? 0);
+  const earned = Math.round(subtotal);
 
   if (earned <= 0) {
     return { newLoyaltyPoints: String(current) };
@@ -50,17 +33,13 @@ export default function main(input) {
 INPUT_QUERY = """query {
   order {
     subtotalPriceSet { shopMoney { amount } }
-    currentSubtotalPriceSet { shopMoney { amount } }
-    totalPriceSet { shopMoney { amount } }
-    totalRefundedSet { shopMoney { amount } }
     customer {
-      id
       loyaltyPoints { value }
     }
   }
 }"""
 
-OUTPUT_SCHEMA = '"The output of Run Code"\ntype Output {\n  "The customer\'s new loyalty points balance after deduction"\n  newLoyaltyPoints: String!\n}'
+OUTPUT_SCHEMA = '"The output of Run Code"\ntype Output {\n  "The new loyalty points total"\n  newLoyaltyPoints: String!\n}'
 
 CONDITION = {
     "uuid": "01KX1JZ3T55YPT7CFZQ3GNYTPE",
@@ -122,8 +101,24 @@ def build_workflow() -> dict:
                     "name": None,
                 },
                 {
+                    "step_id": "b1log000-0000-4000-8000-000000000001",
+                    "step_position": [0, 200],
+                    "config_field_values": [
+                        {
+                            "config_field_id": "message",
+                            "value": "{{ order.customer.loyaltyPoints.value }}",
+                        }
+                    ],
+                    "task_id": "shopify::flow::log_output",
+                    "task_version": "0.1",
+                    "task_type": "ACTION",
+                    "description": None,
+                    "note": None,
+                    "name": "Register loyalty metafield",
+                },
+                {
                     "step_id": "c5f93c43-9d0c-4ceb-a6d8-c3d7edb640d3",
-                    "step_position": [0, 260],
+                    "step_position": [0, 320],
                     "config_field_values": [
                         {"config_field_id": "input", "value": INPUT_QUERY},
                         {"config_field_id": "script", "value": SCRIPT},
@@ -138,7 +133,7 @@ def build_workflow() -> dict:
                 },
                 {
                     "step_id": "aa6ec9cf-3c6c-4c8a-b155-210497fa7db2",
-                    "step_position": [0, 400],
+                    "step_position": [0, 460],
                     "config_field_values": [
                         {
                             "config_field_id": "customer_id",
@@ -184,6 +179,12 @@ def build_workflow() -> dict:
                 {
                     "from_step_id": "a6225e89-079f-4e72-b759-60bfe59f89c9",
                     "from_port_id": "true",
+                    "to_step_id": "b1log000-0000-4000-8000-000000000001",
+                    "to_port_id": "input",
+                },
+                {
+                    "from_step_id": "b1log000-0000-4000-8000-000000000001",
+                    "from_port_id": "output",
                     "to_step_id": "c5f93c43-9d0c-4ceb-a6d8-c3d7edb640d3",
                     "to_port_id": "input",
                 },

@@ -1,5 +1,8 @@
 // Cancel flow — paste into Shopify Flow → Run code
 //
+// BEFORE Run code: add a Log output step that references Customer →
+// Metafield → loyalty_points so Flow registers the metafield.
+//
 // Select inputs (GraphQL):
 // query {
 //   order {
@@ -8,23 +11,7 @@
 //         amount
 //       }
 //     }
-//     currentSubtotalPriceSet {
-//       shopMoney {
-//         amount
-//       }
-//     }
-//     totalPriceSet {
-//       shopMoney {
-//         amount
-//       }
-//     }
-//     totalRefundedSet {
-//       shopMoney {
-//         amount
-//       }
-//     }
 //     customer {
-//       id
 //       loyaltyPoints {
 //         value
 //       }
@@ -33,30 +20,14 @@
 // }
 //
 // Define outputs (GraphQL):
+// "The output of Run Code"
 // type Output {
-//   "The customer's new loyalty points balance after deduction"
+//   "The new loyalty points total"
 //   newLoyaltyPoints: String!
 // }
 //
-// Map loyaltyPoints → customer metafield custom.loyalty_points (key: loyalty_points)
-
-function orderAmount(order) {
-  const candidates = [
-    order?.subtotalPriceSet?.shopMoney?.amount,
-    order?.currentSubtotalPriceSet?.shopMoney?.amount,
-    order?.totalPriceSet?.shopMoney?.amount,
-    order?.totalRefundedSet?.shopMoney?.amount,
-  ];
-
-  for (const value of candidates) {
-    const amount = Number(value);
-    if (Number.isFinite(amount) && amount > 0) {
-      return amount;
-    }
-  }
-
-  return 0;
-}
+// Step after Run code: Update customer metafield → custom.loyalty_points
+// Value: Add variable → Run code → newLoyaltyPoints (do not type by hand)
 
 export default function main(input) {
   const order = input.order;
@@ -67,7 +38,8 @@ export default function main(input) {
   }
 
   const current = Number(customer.loyaltyPoints?.value ?? 0);
-  const earned = Math.round(orderAmount(order));
+  const subtotal = Number(order.subtotalPriceSet?.shopMoney?.amount ?? 0);
+  const earned = Math.round(subtotal);
 
   if (earned <= 0) {
     return { newLoyaltyPoints: String(current) };
