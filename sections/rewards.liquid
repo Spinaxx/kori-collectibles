@@ -1,3 +1,5 @@
+{%- include 'loyalty-balance' -%}
+
 {%- liquid
   assign points_rate = section.settings.points_per_gbp | default: settings.loyalty_points_per_gbp | default: 1
   assign redeem_points = section.settings.redeem_points | default: settings.loyalty_redeem_points | default: 100
