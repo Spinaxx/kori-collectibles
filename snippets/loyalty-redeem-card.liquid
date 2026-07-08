@@ -54,10 +54,16 @@
             Redeem {{ redeem_points }} points
           </button>
         {%- else -%}
-          <p class="loyalty-redeem__hint">Submit the form below to get your code. Refresh this page after a few seconds once Flow has run.</p>
-          <button type="button" class="button button--full" data-loyalty-redeem-form-trigger>
-            Get my discount code
-          </button>
+          <p class="loyalty-redeem__hint">Tap below to confirm your redemption. Refresh this page after submitting.</p>
+          {%- if compact and rewards_url != blank -%}
+            <a class="button button--full" href="{{ rewards_url }}">
+              Get my discount code
+            </a>
+          {%- else -%}
+            <button type="button" class="button button--full" data-loyalty-redeem-form-trigger>
+              Get my discount code
+            </button>
+          {%- endif -%}
         {%- endif -%}
       </div>
 
@@ -75,15 +81,40 @@
       <p class="loyalty-redeem__loading" data-loyalty-redeem-loading hidden>Creating your code…</p>
 
       {%- unless compact -%}
-        <div class="loyalty-redeem__form-slot" id="loyalty-redeem-form">
-          {%- if form_content != blank -%}
-            {{ form_content }}
-          {%- elsif redeem_method == 'flow' -%}
-            <p class="loyalty-redeem__form-note">
-              Add your <strong>Redeem loyalty points</strong> Shopify Form block here in the theme editor.
-            </p>
-          {%- endif -%}
-        </div>
+        {%- if redeem_method == 'flow' -%}
+          <div class="loyalty-redeem-modal" data-loyalty-redeem-modal hidden>
+            <div class="loyalty-redeem-modal__backdrop" data-loyalty-redeem-modal-close></div>
+            <div
+              class="loyalty-redeem-modal__panel"
+              id="loyalty-redeem-form"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="loyalty-redeem-modal-title"
+            >
+              <div class="loyalty-redeem-modal__header">
+                <div>
+                  <p class="loyalty-redeem-modal__eyebrow">Redeem points</p>
+                  <h3 class="loyalty-redeem-modal__title" id="loyalty-redeem-modal-title">Get your discount code</h3>
+                </div>
+                <button type="button" class="icon-btn" data-loyalty-redeem-modal-close aria-label="Close">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="loyalty-redeem-modal__body">
+                {%- if form_content != blank -%}
+                  {{ form_content }}
+                {%- else -%}
+                  <p class="loyalty-redeem__form-note">
+                    Add your <strong>Redeem loyalty points</strong> Shopify Form block here in the theme editor.
+                  </p>
+                {%- endif -%}
+              </div>
+              <p class="loyalty-redeem-modal__hint">After submitting, refresh this page in a few seconds to see your code.</p>
+            </div>
+          </div>
+        {%- endif -%}
       {%- endunless -%}
     {%- else -%}
       <p class="loyalty-redeem__locked">{{ points_needed }} more points needed</p>

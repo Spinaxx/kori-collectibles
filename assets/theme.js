@@ -1022,14 +1022,32 @@
       const loadingEl = qs('[data-loyalty-redeem-loading]', root);
 
       if (formTrigger) {
-        formTrigger.addEventListener('click', () => {
-          const target = document.getElementById('loyalty-redeem-form');
-          if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            target.classList.add('loyalty-redeem__form-slot--highlight');
-            setTimeout(() => target.classList.remove('loyalty-redeem__form-slot--highlight'), 2000);
+        const modal = qs('[data-loyalty-redeem-modal]', root);
+
+        const setRedeemModalOpen = (open) => {
+          if (!modal) return;
+          modal.hidden = !open;
+          modal.classList.toggle('is-open', open);
+          document.documentElement.style.overflow = open ? 'hidden' : '';
+          if (open) {
+            const closeBtn = qs('[data-loyalty-redeem-modal-close]', modal);
+            if (closeBtn instanceof HTMLElement) closeBtn.focus();
+          } else if (formTrigger instanceof HTMLElement) {
+            formTrigger.focus();
           }
-        });
+        };
+
+        formTrigger.addEventListener('click', () => setRedeemModalOpen(true));
+
+        if (modal) {
+          qsa('[data-loyalty-redeem-modal-close]', modal).forEach((btn) => {
+            btn.addEventListener('click', () => setRedeemModalOpen(false));
+          });
+
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.hidden) setRedeemModalOpen(false);
+          });
+        }
       }
 
       if (trigger && proxyUrl && method === 'proxy') {

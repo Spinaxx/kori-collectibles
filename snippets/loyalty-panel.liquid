@@ -97,7 +97,7 @@
 
         <section class="loyalty-panel__section">
           <h3>Ways to redeem</h3>
-          {%- render 'loyalty-redeem-card', balance: balance, compact: true -%}
+          {%- render 'loyalty-redeem-card', balance: balance, compact: true, rewards_url: rewards_url -%}
         </section>
 
         <a class="loyalty-panel__link" href="{{ rewards_url }}">Full program details</a>
