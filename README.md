@@ -56,11 +56,40 @@ Apps → **Flow** → Create workflow:
 1. **Trigger:** Order paid
 2. **Condition:** Customer is not null
 3. **Action:** Run code — paste `shopify-flow/award-loyalty-on-order-paid.js`
-   - Input `order` → from trigger
-   - Input `currentPoints` → `order.customer.metafields.custom.loyalty_points.value`
-4. **Condition:** `shouldUpdate` is true
-5. **Action:** Update customer metafield → `custom.loyalty_points` = `newBalance`
-6. **Action:** Update order metafield → `custom.loyalty_points_awarded` = `pointsAwarded`
+
+   **Select inputs** (GraphQL):
+
+   ```graphql
+   query {
+     order {
+       subtotalPriceSet {
+         shopMoney {
+           amount
+         }
+       }
+       customer {
+         loyaltyPoints {
+           value
+         }
+       }
+     }
+   }
+   ```
+
+   In the input mapper, connect `loyaltyPoints` to the customer metafield `custom.loyalty_points`.
+
+   **Define outputs** (GraphQL):
+
+   ```graphql
+   type Output {
+     "The new loyalty points total as a string"
+     newLoyaltyPoints: String!
+   }
+   ```
+
+4. **Action:** Update customer metafield → `custom.loyalty_points` = **Run code → newLoyaltyPoints**
+
+5. **(Optional but recommended)** Add a second Run code output or a separate calculation step, then **Update order metafield** → `custom.loyalty_points_awarded` = points earned (`Math.round` of order subtotal). This makes cancellations exact. If you skip this, the cancel flow can still fall back to the subtotal formula.
 
 Awards **1 point per £1** of subtotal (`Math.round(subtotal)`). Match the rate in **Theme settings → Loyalty rewards → Points earned per £1**.
 
@@ -71,16 +100,46 @@ Create a second workflow:
 1. **Trigger:** Order cancelled
 2. **Condition:** Customer is not null
 3. **Action:** Run code — paste `shopify-flow/deduct-loyalty-on-order-cancelled.js`
-   - Input `order` → from trigger
-   - Input `currentPoints` → `order.customer.metafields.custom.loyalty_points.value`
-   - Input `pointsAwarded` → `order.metafields.custom.loyalty_points_awarded.value`
-4. **Condition:** `shouldUpdate` is true
-5. **Action:** Update customer metafield → `custom.loyalty_points` = `newBalance`
-6. **Action:** Update order metafield → `custom.loyalty_points_awarded` = `clearAwarded` (0)
 
-This deducts the points that were awarded for that order. Unpaid cancelled orders are skipped automatically (no `loyalty_points_awarded` stored). The balance never goes below zero.
+   **Select inputs** (GraphQL):
 
-If you already have a working award workflow, update it to also write `custom.loyalty_points_awarded` on the order. The deduct workflow includes a fallback for older orders that only checks paid/refunded statuses and uses the subtotal formula.
+   ```graphql
+   query {
+     order {
+       subtotalPriceSet {
+         shopMoney {
+           amount
+         }
+       }
+       displayFinancialStatus
+       customer {
+         loyaltyPoints {
+           value
+         }
+       }
+       loyaltyPointsAwarded {
+         value
+       }
+     }
+   }
+   ```
+
+   Map `loyaltyPoints` → `custom.loyalty_points` and `loyaltyPointsAwarded` → `custom.loyalty_points_awarded`.
+
+   **Define outputs** (GraphQL):
+
+   ```graphql
+   type Output {
+     "The new loyalty points total as a string"
+     newLoyaltyPoints: String!
+   }
+   ```
+
+4. **Action:** Update customer metafield → `custom.loyalty_points` = **Run code → newLoyaltyPoints**
+
+5. **Action:** Update order metafield → `custom.loyalty_points_awarded` = `0` (only if you use the order metafield on the award flow)
+
+This deducts the points that were awarded for that order. Unpaid cancelled orders are skipped automatically. The balance never goes below zero.
 
 ### 4. Theme settings
 

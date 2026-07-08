@@ -1,20 +1,43 @@
-// Shopify Flow → Run code
-// Inputs: order, currentPoints (order.customer.metafields.custom.loyalty_points.value)
-// Outputs: shouldUpdate, newBalance, pointsAwarded
+// Award flow — paste into Shopify Flow → Run code
+//
+// Select inputs (GraphQL):
+// query {
+//   order {
+//     subtotalPriceSet {
+//       shopMoney {
+//         amount
+//       }
+//     }
+//     customer {
+//       loyaltyPoints {
+//         value
+//       }
+//     }
+//   }
+// }
+//
+// Define outputs (GraphQL):
+// type Output {
+//   "The new loyalty points total as a string"
+//   newLoyaltyPoints: String!
+// }
+//
+// Map `loyaltyPoints` to customer metafield custom.loyalty_points in the Run code input picker.
 
-export default function main({ order, currentPoints }) {
+export default function main(input) {
+  const order = input.order;
   const customer = order?.customer;
-  if (!customer?.id) {
-    return { shouldUpdate: false };
+
+  if (!customer) {
+    return { newLoyaltyPoints: '0' };
   }
 
+  const current = Number(customer.loyaltyPoints?.value ?? 0);
   const subtotal = Number(order.subtotalPriceSet?.shopMoney?.amount ?? 0);
-  const pointsAwarded = Math.round(subtotal);
-  const newBalance = Number(currentPoints ?? 0) + pointsAwarded;
+  const earned = Math.round(subtotal);
+  const newBalance = current + earned;
 
   return {
-    shouldUpdate: true,
-    newBalance,
-    pointsAwarded,
+    newLoyaltyPoints: String(newBalance),
   };
 }
