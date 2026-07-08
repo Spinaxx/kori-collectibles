@@ -186,6 +186,50 @@ async function getDiscountUsage(shop, token, code) {
   return { active, used };
 }
 
+async function handleStatus(request, env = {}) {
+  const shop = env.SHOPIFY_SHOP_DOMAIN || process.env.SHOPIFY_SHOP_DOMAIN;
+  const token = env.SHOPIFY_ADMIN_API_TOKEN || process.env.SHOPIFY_ADMIN_API_TOKEN;
+  const secret = env.SHOPIFY_API_SECRET || process.env.SHOPIFY_API_SECRET;
+
+  if (!shop || !token || !secret) {
+    return json({ error: 'Loyalty status service is not configured.' }, 503);
+  }
+
+  const url = new URL(request.url);
+  const valid = await verifyProxySignature(url, secret);
+  if (!valid) {
+    return json({ error: 'Invalid request signature.' }, 401);
+  }
+
+  const customerId = url.searchParams.get('logged_in_customer_id');
+  if (!customerId) {
+    return json({ error: 'Sign in to view loyalty status.' }, 401);
+  }
+
+  const customerGid = `gid://shopify/Customer/${customerId}`;
+  const customer = await getCustomerBalance(shop, token, customerGid);
+  if (!customer) {
+    return json({ error: 'Customer not found.' }, 404);
+  }
+
+  const balance = Number(customer.loyaltyPoints?.value ?? 0);
+  const redeemCode = customer.redeemCode?.value?.trim() || '';
+  let activeCode = null;
+
+  if (redeemCode) {
+    const usage = await getDiscountUsage(shop, token, redeemCode);
+    if (usage.active) {
+      activeCode = redeemCode;
+    }
+  }
+
+  return json({
+    balance,
+    redeemCode: activeCode,
+    applyUrl: activeCode ? `/discount/${encodeURIComponent(activeCode)}` : null,
+  });
+}
+
 async function handleRedeem(request, env = {}) {
   const shop = env.SHOPIFY_SHOP_DOMAIN || process.env.SHOPIFY_SHOP_DOMAIN;
   const token = env.SHOPIFY_ADMIN_API_TOKEN || process.env.SHOPIFY_ADMIN_API_TOKEN;
@@ -265,6 +309,11 @@ async function handleRedeem(request, env = {}) {
   });
 }
 
+function isStatusRequest(url) {
+  const path = url.pathname.replace(/\/+$/, '');
+  return path === '/status' || path.endsWith('/status');
+}
+
 export default {
   async fetch(request, env = {}) {
     if (request.method === 'OPTIONS') {
@@ -282,11 +331,16 @@ export default {
       return json({ error: 'Method not allowed.' }, 405);
     }
 
+    const url = new URL(request.url);
+
     try {
+      if (isStatusRequest(url)) {
+        return await handleStatus(request, env);
+      }
       return await handleRedeem(request, env);
     } catch (error) {
-      console.error('loyalty redeem failed', error);
-      return json({ error: error.message || 'Redemption failed.' }, 500);
+      console.error('loyalty proxy failed', error);
+      return json({ error: error.message || 'Loyalty request failed.' }, 500);
     }
   },
 };

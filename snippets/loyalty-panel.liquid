@@ -31,11 +31,9 @@
   assign redeem_code_id = redeem_code_parts[1] | strip
 
   if customer
-    if redeem_code_ns != blank and redeem_code_id != blank
+    assign loyalty_redeem_code = customer.metafields.custom.loyalty_redeem_code.value
+    if loyalty_redeem_code == blank and redeem_code_ns != blank and redeem_code_id != blank
       assign loyalty_redeem_code = customer.metafields[redeem_code_ns][redeem_code_id].value
-    endif
-    if loyalty_redeem_code == blank
-      assign loyalty_redeem_code = customer.metafields.custom.loyalty_redeem_code.value
     endif
     assign active_redeem_code = loyalty_redeem_code | strip
   endif

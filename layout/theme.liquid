@@ -62,20 +62,6 @@
 
     {{ 'theme.css' | asset_url | stylesheet_tag }}
     {{ content_for_header }}
-  </head>
-
-  <body
-    {% if customer %}data-loyalty-balance="{{ loyalty_balance | default: 0 }}"{% endif %}
-    data-rewards-url="{{ rewards_url }}"
-  >
-    <a class="skip-link" href="#MainContent">Skip to content</a>
-
-    {%- assign main_menu = linklists[settings.menu] -%}
-    {%- if main_menu == blank -%}
-      {%- assign main_menu = linklists['main-menu'] -%}
-    {%- endif -%}
-
-    {%- include 'loyalty-balance' -%}
 
     {%- liquid
       assign rewards_url = pages.rewards.url | default: '/pages/rewards'
@@ -83,7 +69,21 @@
         assign rewards_url = settings.loyalty_page.url
       endif
     -%}
+    {%- include 'loyalty-balance' -%}
     {%- include 'loyalty-auth-urls' -%}
+  </head>
+
+  <body
+    {% if customer %}data-customer-logged-in="true" data-loyalty-balance="{{ loyalty_balance | default: 0 }}"{% endif %}
+    data-rewards-url="{{ rewards_url | escape }}"
+    data-loyalty-status-url="{{ settings.loyalty_status_proxy_url | default: '/apps/kori-loyalty/status' | escape }}"
+  >
+    <a class="skip-link" href="#MainContent">Skip to content</a>
+
+    {%- assign main_menu = linklists[settings.menu] -%}
+    {%- if main_menu == blank -%}
+      {%- assign main_menu = linklists['main-menu'] -%}
+    {%- endif -%}
 
     {% sections 'header-group' %}
 

@@ -8,14 +8,13 @@
     assign points_parts = points_key | split: '.'
     assign points_ns = points_parts[0] | strip
     assign points_id = points_parts[1] | strip
+    assign points_value = customer.metafields.custom.loyalty_points.value
 
-    if points_ns != blank and points_id != blank
-      assign balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
+    if points_value == blank and points_ns != blank and points_id != blank
+      assign points_value = customer.metafields[points_ns][points_id].value
     endif
 
-    if balance == 0
-      assign balance = customer.metafields.custom.loyalty_points.value | default: 0 | plus: 0
-    endif
+    assign balance = points_value | default: 0 | plus: 0
   endif
 
   assign points_rate = section.settings.points_per_gbp | default: settings.loyalty_points_per_gbp | default: 1
@@ -31,11 +30,9 @@
   assign redeem_code_id = redeem_code_parts[1] | strip
 
   if customer
-    if redeem_code_ns != blank and redeem_code_id != blank
+    assign active_redeem_code = customer.metafields.custom.loyalty_redeem_code.value
+    if active_redeem_code == blank and redeem_code_ns != blank and redeem_code_id != blank
       assign active_redeem_code = customer.metafields[redeem_code_ns][redeem_code_id].value
-    endif
-    if active_redeem_code == blank
-      assign active_redeem_code = customer.metafields.custom.loyalty_redeem_code.value
     endif
     assign active_redeem_code = active_redeem_code | strip
   endif

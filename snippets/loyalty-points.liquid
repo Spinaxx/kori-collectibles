@@ -6,7 +6,11 @@
   assign points_id = points_parts[1]
   assign balance = 0
 
-  if enabled and customer and points_ns != blank and points_id != blank
-    assign balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
+  if enabled and customer
+    assign points_value = customer.metafields.custom.loyalty_points.value
+    if points_value == blank and points_ns != blank and points_id != blank
+      assign points_value = customer.metafields[points_ns][points_id].value
+    endif
+    assign balance = points_value | default: 0 | plus: 0
   endif
 -%}

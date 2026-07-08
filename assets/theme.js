@@ -978,6 +978,14 @@
   };
 
   const initLoyaltyRedeem = () => {
+    const updateLoyaltyBalance = (balance) => {
+      if (balance === undefined || balance === null) return;
+      qsa('[data-loyalty-balance]').forEach((el) => {
+        el.textContent = String(balance);
+      });
+      document.body.dataset.loyaltyBalance = String(balance);
+    };
+
     const revealActiveCode = (code) => {
       const applyUrl = `/discount/${encodeURIComponent(code)}`;
       let section = qs('[data-loyalty-active-codes]');
@@ -1089,10 +1097,31 @@
       root.dataset.activeCode = payload.code;
 
       if (payload.balance !== undefined) {
-        qsa('[data-loyalty-balance]').forEach((el) => {
-          el.textContent = String(payload.balance);
+        updateLoyaltyBalance(payload.balance);
+      }
+    };
+
+    const syncLoyaltyFromProxy = async () => {
+      const statusUrl = document.body.dataset.loyaltyStatusUrl;
+      if (!statusUrl || document.body.dataset.customerLoggedIn !== 'true') return null;
+
+      try {
+        const response = await fetch(statusUrl, {
+          credentials: 'same-origin',
+          headers: { Accept: 'application/json' },
         });
-        document.body.dataset.loyaltyBalance = String(payload.balance);
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        if (data.balance !== undefined && data.balance !== null) {
+          updateLoyaltyBalance(data.balance);
+        }
+        if (data.redeemCode) {
+          revealActiveCode(data.redeemCode);
+        }
+        return data;
+      } catch {
+        return null;
       }
     };
 
@@ -1164,6 +1193,14 @@
       const check = async () => {
         attempts += 1;
         try {
+          const proxyData = await syncLoyaltyFromProxy();
+          if (proxyData?.redeemCode) {
+            const modal = qs('[data-loyalty-redeem-modal]', root);
+            setRedeemModalOpen(modal, false, qs('[data-loyalty-redeem-form-trigger]', root));
+            if (loadingEl) loadingEl.hidden = true;
+            return;
+          }
+
           const url = new URL(window.location.href);
           url.searchParams.set('loyalty_poll', String(Date.now()));
           const response = await fetch(url.toString(), {
@@ -1356,6 +1393,7 @@
     });
 
     validateActiveCodes();
+    syncLoyaltyFromProxy();
   };
 
   const initLoyaltyBalanceSync = () => {

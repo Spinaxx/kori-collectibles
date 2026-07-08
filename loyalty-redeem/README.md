@@ -29,7 +29,7 @@ Stores the customer’s active unused code so they can see it again after refres
 3. **Configuration → App proxy**
    - Subpath prefix: `apps`
    - Subpath: `kori-loyalty`
-   - Proxy URL: `https://YOUR-HOST/redeem` (or root if your worker handles `/redeem`)
+   - Proxy URL: `https://YOUR-HOST/` (worker root — handles `/redeem` and `/status`)
 4. **API credentials → Admin API access scopes**
    - `read_customers`
    - `write_customers`
@@ -63,15 +63,34 @@ SHOPIFY_API_SECRET=shpss_... \
 PORT=8787 node worker.js
 ```
 
-## 4. Theme setting
+## 4. Theme settings
 
-**Theme settings → Loyalty rewards → Redemption app proxy URL**
+**Theme settings → Loyalty rewards**
 
-Default: `/apps/kori-loyalty/redeem`
+| Setting | Default | Purpose |
+|---------|---------|---------|
+| Redemption app proxy URL | `/apps/kori-loyalty/redeem` | Instant redemption (proxy method only) |
+| Loyalty status app proxy URL | `/apps/kori-loyalty/status` | Syncs balance + active code on every page load |
 
 Change only if you used a different app proxy subpath.
 
-## 5. Test
+## 5. Status endpoint (Flow + storefront display)
+
+Even when using **Shopify Flow** for redemption, deploy this worker so the theme can read the customer's live balance and active code via the Admin API.
+
+`GET /apps/kori-loyalty/status` (signed app proxy request when loaded from the storefront) returns:
+
+```json
+{
+  "balance": 150,
+  "redeemCode": "KORI-123-ABC",
+  "applyUrl": "/discount/KORI-123-ABC"
+}
+```
+
+The theme calls this automatically for signed-in customers.
+
+## 6. Test
 
 1. Sign in with a customer who has ≥ 100 points
 2. Open `/pages/rewards`
