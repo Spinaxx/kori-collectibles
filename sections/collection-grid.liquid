@@ -30,11 +30,20 @@
   </div>
 
   {%- paginate collection.products by products_per_page -%}
+    {%- liquid
+      assign product_count = collection.products_count | default: 0
+      if paginate.items > product_count
+        assign product_count = paginate.items
+      endif
+      if collection.products.size > product_count
+        assign product_count = collection.products.size
+      endif
+    -%}
     <div class="collection-layout{% if show_filters %} collection-layout--with-filters{% endif %}">
       <div class="collection-toolbar">
         <div class="collection-toolbar__count">
-          {{ collection.products_count }}
-          {% if collection.products_count == 1 %}product{% else %}products{% endif %}
+          {{ product_count }}
+          {% if product_count == 1 %}product{% else %}products{% endif %}
           {%- if active_values_count > 0 -%}
             <span class="collection-toolbar__filtered">· filtered</span>
           {%- endif -%}
