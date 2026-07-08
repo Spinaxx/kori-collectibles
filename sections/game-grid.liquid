@@ -10,9 +10,71 @@
     </div>
     <div class="game-grid">
       {%- for block in section.blocks -%}
-        <a class="game-tile" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
+        {%- liquid
+          assign logo_key = block.settings.logo_key | default: 'auto'
+          if logo_key == 'auto'
+            assign title_key = block.settings.title | downcase | strip
+            if title_key contains 'pokemon' or title_key contains 'pokémon'
+              assign logo_key = 'pokemon'
+            elsif title_key contains 'yu-gi' or title_key contains 'yugioh' or title_key contains 'yu gi'
+              assign logo_key = 'yugioh'
+            elsif title_key contains 'magic' or title_key contains 'mtg'
+              assign logo_key = 'magic'
+            elsif title_key contains 'one piece'
+              assign logo_key = 'onepiece'
+            elsif title_key contains 'lorcana'
+              assign logo_key = 'lorcana'
+            else
+              assign logo_key = 'accessories'
+            endif
+          endif
+
+          case logo_key
+            when 'pokemon'
+              assign logo_asset = 'logo-pokemon.svg'
+            when 'yugioh'
+              assign logo_asset = 'logo-yugioh.svg'
+            when 'magic'
+              assign logo_asset = 'logo-magic.svg'
+            when 'onepiece'
+              assign logo_asset = 'logo-onepiece.svg'
+            when 'lorcana'
+              assign logo_asset = 'logo-lorcana.svg'
+            else
+              assign logo_asset = 'logo-accessories.svg'
+          endcase
+        -%}
+        <a
+          class="game-tile"
+          href="{% if block.settings.link != blank %}{{ block.settings.link }}{% else %}{{ routes.collections_url }}{% endif %}"
+          {{ block.shopify_attributes }}
+        >
+          <span class="game-tile__logo" aria-hidden="true">
+            {%- if block.settings.logo != blank -%}
+              <img
+                src="{{ block.settings.logo | image_url: width: 160 }}"
+                srcset="{{ block.settings.logo | image_url: width: 80 }} 80w, {{ block.settings.logo | image_url: width: 160 }} 160w"
+                sizes="48px"
+                alt=""
+                width="48"
+                height="48"
+                loading="lazy"
+              >
+            {%- else -%}
+              <img
+                class="game-tile__mark"
+                src="{{ logo_asset | asset_url }}"
+                alt=""
+                width="40"
+                height="40"
+                loading="lazy"
+              >
+            {%- endif -%}
+          </span>
           <span class="game-tile__label">{{ block.settings.title | escape }}</span>
-          <span class="game-tile__meta">{{ block.settings.meta | escape }}</span>
+          {%- if block.settings.meta != blank -%}
+            <span class="game-tile__meta">{{ block.settings.meta | escape }}</span>
+          {%- endif -%}
         </a>
       {%- endfor -%}
     </div>
@@ -23,30 +85,77 @@
 {
   "name": "Game grid",
   "settings": [
-    {"type": "text", "id": "heading", "label": "Heading", "default": "Shop by game"},
-    {"type": "textarea", "id": "subheading", "label": "Subheading", "default": "Jump straight into the catalogue collectors actually browse."}
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by game"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Jump straight into the catalogue collectors actually browse."
+    }
   ],
   "blocks": [
     {
       "type": "game",
       "name": "Game",
       "settings": [
-        {"type": "text", "id": "title", "label": "Title", "default": "Pokémon"},
-        {"type": "text", "id": "meta", "label": "Meta", "default": "Singles · Sealed"},
-        {"type": "url", "id": "link", "label": "Link"}
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Pokemon"
+        },
+        {
+          "type": "text",
+          "id": "meta",
+          "label": "Meta",
+          "default": "Singles · Sealed"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Custom logo",
+          "info": "Optional. Upload an official logo to replace the built-in mark."
+        },
+        {
+          "type": "select",
+          "id": "logo_key",
+          "label": "Built-in mark",
+          "default": "auto",
+          "options": [
+            { "value": "auto", "label": "Auto from title" },
+            { "value": "pokemon", "label": "Pokemon" },
+            { "value": "yugioh", "label": "Yu-Gi-Oh!" },
+            { "value": "magic", "label": "Magic" },
+            { "value": "onepiece", "label": "One Piece" },
+            { "value": "lorcana", "label": "Lorcana" },
+            { "value": "accessories", "label": "Accessories" }
+          ]
+        }
       ]
     }
   ],
-  "presets": [{
-    "name": "Game grid",
-    "blocks": [
-      {"type": "game", "settings": {"title": "Pokémon", "meta": "Singles · Sealed"}},
-      {"type": "game", "settings": {"title": "Yu-Gi-Oh!", "meta": "Singles · Sealed"}},
-      {"type": "game", "settings": {"title": "Magic", "meta": "Singles · Sealed"}},
-      {"type": "game", "settings": {"title": "One Piece", "meta": "Sealed"}},
-      {"type": "game", "settings": {"title": "Lorcana", "meta": "Sealed"}},
-      {"type": "game", "settings": {"title": "Accessories", "meta": "Sleeves · Binders"}}
-    ]
-  }]
+  "presets": [
+    {
+      "name": "Game grid",
+      "blocks": [
+        { "type": "game", "settings": { "title": "Pokemon", "meta": "Singles · Sealed", "logo_key": "pokemon" } },
+        { "type": "game", "settings": { "title": "Yu-Gi-Oh!", "meta": "Singles · Sealed", "logo_key": "yugioh" } },
+        { "type": "game", "settings": { "title": "Magic", "meta": "Singles · Sealed", "logo_key": "magic" } },
+        { "type": "game", "settings": { "title": "One Piece", "meta": "Sealed", "logo_key": "onepiece" } },
+        { "type": "game", "settings": { "title": "Lorcana", "meta": "Sealed", "logo_key": "lorcana" } },
+        { "type": "game", "settings": { "title": "Accessories", "meta": "Sleeves · Binders", "logo_key": "accessories" } }
+      ]
+    }
+  ]
 }
 {% endschema %}

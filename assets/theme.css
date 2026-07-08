@@ -813,24 +813,53 @@ ul {
 .game-tile {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  padding: 1rem 0.85rem;
-  background: var(--surface);
+  gap: 0.55rem;
+  padding: 1rem 0.85rem 0.95rem;
+  background:
+    linear-gradient(160deg, rgba(45, 212, 191, 0.08), transparent 45%),
+    var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  transition: border-color 0.15s, transform 0.15s;
-  min-height: 110px;
+  transition: border-color 0.15s, transform 0.15s, background 0.15s;
+  min-height: 132px;
 }
 
 .game-tile:hover {
   border-color: rgba(45, 212, 191, 0.45);
   transform: translateY(-2px);
+  background:
+    linear-gradient(160deg, rgba(45, 212, 191, 0.14), transparent 50%),
+    var(--surface);
+}
+
+.game-tile__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  background: rgba(242, 240, 235, 0.04);
+  border: 1px solid rgba(242, 240, 235, 0.08);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.game-tile__logo img {
+  width: 1.65rem;
+  height: 1.65rem;
+  object-fit: contain;
+}
+
+.game-tile__mark {
+  filter: brightness(0) saturate(100%) invert(79%) sepia(29%) saturate(620%) hue-rotate(120deg) brightness(95%) contrast(92%);
 }
 
 .game-tile__label {
   font-family: var(--font-display);
   font-weight: 650;
   font-size: 0.95rem;
+  letter-spacing: -0.02em;
 }
 
 .game-tile__meta {

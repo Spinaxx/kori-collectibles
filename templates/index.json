@@ -24,12 +24,12 @@
     "games": {
       "type": "game-grid",
       "blocks": {
-        "g1": {"type": "game", "settings": {"title": "Pokemon", "meta": "Singles · Sealed"}},
-        "g2": {"type": "game", "settings": {"title": "Yu-Gi-Oh!", "meta": "Singles · Sealed"}},
-        "g3": {"type": "game", "settings": {"title": "Magic", "meta": "Singles · Sealed"}},
-        "g4": {"type": "game", "settings": {"title": "One Piece", "meta": "Sealed"}},
-        "g5": {"type": "game", "settings": {"title": "Lorcana", "meta": "Sealed"}},
-        "g6": {"type": "game", "settings": {"title": "Accessories", "meta": "Sleeves · Binders"}}
+        "g1": {"type": "game", "settings": {"title": "Pokemon", "meta": "Singles · Sealed", "logo_key": "pokemon"}},
+        "g2": {"type": "game", "settings": {"title": "Yu-Gi-Oh!", "meta": "Singles · Sealed", "logo_key": "yugioh"}},
+        "g3": {"type": "game", "settings": {"title": "Magic", "meta": "Singles · Sealed", "logo_key": "magic"}},
+        "g4": {"type": "game", "settings": {"title": "One Piece", "meta": "Sealed", "logo_key": "onepiece"}},
+        "g5": {"type": "game", "settings": {"title": "Lorcana", "meta": "Sealed", "logo_key": "lorcana"}},
+        "g6": {"type": "game", "settings": {"title": "Accessories", "meta": "Sleeves · Binders", "logo_key": "accessories"}}
       },
       "block_order": ["g1", "g2", "g3", "g4", "g5", "g6"],
       "settings": {
