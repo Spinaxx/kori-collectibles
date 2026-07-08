@@ -45,7 +45,7 @@ const REDEEM_POINTS = 100;
 const REDEEM_VALUE_GBP = 5;
 
 export default function main(input) {
-  const customer = input.customer;
+  const customer = input.customer ?? input.metaobject?.formSubmittedBy;
 
   if (!customer) {
     return {

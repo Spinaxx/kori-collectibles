@@ -29,9 +29,13 @@ You should already have `custom.loyalty_points`. Also add:
 
 The theme includes a `#loyalty-redeem-form` anchor — point the form block there.
 
-## 3. Build the Flow workflow
+## 3. Import or build the Flow workflow
 
-**Apps → Flow → Create workflow**
+**Fast path:** **Apps → Flow → Import** → choose  
+`shopify-flow/Redeem loyalty points.flow`  
+(form ID **1063387** is pre-configured on the metaobject trigger).
+
+**Manual path:** **Apps → Flow → Create workflow**
 
 ### Trigger
 
