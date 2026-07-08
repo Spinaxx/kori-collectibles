@@ -1,57 +1,187 @@
 {%- if section.settings.show_ticker -%}
-  <div class="ticker-bar" {{ section.shopify_attributes }}>
+  <div class="ticker-bar">
     <div class="ticker-track">
       {%- for block in section.blocks -%}
-        <span {{ block.shopify_attributes }}>
-          {{ block.settings.text }}
-          {%- if block.settings.highlight != blank -%}
-            <b>{{ block.settings.highlight }}</b>
-          {%- endif -%}
-          {{ block.settings.text_after }}
-        </span>
+        {%- if block.type == 'ticker_item' -%}
+          <span {{ block.shopify_attributes }}>
+            {{ block.settings.text }}
+            {%- if block.settings.highlight != blank -%}
+              <b>{{ block.settings.highlight }}</b>
+            {%- endif -%}
+            {{ block.settings.text_after }}
+          </span>
+        {%- endif -%}
       {%- endfor -%}
-      {%- comment -%} Duplicate for seamless loop {%- endcomment -%}
       {%- for block in section.blocks -%}
-        <span aria-hidden="true">
-          {{ block.settings.text }}
-          {%- if block.settings.highlight != blank -%}
-            <b>{{ block.settings.highlight }}</b>
-          {%- endif -%}
-          {{ block.settings.text_after }}
-        </span>
+        {%- if block.type == 'ticker_item' -%}
+          <span aria-hidden="true">
+            {{ block.settings.text }}
+            {%- if block.settings.highlight != blank -%}
+              <b>{{ block.settings.highlight }}</b>
+            {%- endif -%}
+            {{ block.settings.text_after }}
+          </span>
+        {%- endif -%}
       {%- endfor -%}
     </div>
   </div>
 {%- endif -%}
 
-<header class="site-header">
+<header class="site-header" data-site-header>
   <div class="wrap">
-    <nav class="site-header__nav" aria-label="Primary">
+    <div class="site-header__bar">
+      <button
+        type="button"
+        class="header-icon header-icon--menu"
+        data-menu-open
+        aria-expanded="false"
+        aria-controls="MobileMenu"
+        aria-label="Open menu"
+      >
+        {{ 'icon-menu.svg' | inline_asset_content }}
+      </button>
+
       <a class="logo" href="{{ routes.root_url }}">
-        <span class="logo-mark" aria-hidden="true"></span>
-        {{ section.settings.logo_text | default: shop.name }}
+        {%- if section.settings.logo != blank -%}
+          {{
+            section.settings.logo
+            | image_url: width: 400
+            | image_tag:
+              class: 'logo__image',
+              widths: '120, 180, 240, 320, 400',
+              sizes: '(max-width: 760px) 140px, 180px',
+              alt: shop.name,
+              loading: 'eager'
+          }}
+        {%- else -%}
+          <span class="logo-mark" aria-hidden="true"></span>
+          <span class="logo__text">{{ section.settings.logo_text | default: shop.name }}</span>
+        {%- endif -%}
       </a>
 
-      <div class="nav-links">
-        {% for link in section.settings.menu.links %}
-          <a href="{{ link.url }}">{{ link.title }}</a>
-        {% endfor %}
-      </div>
+      <nav class="header-nav" aria-label="Primary">
+        <ul class="header-nav__list" role="list">
+          {%- for link in section.settings.menu.links -%}
+            <li class="header-nav__item{% if link.links != blank %} header-nav__item--has-dropdown{% endif %}">
+              {%- if link.links != blank -%}
+                <details class="header-dropdown">
+                  <summary class="header-nav__link">
+                    <span>{{ link.title | escape }}</span>
+                    <svg class="header-nav__caret" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+                      <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </summary>
+                  <div class="header-dropdown__panel">
+                    <ul class="header-dropdown__list" role="list">
+                      {%- for childlink in link.links -%}
+                        <li class="header-dropdown__col">
+                          <a
+                            href="{{ childlink.url }}"
+                            class="header-dropdown__link header-dropdown__link--parent{% if childlink.current %} is-active{% endif %}"
+                          >
+                            {{ childlink.title | escape }}
+                          </a>
+                          {%- if childlink.links != blank -%}
+                            <ul class="header-dropdown__children" role="list">
+                              {%- for grandchildlink in childlink.links -%}
+                                <li>
+                                  <a
+                                    href="{{ grandchildlink.url }}"
+                                    class="header-dropdown__link{% if grandchildlink.current %} is-active{% endif %}"
+                                  >
+                                    {{ grandchildlink.title | escape }}
+                                  </a>
+                                </li>
+                              {%- endfor -%}
+                            </ul>
+                          {%- endif -%}
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+                </details>
+              {%- else -%}
+                <a
+                  href="{{ link.url }}"
+                  class="header-nav__link{% if link.current %} is-active{% endif %}"
+                  {% if link.current %}aria-current="page"{% endif %}
+                >
+                  {{ link.title | escape }}
+                </a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
 
-      <div class="nav-actions">
-        {% if section.settings.cta_label != blank %}
-          <a href="{{ section.settings.cta_link }}" class="nav-cta">{{ section.settings.cta_label }}</a>
-        {% endif %}
-        <a href="{{ routes.cart_url }}" class="nav-cart" aria-label="Cart">
-          {% if cart.item_count > 0 %}
-            <span class="nav-cart__count">{{ cart.item_count }}</span>
-          {% endif %}
+      <div class="header-icons">
+        <a href="{{ routes.search_url }}" class="header-icon" aria-label="Search">
+          {{ 'icon-search.svg' | inline_asset_content }}
+        </a>
+
+        {%- if shop.customer_accounts_enabled -%}
+          <a
+            href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+            class="header-icon header-icon--account"
+            aria-label="{% if customer %}Account{% else %}Log in{% endif %}"
+          >
+            {{ 'icon-account.svg' | inline_asset_content }}
+          </a>
+        {%- endif -%}
+
+        <a href="{{ routes.cart_url }}" class="header-icon header-icon--cart" aria-label="Cart">
           {{ 'icon-cart.svg' | inline_asset_content }}
+          {%- if cart.item_count > 0 -%}
+            <span class="header-icon__count">{{ cart.item_count }}</span>
+          {%- endif -%}
         </a>
       </div>
-    </nav>
+    </div>
   </div>
 </header>
+
+<div class="mobile-menu" id="MobileMenu" data-mobile-menu hidden>
+  <div class="mobile-menu__backdrop" data-menu-close></div>
+  <div class="mobile-menu__panel" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="mobile-menu__top">
+      <span class="mobile-menu__title">Menu</span>
+      <button type="button" class="header-icon" data-menu-close aria-label="Close menu">
+        {{ 'icon-close.svg' | inline_asset_content }}
+      </button>
+    </div>
+    <nav class="mobile-menu__nav" aria-label="Mobile">
+      <ul class="mobile-menu__list" role="list">
+        {%- for link in section.settings.menu.links -%}
+          <li>
+            {%- if link.links != blank -%}
+              <details class="mobile-menu__details">
+                <summary>{{ link.title | escape }}</summary>
+                <ul role="list">
+                  {%- for childlink in link.links -%}
+                    <li>
+                      <a href="{{ childlink.url }}">{{ childlink.title | escape }}</a>
+                      {%- if childlink.links != blank -%}
+                        <ul class="mobile-menu__grandchildren" role="list">
+                          {%- for grandchildlink in childlink.links -%}
+                            <li>
+                              <a href="{{ grandchildlink.url }}">{{ grandchildlink.title | escape }}</a>
+                            </li>
+                          {%- endfor -%}
+                        </ul>
+                      {%- endif -%}
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </details>
+            {%- else -%}
+              <a href="{{ link.url }}">{{ link.title | escape }}</a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  </div>
+</div>
 
 {% schema %}
 {
@@ -64,26 +194,22 @@
       "default": true
     },
     {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
       "type": "text",
       "id": "logo_text",
-      "label": "Logo text",
-      "default": "Kori Collectibles"
+      "label": "Logo text fallback",
+      "default": "Kori Collectibles",
+      "info": "Used when no logo image is uploaded."
     },
     {
       "type": "link_list",
       "id": "menu",
-      "label": "Menu"
-    },
-    {
-      "type": "text",
-      "id": "cta_label",
-      "label": "CTA label",
-      "default": "Shop now"
-    },
-    {
-      "type": "url",
-      "id": "cta_link",
-      "label": "CTA link"
+      "label": "Menu",
+      "default": "main-menu"
     }
   ],
   "blocks": [

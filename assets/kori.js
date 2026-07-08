@@ -50,8 +50,45 @@
     });
   };
 
+  const initHeaderMenu = () => {
+    const openBtn = document.querySelector('[data-menu-open]');
+    const mobileMenu = document.querySelector('[data-mobile-menu]');
+    if (openBtn && mobileMenu) {
+      const setOpen = (open) => {
+        mobileMenu.hidden = !open;
+        openBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.documentElement.style.overflow = open ? 'hidden' : '';
+      };
+
+      openBtn.addEventListener('click', () => setOpen(true));
+      mobileMenu.querySelectorAll('[data-menu-close]').forEach((el) => {
+        el.addEventListener('click', () => setOpen(false));
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !mobileMenu.hidden) setOpen(false);
+      });
+    }
+
+    const dropdowns = document.querySelectorAll('.header-dropdown');
+    dropdowns.forEach((details) => {
+      details.addEventListener('toggle', () => {
+        if (!details.open) return;
+        dropdowns.forEach((other) => {
+          if (other !== details) other.open = false;
+        });
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      dropdowns.forEach((details) => {
+        if (details.open && !details.contains(e.target)) details.open = false;
+      });
+    });
+  };
+
   document.addEventListener('DOMContentLoaded', () => {
     initHeroCard();
     initTilt();
+    initHeaderMenu();
   });
 })();

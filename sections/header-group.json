@@ -42,8 +42,7 @@
       "settings": {
         "show_ticker": true,
         "logo_text": "Kori Collectibles",
-        "cta_label": "Shop now",
-        "cta_link": "#grid"
+        "menu": "main-menu"
       }
     }
   },
