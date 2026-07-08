@@ -203,13 +203,8 @@ ul {
   will-change: transform;
 }
 
-.announcement__gap {
-  flex: 0 0 auto;
-  align-self: stretch;
-}
-
 .announcement__track.is-ready {
-  animation: announcement-scroll var(--announcement-duration, 32s) linear infinite;
+  animation: announcement-scroll var(--announcement-duration, 20s) linear infinite;
 }
 
 .announcement:hover .announcement__track {

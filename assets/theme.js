@@ -756,38 +756,28 @@
     const tracks = qsa('.announcement__track');
     if (!tracks.length) return;
 
-    const buildUnit = (template) => {
-      const unit = document.createDocumentFragment();
-      const inner = template.cloneNode(true);
-      unit.appendChild(inner);
-
-      const gap = document.createElement('div');
-      gap.className = 'announcement__gap';
-      gap.setAttribute('aria-hidden', 'true');
-      unit.appendChild(gap);
-
-      return { unit, inner, gap };
-    };
-
     const setup = (track) => {
       const seed = track.querySelector('.announcement__inner');
       if (!seed) return;
 
       const template = seed.cloneNode(true);
-      track.replaceChildren();
+      track.replaceChildren(template);
 
-      const first = buildUnit(template);
-      track.appendChild(first.unit);
-      const gapWidth = Math.max(0, window.innerWidth - first.inner.offsetWidth);
-      first.gap.style.width = `${gapWidth}px`;
-      const unitWidth = track.scrollWidth;
+      while (track.scrollWidth < window.innerWidth) {
+        const clone = template.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        track.appendChild(clone);
+      }
 
-      const second = buildUnit(template);
-      track.appendChild(second.unit);
-      second.gap.style.width = `${gapWidth}px`;
+      const loopWidth = track.scrollWidth;
+      [...track.children].forEach((child) => {
+        const clone = child.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        track.appendChild(clone);
+      });
 
-      const duration = Math.max(24, unitWidth / 45);
-      track.style.setProperty('--announcement-distance', `-${unitWidth}px`);
+      const duration = Math.max(16, loopWidth / 80);
+      track.style.setProperty('--announcement-distance', `-${loopWidth}px`);
       track.style.setProperty('--announcement-duration', `${duration}s`);
       track.classList.add('is-ready');
     };
