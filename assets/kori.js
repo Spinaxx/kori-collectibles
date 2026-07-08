@@ -14,20 +14,12 @@
     if (!Array.isArray(candidates) || candidates.length === 0) return;
 
     const pick = candidates[Math.floor(Math.random() * candidates.length)];
-    const nameEl = card.querySelector('[data-hero-name]');
-    const priceEl = card.querySelector('[data-hero-price]');
-    const descEl = card.querySelector('[data-hero-desc]');
-    const setEl = card.querySelector('[data-hero-set]');
     const imageEl = card.querySelector('[data-hero-image]');
     const fallbackEl = card.querySelector('[data-hero-fallback]');
 
-    if (nameEl) nameEl.textContent = pick.title;
-    if (priceEl) priceEl.textContent = pick.price;
-    if (descEl) descEl.textContent = pick.desc;
-    if (setEl) setEl.textContent = pick.set || '';
     if (pick.url) {
       card.href = pick.url;
-      card.setAttribute('aria-label', `${pick.title} — ${pick.price}`);
+      card.setAttribute('aria-label', pick.title);
     }
 
     if (imageEl && pick.image) {

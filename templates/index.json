@@ -15,10 +15,7 @@
         "secondary_link": "#grid",
         "min_price": 5,
         "pool_size": 50,
-        "fallback_name": "Duskwing",
-        "fallback_price": "£—",
-        "fallback_desc": "Add in-stock products over £5 to power the hero card.",
-        "fallback_set": "Kori Collectibles"
+        "fallback_name": "Featured single"
       }
     },
     "binder": {
