@@ -164,8 +164,18 @@
         <div class="header__actions">
           {%- if settings.loyalty_enable -%}
             {%- if customer -%}
-              <a class="header__loyalty" href="{{ loyalty_url }}" aria-label="Rewards points">
-                <span class="header__loyalty-value">{{ balance }}</span>
+              <a
+                class="header__loyalty"
+                href="{{ loyalty_url }}"
+                {% if settings.loyalty_provider == 'smile' %}data-open-smile-panel{% endif %}
+                aria-label="Rewards points"
+              >
+                <span
+                  class="header__loyalty-value"
+                  {% if settings.loyalty_provider == 'smile' %}data-smile-loyalty-balance{% endif %}
+                >
+                  {%- if settings.loyalty_provider == 'smile' -%}…{%- else -%}{{ balance }}{%- endif -%}
+                </span>
                 <span class="header__loyalty-label">pts</span>
               </a>
             {%- endif -%}
@@ -245,7 +255,16 @@
             {%- if settings.loyalty_enable -%}
               <li class="drawer-nav__loyalty">
                 {%- if customer -%}
-                  <a href="{{ loyalty_url }}">Rewards · {{ balance }} pts</a>
+                  <a
+                    href="{{ loyalty_url }}"
+                    {% if settings.loyalty_provider == 'smile' %}data-open-smile-panel{% endif %}
+                  >
+                    Rewards ·
+                    <span {% if settings.loyalty_provider == 'smile' %}data-smile-loyalty-balance{% endif %}>
+                      {%- if settings.loyalty_provider == 'smile' -%}…{%- else -%}{{ balance }}{%- endif -%}
+                    </span>
+                    pts
+                  </a>
                 {%- else -%}
                   <a href="{{ routes.account_login_url }}">Sign in for rewards</a>
                 {%- endif -%}
@@ -338,18 +357,30 @@
               {%- endif -%}
             </div>
           {%- endif -%}
-          {%- if settings.loyalty_enable and customer -%}
-            {%- assign earn_preview = cart.total_price | times: settings.loyalty_points_per_gbp | divided_by: 100 -%}
-            <div class="cart-drawer__loyalty" data-cart-loyalty data-points-rate="{{ settings.loyalty_points_per_gbp }}">
-              You'll earn <strong data-cart-loyalty-earn>{{ earn_preview }}</strong> points on this order
-              {%- if balance > 0 -%}
-                · Balance: <strong>{{ balance }}</strong> pts
-              {%- endif -%}
-            </div>
-          {%- elsif settings.loyalty_enable -%}
-            <div class="cart-drawer__loyalty cart-drawer__loyalty--guest">
-              <a href="{{ routes.account_login_url }}">Sign in</a> to earn rewards points on this order
-            </div>
+          {%- if settings.loyalty_enable -%}
+            {%- if settings.loyalty_provider == 'smile' -%}
+              <div class="cart-drawer__loyalty" data-cart-loyalty-smile>
+                {%- if customer -%}
+                  Points are added after checkout.
+                  <button type="button" class="cart-drawer__loyalty-link" data-open-smile-panel>Open rewards</button>
+                  · Balance: <strong data-smile-loyalty-balance>…</strong>
+                {%- else -%}
+                  <a href="{{ routes.account_login_url }}">Sign in</a> to earn Smile rewards on this order.
+                {%- endif -%}
+              </div>
+            {%- elsif customer -%}
+              {%- assign earn_preview = cart.total_price | times: settings.loyalty_points_per_gbp | divided_by: 100 -%}
+              <div class="cart-drawer__loyalty" data-cart-loyalty data-points-rate="{{ settings.loyalty_points_per_gbp }}">
+                You'll earn <strong data-cart-loyalty-earn>{{ earn_preview }}</strong> points on this order
+                {%- if balance > 0 -%}
+                  · Balance: <strong>{{ balance }}</strong> pts
+                {%- endif -%}
+              </div>
+            {%- else -%}
+              <div class="cart-drawer__loyalty cart-drawer__loyalty--guest">
+                <a href="{{ routes.account_login_url }}">Sign in</a> to earn rewards points on this order
+              </div>
+            {%- endif -%}
           {%- endif -%}
           <div class="cart-drawer__subtotal">
             <span>Subtotal</span>

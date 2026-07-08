@@ -20,6 +20,8 @@
     "color_danger": "#ff6b5a",
     "color_button": "#f2f0eb",
     "color_button_text": "#0c0e14",
+    "loyalty_provider": "smile",
+    "loyalty_enable": true,
     "logo_text": "Kori Collectibles",
     "menu": "main-menu",
     "footer_brand_name": "Kori Collectibles",

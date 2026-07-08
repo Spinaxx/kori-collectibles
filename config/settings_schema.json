@@ -208,6 +208,16 @@
     "name": "Loyalty rewards",
     "settings": [
       {
+        "type": "select",
+        "id": "loyalty_provider",
+        "label": "Loyalty provider",
+        "default": "smile",
+        "options": [
+          { "value": "smile", "label": "Smile.io" },
+          { "value": "metafield", "label": "Customer metafield (manual / Flow)" }
+        ]
+      },
+      {
         "type": "checkbox",
         "id": "loyalty_enable",
         "label": "Show rewards in header and cart",
@@ -217,14 +227,14 @@
         "type": "page",
         "id": "loyalty_page",
         "label": "Rewards page",
-        "info": "Create a page and assign the rewards template."
+        "info": "Optional info page. Smile handles earn, redeem, and balance."
       },
       {
         "type": "text",
         "id": "loyalty_points_metafield",
         "label": "Customer points metafield",
         "default": "custom.loyalty_points",
-        "info": "Namespace and key for the customer's point balance."
+        "info": "Only used when provider is Customer metafield."
       },
       {
         "type": "range",
@@ -233,7 +243,12 @@
         "max": 20,
         "step": 1,
         "label": "Points earned per £1 spent (display only)",
-        "default": 1
+        "default": 1,
+        "info": "Only used when provider is Customer metafield."
+      },
+      {
+        "type": "paragraph",
+        "content": "Smile.io: enable the app embed in the theme editor, turn on JavaScript SDK in Smile Admin (Settings → Developer tools), then click Apply Smile if the launcher is missing."
       }
     ]
   },

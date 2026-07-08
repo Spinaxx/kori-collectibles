@@ -1,12 +1,18 @@
 {%- liquid
   assign enabled = enabled | default: settings.loyalty_enable
-  assign points_key = settings.loyalty_points_metafield | default: 'custom.loyalty_points'
-  assign points_parts = points_key | split: '.'
-  assign points_ns = points_parts[0]
-  assign points_id = points_parts[1]
-  assign balance = 0
-
-  if enabled and customer and points_ns != blank and points_id != blank
-    assign balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
+  assign use_smile = false
+  if settings.loyalty_provider == 'smile'
+    assign use_smile = true
   endif
+
+  assign balance = 0
+  unless use_smile
+    assign points_key = settings.loyalty_points_metafield | default: 'custom.loyalty_points'
+    assign points_parts = points_key | split: '.'
+    assign points_ns = points_parts[0]
+    assign points_id = points_parts[1]
+    if enabled and customer and points_ns != blank and points_id != blank
+      assign balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
+    endif
+  endunless
 -%}

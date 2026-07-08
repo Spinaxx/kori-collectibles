@@ -482,6 +482,29 @@ ul {
   font-weight: 600;
 }
 
+.cart-drawer__loyalty-link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.rewards__smile-note {
+  margin: -0.5rem 0 1.25rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
 /* Rewards page */
 
 .rewards {

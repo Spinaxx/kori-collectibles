@@ -27,45 +27,32 @@ A from-scratch Online Store 2.0 theme for a UK TCG shop, taking structure cues f
 - Tag sealed as `sealed` / `etb` / product type containing booster
 - Tag `preorder` for the pre-order badge
 
-## Loyalty rewards (Kori Collectors Club)
+## Loyalty rewards (Smile.io)
 
-The theme includes a rewards page, header points badge, and cart earn preview. **Points are stored on each customer's shop account** via a customer metafield — the theme displays the balance but does not award points by itself.
+The theme is wired for **Smile.io** by default. Smile handles earning points, redemption, and the rewards panel.
 
-### 1. Enable customer accounts
+### Theme checklist
 
-Shopify admin → **Settings → Customer accounts**. Use Shopify-hosted accounts (recommended).
+1. **Theme editor** → App embeds → enable **Smile.io**
+2. **Smile Admin** → Settings → **Developer tools** → enable **JavaScript SDK** (needed for header/cart point balances)
+3. **Smile Admin** → Settings → **Platform** → **Apply Smile** if the launcher is missing
+4. **Theme settings → Loyalty rewards** → provider: **Smile.io**
+5. Optional: create a `/pages/rewards` page with the **rewards** template for program info
 
-### 2. Create the customer metafield
+### What the theme shows
 
-Admin → **Settings → Custom data → Customers → Add definition**
+- Header points badge (live balance from Smile when signed in)
+- Cart drawer link to open the Smile rewards panel
+- Optional rewards info page with **Open rewards panel** button
 
-- Name: `Loyalty points`
-- Namespace and key: `custom.loyalty_points`
-- Type: **Integer**
+### Customer accounts
 
-### 3. Create the rewards page
+Customers must check out while signed in to earn points. In Smile Admin, configure earn rules (e.g. points per £1 spent) and redemption rewards.
 
-Admin → **Online store → Pages → Add page**
+### Loyalty Hub (optional)
 
-- Title: `Rewards` (handle `/pages/rewards`)
-- Theme template: **rewards**
+Smile Admin → On-site content → add **Loyalty Hub** to customer accounts for a full rewards page inside the account area.
 
-Then **Theme settings → Loyalty rewards** → pick the Rewards page.
+### Manual metafield mode
 
-### 4. Award points after orders (pick one)
-
-**Option A — Shopify Flow** (Shopify plan and above)
-
-1. Apps → **Flow** → Create workflow
-2. Trigger: **Order paid**
-3. Condition: Customer is not null
-4. Action: **Update customer metafield** `custom.loyalty_points`
-5. Value: current balance + (`order subtotal in GBP` × points rate)
-
-**Option B — Loyalty app** (any plan)
-
-Install [Smile.io](https://apps.shopify.com/smile-io), Rivo, or similar. Point the theme metafield setting at the app's field, or use the app's own widgets.
-
-### 5. Redemption
-
-Automatic checkout redemption needs an app or custom Shopify app. Until then, redeem manually with discount codes or store credit when customers contact you.
+Set **Theme settings → Loyalty provider** to **Customer metafield** only if you are not using Smile and are awarding points via Shopify Flow instead.
