@@ -23,6 +23,22 @@
   assign redeem_value = section.settings.redeem_value_gbp | default: settings.loyalty_redeem_value_gbp | default: 5
   assign redeem_blocks = balance | divided_by: redeem_points | floor
   assign redeemable_gbp = redeem_blocks | times: redeem_value
+
+  assign active_redeem_code = blank
+  assign redeem_code_key = settings.loyalty_redeem_code_metafield | default: 'custom.loyalty_redeem_code' | strip
+  assign redeem_code_parts = redeem_code_key | split: '.'
+  assign redeem_code_ns = redeem_code_parts[0] | strip
+  assign redeem_code_id = redeem_code_parts[1] | strip
+
+  if customer
+    if redeem_code_ns != blank and redeem_code_id != blank
+      assign active_redeem_code = customer.metafields[redeem_code_ns][redeem_code_id].value
+    endif
+    if active_redeem_code == blank
+      assign active_redeem_code = customer.metafields.custom.loyalty_redeem_code.value
+    endif
+    assign active_redeem_code = active_redeem_code | strip
+  endif
 -%}
 
 <section class="section rewards">
@@ -67,10 +83,10 @@
             {%- endif -%}
           {%- endfor -%}
         {%- endcapture -%}
-        {%- render 'loyalty-redeem-card', balance: balance, form_content: redeem_form_blocks, show_active_code: false -%}
+        {%- render 'loyalty-redeem-card', balance: balance, form_content: redeem_form_blocks, show_active_code: false, active_redeem_code: active_redeem_code -%}
       </div>
 
-      {%- render 'loyalty-active-codes', redeem_value: redeem_value -%}
+      {%- render 'loyalty-active-codes', redeem_value: redeem_value, active_redeem_code: active_redeem_code -%}
     {%- else -%}
       <div class="rewards__balance-card rewards__balance-card--guest">
         <div class="rewards__balance-main">

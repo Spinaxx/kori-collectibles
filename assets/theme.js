@@ -982,7 +982,37 @@
       const applyUrl = `/discount/${encodeURIComponent(code)}`;
       let section = qs('[data-loyalty-active-codes]');
 
-      if (!section) {
+      if (section) {
+        section.removeAttribute('data-loyalty-active-codes-empty');
+        const placeholder = qs('[data-loyalty-active-codes-placeholder]', section);
+        const list = qs('.rewards__codes-list', section);
+
+        if (placeholder && !list) {
+          const redeemValue = section.dataset.redeemValue || '5';
+          placeholder.outerHTML = `
+            <div class="rewards__codes-list">
+              <article class="rewards__code-card" data-loyalty-code-card>
+                <div class="rewards__code-card-main">
+                  <p class="rewards__code-label">Discount code</p>
+                  <p class="rewards__code-value" data-loyalty-active-code>${code}</p>
+                  <p class="rewards__code-meta">£${redeemValue} off · single use · does not expire</p>
+                </div>
+                <div class="rewards__code-actions">
+                  <a class="button button--full" href="${applyUrl}" data-loyalty-active-apply>Apply to cart</a>
+                  <button type="button" class="button button--secondary button--full" data-loyalty-active-copy>Copy code</button>
+                </div>
+                <p class="rewards__code-invalid" data-loyalty-code-invalid hidden role="status">
+                  This code has already been used or is no longer valid.
+                </p>
+              </article>
+            </div>`;
+        } else {
+          const codeEl = qs('[data-loyalty-active-code]', section);
+          const applyBtn = qs('[data-loyalty-active-apply]', section);
+          if (codeEl) codeEl.textContent = code;
+          if (applyBtn) applyBtn.href = applyUrl;
+        }
+      } else {
         const panel = qs('.rewards__redeem-panel');
         if (panel) {
           section = document.createElement('section');
@@ -1007,15 +1037,11 @@
               </article>
             </div>`;
           panel.insertAdjacentElement('afterend', section);
+          const codeEl = qs('[data-loyalty-active-code]', section);
+          const applyBtn = qs('[data-loyalty-active-apply]', section);
+          if (codeEl) codeEl.textContent = code;
+          if (applyBtn) applyBtn.href = applyUrl;
         }
-      }
-
-      if (section) {
-        section.hidden = false;
-        const codeEl = qs('[data-loyalty-active-code]', section);
-        const applyBtn = qs('[data-loyalty-active-apply]', section);
-        if (codeEl) codeEl.textContent = code;
-        if (applyBtn) applyBtn.href = applyUrl;
       }
 
       qsa('[data-loyalty-redeem]').forEach((root) => {

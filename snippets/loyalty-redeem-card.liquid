@@ -21,7 +21,8 @@
   assign redeem_email = settings.loyalty_redeem_email | default: shop.email
   assign redeem_method = settings.loyalty_redeem_method | default: 'flow'
   assign proxy_url = settings.loyalty_redeem_proxy_url | default: '/apps/kori-loyalty/redeem'
-  assign active_code = loyalty_redeem_code
+  assign active_code = active_redeem_code | default: loyalty_redeem_code | strip
+
   assign show_active_code = show_active_code
   if show_active_code == nil and compact
     assign show_active_code = true
