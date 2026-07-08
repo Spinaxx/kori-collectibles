@@ -45,22 +45,24 @@
           endcase
         -%}
         <a
-          class="game-tile"
+          class="game-tile{% if block.settings.logo != blank %} game-tile--has-logo{% endif %}"
           href="{% if block.settings.link != blank %}{{ block.settings.link }}{% else %}{{ routes.collections_url }}{% endif %}"
           {{ block.shopify_attributes }}
         >
-          <span class="game-tile__logo" aria-hidden="true">
-            {%- if block.settings.logo != blank -%}
+          {%- if block.settings.logo != blank -%}
+            <span class="game-tile__logo game-tile__logo--custom" aria-hidden="true">
               <img
-                src="{{ block.settings.logo | image_url: width: 160 }}"
-                srcset="{{ block.settings.logo | image_url: width: 80 }} 80w, {{ block.settings.logo | image_url: width: 160 }} 160w"
-                sizes="48px"
+                src="{{ block.settings.logo | image_url: width: 320 }}"
+                srcset="{{ block.settings.logo | image_url: width: 160 }} 160w, {{ block.settings.logo | image_url: width: 240 }} 240w, {{ block.settings.logo | image_url: width: 320 }} 320w"
+                sizes="96px"
                 alt=""
-                width="48"
+                width="96"
                 height="48"
                 loading="lazy"
               >
-            {%- else -%}
+            </span>
+          {%- else -%}
+            <span class="game-tile__logo game-tile__logo--mark" aria-hidden="true">
               <img
                 class="game-tile__mark"
                 src="{{ logo_asset | asset_url }}"
@@ -69,8 +71,8 @@
                 height="40"
                 loading="lazy"
               >
-            {%- endif -%}
-          </span>
+            </span>
+          {%- endif -%}
           <span class="game-tile__label">{{ block.settings.title | escape }}</span>
           {%- if block.settings.meta != blank -%}
             <span class="game-tile__meta">{{ block.settings.meta | escape }}</span>
@@ -123,13 +125,14 @@
         {
           "type": "image_picker",
           "id": "logo",
-          "label": "Custom logo",
-          "info": "Optional. Upload an official logo to replace the built-in mark."
+          "label": "Official logo",
+          "info": "Upload the official game logo (PNG/SVG with transparent background). Recommended. No border is shown around custom logos."
         },
         {
           "type": "select",
           "id": "logo_key",
-          "label": "Built-in mark",
+          "label": "Fallback mark",
+          "info": "Only used when no official logo is uploaded.",
           "default": "auto",
           "options": [
             { "value": "auto", "label": "Auto from title" },

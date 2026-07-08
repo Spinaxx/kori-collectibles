@@ -1016,20 +1016,42 @@ ul {
 .game-tile__logo {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.game-tile__logo--mark {
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 0.75rem;
   background: rgba(242, 240, 235, 0.04);
   border: 1px solid rgba(242, 240, 235, 0.08);
-  color: var(--accent);
-  flex-shrink: 0;
+  justify-content: center;
 }
 
-.game-tile__logo img {
+.game-tile__logo--mark img {
   width: 1.65rem;
   height: 1.65rem;
   object-fit: contain;
+}
+
+.game-tile__logo--custom {
+  width: auto;
+  max-width: 100%;
+  height: 2.5rem;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+
+.game-tile__logo--custom img {
+  width: auto;
+  max-width: 7.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+  object-position: left center;
 }
 
 .game-tile__mark {
