@@ -76,11 +76,11 @@
           "settings": {
             "coming_soon": true,
             "coming_soon_text": "Coming soon",
-            "title": "Yu-Gi-Oh!",
-            "show_title": false,
+            "title": "Japanese Pokemon",
+            "show_title": true,
             "meta": "Singles · Sealed",
             "link": "",
-            "logo_key": "yugioh"
+            "logo_key": "japanese_pokemon"
           }
         },
         "g3": {
@@ -88,26 +88,14 @@
           "settings": {
             "coming_soon": true,
             "coming_soon_text": "Coming soon",
-            "title": "Magic",
+            "title": "Yu-Gi-Oh!",
             "show_title": false,
             "meta": "Singles · Sealed",
             "link": "",
-            "logo_key": "magic"
+            "logo_key": "yugioh"
           }
         },
         "g4": {
-          "type": "game",
-          "settings": {
-            "coming_soon": true,
-            "coming_soon_text": "Coming soon",
-            "title": "One Piece",
-            "show_title": false,
-            "meta": "Sealed",
-            "link": "",
-            "logo_key": "onepiece"
-          }
-        },
-        "g5": {
           "type": "game",
           "settings": {
             "coming_soon": true,
@@ -117,6 +105,18 @@
             "meta": "Sealed",
             "link": "",
             "logo_key": "lorcana"
+          }
+        },
+        "g5": {
+          "type": "game",
+          "settings": {
+            "coming_soon": true,
+            "coming_soon_text": "Coming soon",
+            "title": "More TCGs",
+            "show_title": false,
+            "meta": "Magic · One Piece · More",
+            "link": "",
+            "logo_key": "more_tcgs"
           }
         },
         "g6": {

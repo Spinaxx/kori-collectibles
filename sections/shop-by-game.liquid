@@ -14,8 +14,12 @@
           assign logo_key = block.settings.logo_key | default: 'auto'
           if logo_key == 'auto'
             assign title_key = block.settings.title | downcase | strip
-            if title_key contains 'pokemon' or title_key contains 'pokémon'
+            if title_key contains 'japanese' and title_key contains 'pokemon'
+              assign logo_key = 'japanese_pokemon'
+            elsif title_key contains 'pokemon' or title_key contains 'pokémon'
               assign logo_key = 'pokemon'
+            elsif title_key contains 'more tcg'
+              assign logo_key = 'more_tcgs'
             elsif title_key contains 'yu-gi' or title_key contains 'yugioh' or title_key contains 'yu gi'
               assign logo_key = 'yugioh'
             elsif title_key contains 'magic' or title_key contains 'mtg'
@@ -32,6 +36,8 @@
           case logo_key
             when 'pokemon'
               assign logo_asset = 'logo-pokemon.svg'
+            when 'japanese_pokemon'
+              assign logo_asset = 'logo-pokemon.svg'
             when 'yugioh'
               assign logo_asset = 'logo-yugioh.png'
             when 'magic'
@@ -40,6 +46,8 @@
               assign logo_asset = 'logo-onepiece.svg'
             when 'lorcana'
               assign logo_asset = 'logo-lorcana.svg'
+            when 'more_tcgs'
+              assign logo_asset = 'logo-more-tcgs.svg'
             else
               assign logo_asset = 'logo-accessories.svg'
           endcase
@@ -193,10 +201,12 @@
           "options": [
             { "value": "auto", "label": "Auto from title" },
             { "value": "pokemon", "label": "Pokemon" },
+            { "value": "japanese_pokemon", "label": "Japanese Pokemon" },
             { "value": "yugioh", "label": "Yu-Gi-Oh!" },
             { "value": "magic", "label": "Magic" },
             { "value": "onepiece", "label": "One Piece" },
             { "value": "lorcana", "label": "Lorcana" },
+            { "value": "more_tcgs", "label": "More TCGs" },
             { "value": "accessories", "label": "Accessories" }
           ]
         }
@@ -208,10 +218,10 @@
       "name": "Shop by game",
       "blocks": [
         { "type": "game", "settings": { "title": "Pokemon", "meta": "Singles · Sealed", "logo_key": "pokemon", "show_title": false, "coming_soon": false } },
+        { "type": "game", "settings": { "title": "Japanese Pokemon", "meta": "Singles · Sealed", "logo_key": "japanese_pokemon", "show_title": true, "coming_soon": false } },
         { "type": "game", "settings": { "title": "Yu-Gi-Oh!", "meta": "Singles · Sealed", "logo_key": "yugioh", "show_title": false, "coming_soon": false } },
-        { "type": "game", "settings": { "title": "Magic", "meta": "Singles · Sealed", "logo_key": "magic", "show_title": false, "coming_soon": false } },
-        { "type": "game", "settings": { "title": "One Piece", "meta": "Sealed", "logo_key": "onepiece", "show_title": false, "coming_soon": false } },
         { "type": "game", "settings": { "title": "Lorcana", "meta": "Sealed", "logo_key": "lorcana", "show_title": false, "coming_soon": false } },
+        { "type": "game", "settings": { "title": "More TCGs", "meta": "Magic · One Piece · More", "logo_key": "more_tcgs", "show_title": false, "coming_soon": false } },
         { "type": "game", "settings": { "title": "Accessories", "meta": "Sleeves · Binders", "logo_key": "accessories", "show_title": false, "coming_soon": false } }
       ]
     }

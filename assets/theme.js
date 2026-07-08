@@ -776,7 +776,7 @@
         track.appendChild(clone);
       });
 
-      const duration = Math.max(16, loopWidth / 80);
+      const duration = Math.max(16, loopWidth / 60);
       track.style.setProperty('--announcement-distance', `-${loopWidth}px`);
       track.style.setProperty('--announcement-duration', `${duration}s`);
       track.classList.add('is-ready');
