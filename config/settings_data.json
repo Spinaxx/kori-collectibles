@@ -32,6 +32,7 @@
     "loyalty_show_launcher": true,
     "loyalty_program_name": "Kori Collectors Club",
     "loyalty_page": "rewards",
+    "loyalty_points_metafield": "loyalty_points",
     "loyalty_redeem_points": 100,
     "loyalty_redeem_value_gbp": 5,
     "loyalty_redeem_email": "support@koricollectibles.co.uk",
