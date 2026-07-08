@@ -1,0 +1,120 @@
+{%- liquid
+  assign min_cents = section.settings.min_price | default: 5 | times: 100
+  assign source = section.settings.source_collection
+  assign limit = section.settings.pool_size | default: 50
+  assign count = 0
+  if source != blank
+    assign list = source.products
+  else
+    assign list = collections.all.products
+  endif
+-%}
+
+<section class="hero">
+  <div class="page-width hero__grid">
+    <div>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="hero__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      <h1 class="hero__title">
+        {{ section.settings.heading_line_1 | escape }}
+        {%- if section.settings.heading_line_2 != blank -%}
+          <br>{{ section.settings.heading_line_2 | escape -}}
+          {%- if section.settings.heading_em != blank -%}<em>{{ section.settings.heading_em | escape }}</em>{%- endif -%}
+          {{- section.settings.heading_after | escape -}}
+        {%- endif -%}
+      </h1>
+      {%- if section.settings.text != blank -%}
+        <p class="hero__text">{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+      <div class="hero__actions">
+        {%- if section.settings.primary_label != blank -%}
+          <a class="button" href="{{ section.settings.primary_link }}">{{ section.settings.primary_label | escape }}</a>
+        {%- endif -%}
+        {%- if section.settings.secondary_label != blank -%}
+          <a class="button button--secondary" href="{{ section.settings.secondary_link }}">{{ section.settings.secondary_label | escape }}</a>
+        {%- endif -%}
+      </div>
+      <div class="hero__stats">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'stat' -%}
+            <div class="hero__stat" {{ block.shopify_attributes }}>
+              <strong>{{ block.settings.label | escape }}</strong>
+              <span>{{ block.settings.text | escape }}</span>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <div class="hero__stage">
+      <a class="hero-card" href="{{ routes.all_products_collection_url }}" data-hero-card aria-label="Featured single">
+        <span class="hero-card__shine" data-hero-shine></span>
+        <img data-hero-image alt="" width="280" height="392" hidden>
+        <span class="hero-card__holo" aria-hidden="true"></span>
+      </a>
+    </div>
+  </div>
+
+  <script type="application/json" data-hero-candidates>
+    [
+      {%- for product in list -%}
+        {%- if count >= limit -%}{%- break -%}{%- endif -%}
+        {%- liquid
+          assign type = product.type | downcase
+          assign tags = product.tags | join: ',' | downcase
+          assign sealed = false
+          if type contains 'sealed' or type contains 'booster' or type contains 'etb' or tags contains 'sealed'
+            assign sealed = true
+          endif
+          assign single = false
+          if source != blank and sealed == false
+            assign single = true
+          elsif type == 'single' or type == 'singles' or tags contains 'single'
+            assign single = true
+          endif
+          if sealed
+            assign single = false
+          endif
+        -%}
+        {%- if single and product.available and product.price > min_cents and product.featured_image -%}
+          {%- assign count = count | plus: 1 -%}
+          {%- unless count == 1 -%},{%- endunless -%}
+          {"title":{{ product.title | json }},"url":{{ product.url | json }},"image":{{ product.featured_image | image_url: width: 800 | json }}}
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+  </script>
+</section>
+
+{% schema %}
+{
+  "name": "Hero",
+  "settings": [
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "UK Pokémon & TCG shop"},
+    {"type": "text", "id": "heading_line_1", "label": "Heading line 1", "default": "The hunt is"},
+    {"type": "text", "id": "heading_line_2", "label": "Heading line 2", "default": "half the "},
+    {"type": "text", "id": "heading_em", "label": "Highlight", "default": "foil"},
+    {"type": "text", "id": "heading_after", "label": "After highlight", "default": "."},
+    {"type": "textarea", "id": "text", "label": "Text", "default": "Singles and sealed, priced for collectors. Condition-checked under lamp — no mystery packs, no guesswork on stock."},
+    {"type": "text", "id": "primary_label", "label": "Primary CTA", "default": "Shop singles"},
+    {"type": "url", "id": "primary_link", "label": "Primary link"},
+    {"type": "text", "id": "secondary_label", "label": "Secondary CTA", "default": "Browse sealed"},
+    {"type": "url", "id": "secondary_link", "label": "Secondary link"},
+    {"type": "collection", "id": "source_collection", "label": "Singles collection for hero card"},
+    {"type": "range", "id": "min_price", "min": 1, "max": 50, "step": 1, "label": "Minimum price (GBP)", "default": 5},
+    {"type": "range", "id": "pool_size", "min": 10, "max": 50, "step": 5, "label": "Candidate pool", "default": 50}
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        {"type": "text", "id": "label", "label": "Label", "default": "Same-week dispatch"},
+        {"type": "text", "id": "text", "label": "Text", "default": "Orders before 2pm"}
+      ]
+    }
+  ],
+  "presets": [{"name": "Hero", "blocks": [{"type": "stat", "settings": {"label": "Free UK delivery", "text": "Over £40"}}, {"type": "stat", "settings": {"label": "Condition first", "text": "Checked under lamp"}}, {"type": "stat", "settings": {"label": "Real stock", "text": "Live inventory counts"}}]}]
+}
+{% endschema %}

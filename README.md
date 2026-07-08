@@ -1,21 +1,28 @@
-# Kori Collectibles theme
+# Kori Collectibles — custom Shopify theme
 
-This is your live **Dawn** theme export, lightly customized for Kori Collectibles.
+A from-scratch Online Store 2.0 theme for a UK TCG shop, taking structure cues from Chaos Cards, The Card Vault, and Magic Madhouse — without copying their look.
 
-## What’s changed vs stock Dawn
+## Storefront patterns included
 
-- Dark Kori color schemes
-- Softer button / card radii
-- New **Kori hero** homepage section: random in-stock single over £5 as a full-bleed tilt card
-- Keeps your Dawn header (mega menu), footer, product, cart, and mobile patterns
+- Sticky header with mega menu + mobile drawer + search modal
+- Announcement strip (shipping / restocks)
+- Homepage: hero with random in-stock single (£5+), shop-by-game tiles, featured products, promo cards, trust strip
+- Collection pages with filters, sort, mobile filter sheet
+- Product page with variant picker + add to cart
+- Cart with free-shipping progress threshold
+- Search, pages, collections list, 404
 
 ## Theme editor setup
 
-1. Connect this repo in Shopify if you haven’t already
-2. Homepage → **Kori hero** → set **Singles collection**
-3. Point CTA buttons at your singles / sealed collections
-4. Upload logo in Theme settings if needed (already referenced from your store files)
+1. Connect/publish this GitHub theme
+2. **Navigation** → ensure `main-menu` has Singles / Sealed / Games etc.
+3. Homepage **Hero** → set Singles collection
+4. **Featured collection** → pick New Arrivals / Singles
+5. **Game grid** + **Promo cards** → link each tile to the right collection
+6. Theme settings → upload logo, set social links
 
-## Notes
+## Product tips
 
-Shopify only exposes the first ~50 products of a collection to Liquid for the hero pool — use a Singles collection for best results.
+- Use product type or tags `single` / `singles` for singles (or assign a Singles collection on the hero)
+- Tag sealed as `sealed` / `etb` / product type containing booster
+- Tag `preorder` for the pre-order badge

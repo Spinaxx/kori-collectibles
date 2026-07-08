@@ -1,0 +1,52 @@
+<section class="section section--tight">
+  <div class="page-width">
+    <div class="section-head">
+      <div>
+        <h2>{{ section.settings.heading }}</h2>
+        {%- if section.settings.subheading != blank -%}
+          <p>{{ section.settings.subheading }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+    <div class="game-grid">
+      {%- for block in section.blocks -%}
+        <a class="game-tile" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
+          <span class="game-tile__label">{{ block.settings.title | escape }}</span>
+          <span class="game-tile__meta">{{ block.settings.meta | escape }}</span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Game grid",
+  "settings": [
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Shop by game"},
+    {"type": "textarea", "id": "subheading", "label": "Subheading", "default": "Jump straight into the catalogue collectors actually browse."}
+  ],
+  "blocks": [
+    {
+      "type": "game",
+      "name": "Game",
+      "settings": [
+        {"type": "text", "id": "title", "label": "Title", "default": "Pokémon"},
+        {"type": "text", "id": "meta", "label": "Meta", "default": "Singles · Sealed"},
+        {"type": "url", "id": "link", "label": "Link"}
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Game grid",
+    "blocks": [
+      {"type": "game", "settings": {"title": "Pokémon", "meta": "Singles · Sealed"}},
+      {"type": "game", "settings": {"title": "Yu-Gi-Oh!", "meta": "Singles · Sealed"}},
+      {"type": "game", "settings": {"title": "Magic", "meta": "Singles · Sealed"}},
+      {"type": "game", "settings": {"title": "One Piece", "meta": "Sealed"}},
+      {"type": "game", "settings": {"title": "Lorcana", "meta": "Sealed"}},
+      {"type": "game", "settings": {"title": "Accessories", "meta": "Sleeves · Binders"}}
+    ]
+  }]
+}
+{% endschema %}

@@ -1,90 +1,75 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- * ------------------------------------------------------------
- */
 {
   "sections": {
-    "kori_hero": {
-      "type": "kori-hero",
+    "hero": {
+      "type": "hero",
+      "blocks": {
+        "s1": {"type": "stat", "settings": {"label": "Free UK delivery", "text": "Over £40"}},
+        "s2": {"type": "stat", "settings": {"label": "Condition first", "text": "Checked under lamp"}},
+        "s3": {"type": "stat", "settings": {"label": "Real stock", "text": "Live inventory counts"}}
+      },
+      "block_order": ["s1", "s2", "s3"],
       "settings": {
-        "color_scheme": "scheme-1",
-        "eyebrow": "Independent Pokémon TCG shop",
+        "eyebrow": "UK Pokémon & TCG shop",
         "heading_line_1": "The hunt is",
         "heading_line_2": "half the ",
         "heading_em": "foil",
         "heading_after": ".",
-        "text": "Singles, sealed product, and grading — sourced and condition-checked by people who actually play.",
-        "primary_label": "Browse singles",
-        "secondary_label": "Shop sealed product",
+        "text": "Singles and sealed, priced for collectors. Condition-checked under lamp — no mystery packs, no guesswork on stock.",
+        "primary_label": "Shop singles",
+        "secondary_label": "Browse sealed",
         "min_price": 5,
-        "pool_size": 50,
-        "fallback_name": "Featured single"
+        "pool_size": 50
       }
     },
-    "collage_WEBV9J": {
-      "type": "collage",
+    "games": {
+      "type": "game-grid",
       "blocks": {
-        "image_rjLh6G": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/Mega_Evolutions_Banner_mobil_600x600_999df7a3-6fb0-422d-8f02-3751bec58937.webp"
-          }
-        },
-        "image_ePTzNp": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/497676800_703579128987233_5123409185585563602_n.jpg"
-          }
-        },
-        "image_73Ftwr": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/Destined_Rivals_FP_Banner_8e925582-ccd8-4fd6-96bc-c36386d87e15.webp"
-          }
-        }
+        "g1": {"type": "game", "settings": {"title": "Pokémon", "meta": "Singles · Sealed"}},
+        "g2": {"type": "game", "settings": {"title": "Yu-Gi-Oh!", "meta": "Singles · Sealed"}},
+        "g3": {"type": "game", "settings": {"title": "Magic", "meta": "Singles · Sealed"}},
+        "g4": {"type": "game", "settings": {"title": "One Piece", "meta": "Sealed"}},
+        "g5": {"type": "game", "settings": {"title": "Lorcana", "meta": "Sealed"}},
+        "g6": {"type": "game", "settings": {"title": "Accessories", "meta": "Sleeves · Binders"}}
       },
-      "block_order": ["image_rjLh6G", "image_ePTzNp", "image_73Ftwr"],
-      "name": "t:sections.collage.presets.name",
+      "block_order": ["g1", "g2", "g3", "g4", "g5", "g6"],
       "settings": {
-        "heading": "",
-        "heading_size": "h1",
-        "desktop_layout": "left",
-        "mobile_layout": "column",
-        "card_styles": "product-card-wrapper",
-        "color_scheme": "scheme-1",
-        "padding_top": 36,
-        "padding_bottom": 36
+        "heading": "Shop by game",
+        "subheading": "Jump straight into the catalogue collectors actually browse."
       }
     },
-    "featured_collection": {
+    "featured": {
       "type": "featured-collection",
       "settings": {
-        "collection": "all",
+        "heading": "New in the binder",
+        "subheading": "Fresh stock with live counts — what you see is what’s available.",
         "products_to_show": 8,
-        "title": "Featured products",
-        "heading_size": "h2",
-        "description": "",
-        "show_description": false,
-        "description_style": "body",
-        "columns_desktop": 4,
-        "enable_desktop_slider": false,
-        "full_width": false,
-        "show_view_all": true,
-        "view_all_style": "solid",
-        "color_scheme": "scheme-1",
-        "image_ratio": "portrait",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "columns_mobile": "2",
-        "swipe_on_mobile": false,
-        "padding_top": 44,
-        "padding_bottom": 36
+        "show_view_all": true
       }
+    },
+    "promos": {
+      "type": "promo-cards",
+      "blocks": {
+        "p1": {"type": "promo", "settings": {"title": "Singles", "text": "Condition-checked cards ready to ship.", "cta": "Browse singles"}},
+        "p2": {"type": "promo", "settings": {"title": "Sealed", "text": "ETBs, boxes, and collections.", "cta": "Browse sealed"}},
+        "p3": {"type": "promo", "settings": {"title": "Accessories", "text": "Sleeves, binders, and toploaders.", "cta": "Shop accessories"}}
+      },
+      "block_order": ["p1", "p2", "p3"],
+      "settings": {
+        "heading": "Shop the vault",
+        "subheading": "Sealed drops, graded cards, and everyday accessories."
+      }
+    },
+    "trust": {
+      "type": "trust",
+      "blocks": {
+        "t1": {"type": "item", "settings": {"number": "01", "heading": "Condition checked", "text": "Every single is inspected under lamp against our reference sheet."}},
+        "t2": {"type": "item", "settings": {"number": "02", "heading": "Live inventory", "text": "Stock counts update with the till — no ghost listings."}},
+        "t3": {"type": "item", "settings": {"number": "03", "heading": "Fast UK dispatch", "text": "Orders before cut-off leave the same week."}},
+        "t4": {"type": "item", "settings": {"number": "04", "heading": "Collector advice", "text": "Not sure on a set or grade path? Ask — we actually play."}}
+      },
+      "block_order": ["t1", "t2", "t3", "t4"],
+      "settings": {}
     }
   },
-  "order": ["kori_hero", "collage_WEBV9J", "featured_collection"]
+  "order": ["hero", "games", "featured", "promos", "trust"]
 }

@@ -1,0 +1,39 @@
+<div class="trust">
+  <div class="page-width">
+    <div class="trust__grid">
+      {%- for block in section.blocks -%}
+        <div class="trust__item" {{ block.shopify_attributes }}>
+          <span class="trust__num">{{ block.settings.number | escape }}</span>
+          <h3>{{ block.settings.heading | escape }}</h3>
+          <p>{{ block.settings.text | escape }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Trust strip",
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {"type": "text", "id": "number", "label": "Number", "default": "01"},
+        {"type": "text", "id": "heading", "label": "Heading", "default": "Condition checked"},
+        {"type": "textarea", "id": "text", "label": "Text", "default": "Every single is inspected under lamp against our reference sheet."}
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Trust strip",
+    "blocks": [
+      {"type": "item", "settings": {"number": "01", "heading": "Condition checked", "text": "Every single is inspected under lamp against our reference sheet."}},
+      {"type": "item", "settings": {"number": "02", "heading": "Live inventory", "text": "Stock counts update with the till — no ghost listings."}},
+      {"type": "item", "settings": {"number": "03", "heading": "Fast UK dispatch", "text": "Orders before cut-off leave the same week."}},
+      {"type": "item", "settings": {"number": "04", "heading": "Collector advice", "text": "Not sure on a set or grade path? Ask — we actually play."}}
+    ]
+  }]
+}
+{% endschema %}

@@ -1,0 +1,54 @@
+{%- liquid
+  assign featured = product.selected_or_first_available_variant
+  assign stock = featured.inventory_quantity
+  assign low = false
+  if stock != blank and stock > 0 and stock <= 5
+    assign low = true
+  endif
+  assign image_alt = product.featured_image.alt | default: product.title
+-%}
+
+<a class="card" href="{{ product.url }}">
+  <div class="card__media">
+    {%- unless product.available -%}
+      <span class="card__badge card__badge--sold">Sold out</span>
+    {%- elsif product.tags contains 'preorder' or product.tags contains 'Preorder' or product.tags contains 'pre-order' -%}
+      <span class="card__badge">Pre-order</span>
+    {%- endif -%}
+
+    {%- if product.featured_image -%}
+      {{
+        product.featured_image
+        | image_url: width: 700
+        | image_tag: loading: 'lazy', widths: '240, 360, 480, 700', sizes: '(max-width: 749px) 45vw, 23vw', alt: image_alt
+      }}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag }}
+    {%- endif -%}
+  </div>
+
+  <div class="card__body">
+    {%- if product.vendor != blank -%}
+      <div class="card__vendor">{{ product.vendor | escape }}</div>
+    {%- endif -%}
+    <div class="card__title">{{ product.title | escape }}</div>
+    <div class="card__footer">
+      <span class="card__price">
+        {%- if product.price_varies -%}
+          {{ 'products.from' | t }} {{ product.price_min | money }}
+        {%- else -%}
+          {{ product.price | money }}
+        {%- endif -%}
+      </span>
+      {%- if settings.show_stock_count -%}
+        {%- if stock != blank and stock > 0 -%}
+          <span class="card__stock{% if low %} is-low{% endif %}">
+            {%- if low -%}{{ 'products.low_stock' | t: count: stock }}{%- else -%}{{ 'products.in_stock' | t }}{%- endif -%}
+          </span>
+        {%- elsif product.available == false -%}
+          <span class="card__stock is-low">{{ 'products.sold_out' | t }}</span>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </div>
+</a>
