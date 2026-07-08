@@ -1,12 +1,16 @@
-// Cancel flow — paste into Shopify Flow → Run code
+// Cancel flow — mirror the award flow setup exactly.
 //
-// BEFORE Run code: add a Log output step that references Customer →
-// Metafield → loyalty_points so Flow registers the metafield.
+// NO Log output step. It cannot read customer metafields and will show 0.
 //
-// Select inputs (GraphQL):
+// Run code → Input (GraphQL):
 // query {
 //   order {
 //     subtotalPriceSet {
+//       shopMoney {
+//         amount
+//       }
+//     }
+//     totalPriceSet {
 //       shopMoney {
 //         amount
 //       }
@@ -19,6 +23,9 @@
 //   }
 // }
 //
+// In the Run code input mapper, connect loyaltyPoints → customer metafield
+// custom.loyalty_points (key: loyalty_points). Same mapping as the award flow.
+//
 // Define outputs (GraphQL):
 // "The output of Run Code"
 // type Output {
@@ -26,8 +33,18 @@
 //   newLoyaltyPoints: String!
 // }
 //
-// Step after Run code: Update customer metafield → custom.loyalty_points
-// Value: Add variable → Run code → newLoyaltyPoints (do not type by hand)
+// Next step: Update customer metafield → custom.loyalty_points
+// Value: Add variable → Run code → newLoyaltyPoints
+
+function earnedPoints(order) {
+  const subtotal = parseFloat(order?.subtotalPriceSet?.shopMoney?.amount) || 0;
+  if (subtotal > 0) {
+    return Math.round(subtotal);
+  }
+
+  const total = parseFloat(order?.totalPriceSet?.shopMoney?.amount) || 0;
+  return Math.round(total);
+}
 
 export default function main(input) {
   const order = input.order;
@@ -37,9 +54,9 @@ export default function main(input) {
     return { newLoyaltyPoints: '0' };
   }
 
-  const current = Number(customer.loyaltyPoints?.value ?? 0);
-  const subtotal = Number(order.subtotalPriceSet?.shopMoney?.amount ?? 0);
-  const earned = Math.round(subtotal);
+  const raw = customer.loyaltyPoints ? customer.loyaltyPoints.value : null;
+  const current = parseInt(raw, 10) || 0;
+  const earned = earnedPoints(order);
 
   if (earned <= 0) {
     return { newLoyaltyPoints: String(current) };

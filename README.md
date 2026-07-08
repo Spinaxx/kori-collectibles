@@ -95,27 +95,13 @@ Awards **1 point per £1** of subtotal (`Math.round(subtotal)`). Match the rate 
 
 ### 3. Deduct points (order cancelled)
 
-**Recommended — no Run code (avoids the `newLoyaltyPoints` variable error):**
+**Delete any Log output step** — Flow cannot read customer metafields with liquid dot notation, so Log output will show `0` even when the customer has 286 points.
+
+Mirror the award flow:
 
 1. **Trigger:** Order cancelled
 2. **Condition:** `order.customer.id` is not empty
-3. **Log output** (registers the customer metafield with Flow)
-   - Message: click **Add variable** → Customer → Metafield → `loyalty_points`
-4. **Update customer metafield**
-   - Customer: `order.customer.id`
-   - Metafield: namespace `custom`, key `loyalty_points`
-   - Value: paste from `shopify-flow/cancel-loyalty-metafield-value.liquid`
-
-That liquid does: `current balance - round(order subtotal)`, minimum 0.
-
----
-
-**Alternative — with Run code:**
-
-1. **Trigger:** Order cancelled
-2. **Condition:** `order.customer.id` is not empty
-3. **Log output** — add Customer → Metafield → `loyalty_points` (required before Run code can read it)
-4. **Run code** — paste `shopify-flow/deduct-loyalty-on-order-cancelled.js`
+3. **Run code** — paste `shopify-flow/deduct-loyalty-on-order-cancelled.js`
 
    **Select inputs** (GraphQL):
 
@@ -123,6 +109,11 @@ That liquid does: `current balance - round(order subtotal)`, minimum 0.
    query {
      order {
        subtotalPriceSet {
+         shopMoney {
+           amount
+         }
+       }
+       totalPriceSet {
          shopMoney {
            amount
          }
@@ -136,7 +127,7 @@ That liquid does: `current balance - round(order subtotal)`, minimum 0.
    }
    ```
 
-   Map `loyaltyPoints` → customer metafield **`loyalty_points`**.
+   **Critical:** below the query, map `loyaltyPoints` → customer metafield **`loyalty_points`** (namespace `custom`). This is the same mapping as your working award flow — without it, current balance reads as `0` and the workflow wipes points.
 
    **Define outputs** (GraphQL):
 
@@ -148,14 +139,14 @@ That liquid does: `current balance - round(order subtotal)`, minimum 0.
    }
    ```
 
-5. **Update customer metafield**
+4. **Update customer metafield**
    - Customer: `order.customer.id`
-   - Metafield: `custom.loyalty_points`
-   - Value: click **Add variable** → **Run code** → **newLoyaltyPoints**
+   - Metafield: namespace `custom`, key `loyalty_points`
+   - Value: **Add variable** → **Run code** → **newLoyaltyPoints**
 
-   Do **not** type `{{ runCode.newLoyaltyPoints }}` by hand. Use **Add variable** so Flow inserts the correct reference. If **Run code** does not appear in the list, save/fix step 4 (Run code) first — a GraphQL error there blocks the output variable.
+The code does: `new balance = current balance - round(order total)`, minimum 0. It falls back to `totalPriceSet` if subtotal is `0` on cancelled orders.
 
-Or import `shopify-flow/Deduct loyalty points on order cancelled.flow` directly in Flow.
+Or import `shopify-flow/Deduct loyalty points on order cancelled.flow` directly in Flow, then re-check the `loyaltyPoints` mapping in Run code inputs.
 
 ### 4. Theme settings
 
