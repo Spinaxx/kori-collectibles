@@ -111,7 +111,7 @@
         "g5": {
           "type": "game",
           "settings": {
-            "coming_soon": true,
+            "coming_soon": false,
             "coming_soon_text": "Coming soon",
             "title": "More TCGs",
             "show_title": false,
