@@ -217,105 +217,175 @@
       .replace(/"/g, '&quot;');
 
   const initPredictiveSearch = () => {
-    const form = qs('[data-predictive-search]');
-    const input = qs('[data-predictive-input]');
-    const results = qs('[data-predictive-results]');
-    if (!form || !input || !results) return;
+    const forms = qsa('[data-predictive-search]');
+    if (!forms.length) return;
 
-    const suggestUrl = form.getAttribute('data-suggest-url') || '/search/suggest.json';
-    const searchUrl = form.getAttribute('data-search-url') || '/search';
-    let timer = null;
-    let controller = null;
-    let lastQuery = '';
+    forms.forEach((form) => {
+      const input = qs('[data-predictive-input]', form);
+      const root = form.closest('.search-modal__box') || form.parentElement || document;
+      const results = qs('[data-predictive-results]', root);
+      if (!input || !results) return;
 
-    const renderEmpty = (message) => {
-      results.hidden = false;
-      results.innerHTML = `<p class="predictive__status">${escapeHtml(message)}</p>`;
-    };
+      const suggestUrl = form.getAttribute('data-suggest-url') || '/search/suggest';
+      const searchUrl = form.getAttribute('data-search-url') || '/search';
+      let timer = null;
+      let controller = null;
+      let lastQuery = '';
 
-    const renderProducts = (products, query) => {
+      const renderEmpty = (message) => {
+        results.hidden = false;
+        results.innerHTML = `<p class="predictive__status">${escapeHtml(message)}</p>`;
+      };
+
+      const renderProducts = (products, query) => {
+        if (!products.length) {
+          renderEmpty(`No matches for “${query}”`);
+          return;
+        }
+
+        const items = products
+          .map((product) => {
+            const image =
+              product.image ||
+              (product.featured_image && (product.featured_image.url || product.featured_image)) ||
+              '';
+            const price = formatMoney(product.price);
+            const vendor = product.vendor
+              ? `<div class="predictive__meta">${escapeHtml(product.vendor)}</div>`
+              : '';
+            const media = image
+              ? `<div class="predictive__media"><img src="${escapeHtml(image)}" alt="" width="48" height="48" loading="lazy"></div>`
+              : `<div class="predictive__media"></div>`;
+
+            return `
+              <a class="predictive__item" href="${escapeHtml(product.url)}" role="option">
+                ${media}
+                <div class="predictive__copy">
+                  <div class="predictive__title">${escapeHtml(product.title)}</div>
+                  ${vendor}
+                </div>
+                <div class="predictive__price">${escapeHtml(price)}</div>
+              </a>
+            `;
+          })
+          .join('');
+
+        results.hidden = false;
+        results.innerHTML = `
+          <div class="predictive__list" role="presentation">${items}</div>
+          <div class="predictive__footer">
+            <span>${products.length} suggestion${products.length === 1 ? '' : 's'}</span>
+            <a href="${escapeHtml(searchUrl)}?type=product&options[prefix]=last&options[unavailable_products]=last&q=${encodeURIComponent(query)}">View all results</a>
+          </div>
+        `;
+      };
+
+      const fetchSuggestions = async (query) => {
+        if (controller) controller.abort();
+        controller = new AbortController();
+
+        results.hidden = false;
+        results.innerHTML = `<p class="predictive__status">Searching…</p>`;
+
+        try {
+          const jsonUrl = `${suggestUrl}.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=8&resources[options][unavailable_products]=last`;
+          const res = await fetch(jsonUrl, {
+            headers: { Accept: 'application/json' },
+            signal: controller.signal,
+          });
+          if (!res.ok) throw new Error(`Suggest failed: ${res.status}`);
+          const data = await res.json();
+          const products =
+            (data.resources && data.resources.results && data.resources.results.products) || [];
+          if (query !== lastQuery) return;
+          renderProducts(products, query);
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+          renderEmpty('Could not load suggestions. Press Search to continue.');
+        }
+      };
+
+      const onInput = () => {
+        const query = input.value.trim();
+        lastQuery = query;
+        clearTimeout(timer);
+
+        if (query.length < 2) {
+          results.hidden = true;
+          results.innerHTML = '';
+          return;
+        }
+
+        timer = setTimeout(() => fetchSuggestions(query), 180);
+      };
+
+      input.addEventListener('input', onInput);
+      input.addEventListener('search', onInput);
+    });
+  };
+
+  const initSearchPageFallback = () => {
+    const grid = qs('[data-search-grid]');
+    if (!grid) return;
+
+    const query = (grid.getAttribute('data-query') || '').trim();
+    const resultCount = Number(grid.getAttribute('data-result-count') || 0);
+    if (!query || resultCount > 0) return;
+
+    const suggestUrl = grid.getAttribute('data-suggest-url') || '/search/suggest';
+    const summary = qs('[data-search-summary]');
+    const empty = qs('[data-search-empty]');
+
+    const renderFallbackCards = (products) => {
       if (!products.length) {
-        renderEmpty(`No matches for “${query}”`);
+        if (summary) summary.textContent = `No results for “${query}”`;
+        if (empty) empty.hidden = false;
         return;
       }
 
-      const items = products
+      if (summary) {
+        summary.textContent = `${products.length} result${products.length === 1 ? '' : 's'} for “${query}”`;
+      }
+      if (empty) empty.hidden = true;
+
+      grid.innerHTML = products
         .map((product) => {
           const image =
             product.image ||
             (product.featured_image && (product.featured_image.url || product.featured_image)) ||
             '';
-          const price = formatMoney(product.price);
-          const vendor = product.vendor ? `<div class="predictive__meta">${escapeHtml(product.vendor)}</div>` : '';
           const media = image
-            ? `<div class="predictive__media"><img src="${escapeHtml(image)}" alt="" width="48" height="48" loading="lazy"></div>`
-            : `<div class="predictive__media"></div>`;
-
+            ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(product.title)}" loading="lazy">`
+            : '';
           return `
-            <a class="predictive__item" href="${escapeHtml(product.url)}" role="option">
-              ${media}
-              <div class="predictive__copy">
-                <div class="predictive__title">${escapeHtml(product.title)}</div>
-                ${vendor}
+            <a class="card" href="${escapeHtml(product.url)}">
+              <div class="card__media">${media}</div>
+              <div class="card__body">
+                <div class="card__title">${escapeHtml(product.title)}</div>
+                <div class="card__footer">
+                  <span class="card__price">${escapeHtml(formatMoney(product.price))}</span>
+                </div>
               </div>
-              <div class="predictive__price">${escapeHtml(price)}</div>
             </a>
           `;
         })
         .join('');
-
-      results.hidden = false;
-      results.innerHTML = `
-        <div class="predictive__list" role="presentation">${items}</div>
-        <div class="predictive__footer">
-          <span>${products.length} suggestion${products.length === 1 ? '' : 's'}</span>
-          <a href="${escapeHtml(searchUrl)}?type=product&q=${encodeURIComponent(query)}">View all results</a>
-        </div>
-      `;
     };
 
-    const fetchSuggestions = async (query) => {
-      if (controller) controller.abort();
-      controller = new AbortController();
-
-      results.hidden = false;
-      results.innerHTML = `<p class="predictive__status">Searching…</p>`;
-
+    (async () => {
       try {
-        const jsonUrl = `${suggestUrl}.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=8&resources[options][unavailable_products]=last`;
-        const res = await fetch(jsonUrl, {
-          headers: { Accept: 'application/json' },
-          signal: controller.signal,
-        });
+        const jsonUrl = `${suggestUrl}.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=24&resources[options][unavailable_products]=last`;
+        const res = await fetch(jsonUrl, { headers: { Accept: 'application/json' } });
         if (!res.ok) throw new Error(`Suggest failed: ${res.status}`);
         const data = await res.json();
         const products =
-          (data.resources && data.resources.results && data.resources.results.products) ||
-          [];
-        if (query !== lastQuery) return;
-        renderProducts(products, query);
+          (data.resources && data.resources.results && data.resources.results.products) || [];
+        renderFallbackCards(products);
       } catch (err) {
-        if (err.name === 'AbortError') return;
-        renderEmpty('Could not load suggestions. Press Search to continue.');
+        if (summary) summary.textContent = `No results for “${query}”`;
+        if (empty) empty.hidden = false;
       }
-    };
-
-    const onInput = () => {
-      const query = input.value.trim();
-      lastQuery = query;
-      clearTimeout(timer);
-
-      if (query.length < 2) {
-        results.hidden = true;
-        results.innerHTML = '';
-        return;
-      }
-
-      timer = setTimeout(() => fetchSuggestions(query), 180);
-    };
-
-    input.addEventListener('input', onInput);
-    input.addEventListener('search', onInput);
+    })();
   };
 
   const boot = () => {
@@ -323,6 +393,7 @@
     initNavDropdowns();
     initHeroTilt();
     initPredictiveSearch();
+    initSearchPageFallback();
   };
 
   if (document.readyState === 'loading') {

@@ -675,6 +675,14 @@ ul {
   font-size: 0.78rem;
 }
 
+.predictive--page {
+  margin-bottom: 1.25rem;
+  border-top: 0;
+  padding-top: 0;
+  max-height: none;
+  overflow: visible;
+}
+
 /* Sections common */
 
 .section {

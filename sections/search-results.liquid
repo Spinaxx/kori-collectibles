@@ -1,25 +1,69 @@
-<section class="page-width section">
+<section class="page-width section" data-search-page>
   <div class="section-head">
     <div>
       <h1>Search</h1>
       {%- if search.performed -%}
-        {%- if search.results_count == 0 -%}
-          <p>No results for "{{ search.terms | escape }}"</p>
-        {%- else -%}
-          <p>{{ search.results_count }} results for "{{ search.terms | escape }}"</p>
-        {%- endif -%}
+        <p data-search-summary>
+          {%- if search.results_count == 0 -%}
+            Looking up “{{ search.terms | escape }}”…
+          {%- else -%}
+            {{ search.results_count }} results for “{{ search.terms | escape }}”
+          {%- endif -%}
+        </p>
+      {%- else -%}
+        <p>Search singles, sealed, and accessories.</p>
       {%- endif -%}
     </div>
   </div>
 
-  <form action="{{ routes.search_url }}" method="get" role="search" class="search-modal__form" style="margin-bottom:2rem;">
+  <form
+    action="{{ routes.search_url }}"
+    method="get"
+    role="search"
+    class="search-modal__form"
+    style="margin-bottom:1rem;"
+    data-predictive-search
+    data-search-url="{{ routes.search_url }}"
+    data-suggest-url="{{ routes.predictive_search_url }}"
+  >
     <input type="hidden" name="type" value="product">
-    <input class="search-modal__input" type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search cards, sets, sealed...">
+    <input type="hidden" name="options[prefix]" value="last">
+    <input type="hidden" name="options[unavailable_products]" value="last">
+    <input
+      class="search-modal__input"
+      type="search"
+      name="q"
+      value="{{ search.terms | escape }}"
+      placeholder="Search cards, sets, sealed..."
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+      data-predictive-input
+      aria-controls="SearchPagePredictive"
+      aria-autocomplete="list"
+    >
     <button type="submit" class="button">Search</button>
   </form>
 
-  {%- if search.performed -%}
-    <div class="product-grid">
+  <div
+    class="predictive predictive--page"
+    id="SearchPagePredictive"
+    data-predictive-results
+    hidden
+    role="listbox"
+    aria-label="Search suggestions"
+  ></div>
+
+  <div
+    class="product-grid"
+    data-search-grid
+    data-query="{{ search.terms | escape }}"
+    data-result-count="{{ search.results_count | default: 0 }}"
+    data-suggest-url="{{ routes.predictive_search_url }}"
+    data-search-url="{{ routes.search_url }}"
+  >
+    {%- if search.performed -%}
       {%- paginate search.results by 24 -%}
         {%- for item in search.results -%}
           {%- if item.object_type == 'product' -%}
@@ -27,7 +71,7 @@
               assign product = item
               assign image_alt = product.featured_image.alt | default: product.title
             -%}
-            <a class="card" href="{{ product.url }}">
+            <a class="card" href="{{ product.url }}" data-product-handle="{{ product.handle }}">
               <div class="card__media">
                 {%- if product.available == false -%}
                   <span class="card__badge card__badge--sold">Sold out</span>
@@ -62,13 +106,17 @@
         {%- endfor -%}
 
         {%- if paginate.pages > 1 -%}
-          <div class="pagination" style="grid-column:1/-1">
+          <div class="pagination" style="grid-column:1/-1" data-search-pagination>
             {{ paginate | default_pagination }}
           </div>
         {%- endif -%}
       {%- endpaginate -%}
-    </div>
-  {%- endif -%}
+    {%- endif -%}
+  </div>
+
+  <div class="empty-state" data-search-empty hidden style="margin-top:1.5rem;">
+    No products matched that search.
+  </div>
 </section>
 
 {% schema %}
