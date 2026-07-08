@@ -72,10 +72,7 @@
       {%- assign main_menu = linklists['main-menu'] -%}
     {%- endif -%}
 
-    {%- capture loyalty_balance -%}
-      {%- render 'loyalty-balance' -%}
-    {%- endcapture -%}
-    {%- assign loyalty_balance = loyalty_balance | strip | plus: 0 -%}
+    {%- include 'loyalty-balance' -%}
 
     {%- liquid
       assign rewards_url = pages.rewards.url | default: '/pages/rewards'
@@ -246,7 +243,7 @@
               <li class="drawer-nav__loyalty">
                 {%- if customer -%}
                   <button type="button" data-open-loyalty-panel>
-                    Rewards · <span data-loyalty-balance>{{ loyalty_balance }}</span> pts
+                    Rewards · <span data-loyalty-balance>{{ loyalty_balance | default: 0 }}</span> pts
                   </button>
                 {%- else -%}
                   <button type="button" data-open-loyalty-panel>Sign in for rewards</button>
@@ -347,7 +344,7 @@
                 <p class="cart-drawer__loyalty-line">
                   You'll earn <strong data-cart-loyalty-earn>{{ earn_preview }}</strong> points on this order.
                   {%- if loyalty_balance > 0 -%}
-                    Balance: <strong data-loyalty-balance>{{ loyalty_balance }}</strong> pts.
+                    Balance: <strong data-loyalty-balance>{{ loyalty_balance | default: 0 }}</strong> pts.
                   {%- endif -%}
                 </p>
                 <a class="cart-drawer__loyalty-link" href="{{ rewards_url }}">View rewards</a>
@@ -481,10 +478,10 @@
       </div>
     </footer>
 
-    {%- render 'account-drawer' -%}
+    {%- render 'account-drawer', loyalty_balance: loyalty_balance -%}
 
     {%- if settings.loyalty_enable -%}
-      {%- render 'loyalty-panel' -%}
+      {%- render 'loyalty-panel', loyalty_balance: loyalty_balance -%}
     {%- endif -%}
 
     <script src="{{ 'theme.js' | asset_url }}" defer></script>

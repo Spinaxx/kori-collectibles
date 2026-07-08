@@ -1,9 +1,6 @@
-{%- capture loyalty_balance -%}
-  {%- render 'loyalty-balance' -%}
-{%- endcapture -%}
-{%- assign loyalty_balance = loyalty_balance | strip | plus: 0 -%}
-
 {%- liquid
+  assign balance = loyalty_balance | default: 0 | plus: 0
+
   unless settings.loyalty_enable
     break
   endif
@@ -14,7 +11,6 @@
   assign program_name = settings.loyalty_program_name | default: 'Kori Collectors Club'
   assign redeem_email = settings.loyalty_redeem_email | default: shop.email
   assign points_needed = redeem_points
-  assign balance = loyalty_balance
 
   if customer and balance < redeem_points
     assign points_needed = redeem_points | minus: balance
@@ -74,7 +70,7 @@
     <div class="loyalty-panel__body">
       {%- if customer -%}
         <div class="loyalty-panel__balance">
-          <span class="loyalty-panel__balance-value" data-loyalty-balance>{{ balance }}</span>
+          <span class="loyalty-panel__balance-value" data-loyalty-balance>{{ balance | default: 0 }}</span>
           <span class="loyalty-panel__balance-label">points</span>
         </div>
         {%- if can_redeem -%}

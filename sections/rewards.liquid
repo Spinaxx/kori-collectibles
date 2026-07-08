@@ -1,14 +1,9 @@
-{%- capture loyalty_balance -%}
-  {%- render 'loyalty-balance' -%}
-{%- endcapture -%}
-{%- assign loyalty_balance = loyalty_balance | strip | plus: 0 -%}
-
 {%- liquid
   assign points_rate = section.settings.points_per_gbp | default: settings.loyalty_points_per_gbp | default: 1
   assign redeem_points = section.settings.redeem_points | default: settings.loyalty_redeem_points | default: 100
   assign redeem_value = section.settings.redeem_value_gbp | default: settings.loyalty_redeem_value_gbp | default: 5
 
-  assign balance = loyalty_balance
+  assign balance = loyalty_balance | default: 0 | plus: 0
   assign redeem_blocks = balance | divided_by: redeem_points | floor
   assign redeemable_gbp = redeem_blocks | times: redeem_value
 -%}
@@ -28,7 +23,7 @@
         <div class="rewards__balance-main">
           <span class="rewards__balance-label">Your balance</span>
           <p class="rewards__balance-value">
-            <span data-loyalty-balance>{{ balance }}</span>
+            <span data-loyalty-balance>{{ balance | default: 0 }}</span>
             <span class="rewards__balance-unit">points</span>
           </p>
           {%- if redeemable_gbp > 0 -%}

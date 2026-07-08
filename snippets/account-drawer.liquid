@@ -4,10 +4,7 @@
   data-account-drawer
   hidden
 >
-  {%- capture loyalty_balance -%}
-    {%- render 'loyalty-balance' -%}
-  {%- endcapture -%}
-  {%- assign loyalty_balance = loyalty_balance | strip | plus: 0 -%}
+  {%- assign loyalty_balance = loyalty_balance | default: 0 | plus: 0 -%}
   <div class="account-drawer__backdrop" data-close-account></div>
   <div class="account-drawer__panel" role="dialog" aria-modal="true" aria-label="Account">
     <div class="account-drawer__top">
@@ -31,7 +28,7 @@
         {%- if settings.loyalty_enable -%}
           <button type="button" class="account-drawer__rewards" data-open-loyalty-panel>
             <span class="account-drawer__rewards-label">Rewards balance</span>
-            <span class="account-drawer__rewards-value"><span data-loyalty-balance>{{ loyalty_balance }}</span> pts</span>
+            <span class="account-drawer__rewards-value"><span data-loyalty-balance>{{ loyalty_balance | default: 0 }}</span> pts</span>
           </button>
         {%- endif -%}
 
