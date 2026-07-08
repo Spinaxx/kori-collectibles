@@ -52,12 +52,7 @@
             assign tile_href = block.settings.link
           endif
         -%}
-        <a
-          class="game-tile{% if coming_soon %} game-tile--coming-soon{% endif %}"
-          href="{{ tile_href }}"
-          {% if coming_soon %}aria-label="{{ block.settings.title | escape }} — {{ banner_text | escape }}"{% endif %}
-          {{ block.shopify_attributes }}
-        >
+        {%- capture tile_inner -%}
           {%- if coming_soon -%}
             <span class="game-tile__banner" aria-hidden="true">
               <span class="game-tile__banner-text">{{ banner_text | escape }}</span>
@@ -91,7 +86,26 @@
             <span class="game-tile__meta">{{ block.settings.meta | escape }}</span>
           {%- endif -%}
           <span class="visually-hidden">{{ block.settings.title | escape }}</span>
-        </a>
+        {%- endcapture -%}
+
+        {%- if coming_soon -%}
+          <div
+            class="game-tile game-tile--coming-soon"
+            aria-disabled="true"
+            aria-label="{{ block.settings.title | escape }} — {{ banner_text | escape }}"
+            {{ block.shopify_attributes }}
+          >
+            {{ tile_inner }}
+          </div>
+        {%- else -%}
+          <a
+            class="game-tile"
+            href="{{ tile_href }}"
+            {{ block.shopify_attributes }}
+          >
+            {{ tile_inner }}
+          </a>
+        {%- endif -%}
       {%- endfor -%}
     </div>
   </div>
@@ -162,7 +176,8 @@
         {
           "type": "url",
           "id": "link",
-          "label": "Link"
+          "label": "Link",
+          "info": "Ignored while Coming soon is enabled."
         },
         {
           "type": "image_picker",
