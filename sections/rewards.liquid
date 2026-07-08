@@ -1,0 +1,227 @@
+{%- liquid
+  assign points_key = section.settings.points_metafield | default: 'custom.loyalty_points'
+  assign points_parts = points_key | split: '.'
+  assign points_ns = points_parts[0]
+  assign points_id = points_parts[1]
+  assign points_rate = section.settings.points_per_gbp | default: 1
+  assign redeem_points = section.settings.redeem_points | default: 100
+  assign redeem_value = section.settings.redeem_value_gbp | default: 5
+
+  assign balance = 0
+  if customer and points_ns != blank and points_id != blank
+    assign balance = customer.metafields[points_ns][points_id].value | default: 0 | plus: 0
+  endif
+
+  assign redeem_blocks = balance | divided_by: redeem_points | floor
+  assign redeemable_gbp = redeem_blocks | times: redeem_value
+-%}
+
+<section class="section rewards">
+  <div class="page-width">
+    <div class="rewards__hero">
+      <p class="rewards__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      <h1 class="rewards__title">{{ section.settings.heading | default: page.title | escape }}</h1>
+      {%- if section.settings.intro != blank -%}
+        <p class="rewards__intro">{{ section.settings.intro | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if customer -%}
+      <div class="rewards__balance-card">
+        <div class="rewards__balance-main">
+          <span class="rewards__balance-label">Your balance</span>
+          <p class="rewards__balance-value">
+            <span data-loyalty-balance>{{ balance }}</span>
+            <span class="rewards__balance-unit">points</span>
+          </p>
+          {%- if redeemable_gbp > 0 -%}
+            <p class="rewards__balance-redeem">
+              Worth up to {{ redeemable_gbp | times: 100 | money }} off your next order
+            </p>
+          {%- else -%}
+            <p class="rewards__balance-redeem">
+              {{ redeem_points | minus: balance }} more points until your first £{{ redeem_value }} reward
+            </p>
+          {%- endif -%}
+        </div>
+        <div class="rewards__balance-actions">
+          <a class="button" href="{{ routes.all_products_collection_url }}">Shop to earn</a>
+          <a class="button button--secondary" href="{{ routes.account_url }}">Account</a>
+        </div>
+      </div>
+    {%- else -%}
+      <div class="rewards__balance-card rewards__balance-card--guest">
+        <div class="rewards__balance-main">
+          <span class="rewards__balance-label">Shop account required</span>
+          <p class="rewards__balance-value rewards__balance-value--guest">Earn on every order</p>
+          <p class="rewards__balance-redeem">
+            Sign in or create a free account to collect points automatically after each purchase.
+          </p>
+        </div>
+        <div class="rewards__balance-actions">
+          <a class="button" href="{{ routes.account_login_url }}">Sign in</a>
+          <a class="button button--secondary" href="{{ routes.account_register_url }}">Create account</a>
+        </div>
+      </div>
+    {%- endif -%}
+
+    <div class="rewards__grid">
+      <div class="rewards__panel">
+        <h2>How you earn</h2>
+        <ul class="rewards__list" role="list">
+          <li>
+            <span class="rewards__list-num">01</span>
+            <div>
+              <strong>{{ points_rate }} point{% if points_rate != 1 %}s{% endif %} per £1 spent</strong>
+              <p>Points are added to your account after your order is paid.</p>
+            </div>
+          </li>
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'earn_rule' -%}
+              <li {{ block.shopify_attributes }}>
+                <span class="rewards__list-num">{{ block.settings.number | escape }}</span>
+                <div>
+                  <strong>{{ block.settings.heading | escape }}</strong>
+                  <p>{{ block.settings.text | escape }}</p>
+                </div>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      <div class="rewards__panel">
+        <h2>How you redeem</h2>
+        <ul class="rewards__list" role="list">
+          <li>
+            <span class="rewards__list-num">01</span>
+            <div>
+              <strong>{{ redeem_points }} points = £{{ redeem_value }} off</strong>
+              <p>Redeem your balance for money off future orders. Contact us or use your reward code at checkout.</p>
+            </div>
+          </li>
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'redeem_rule' -%}
+              <li {{ block.shopify_attributes }}>
+                <span class="rewards__list-num">{{ block.settings.number | escape }}</span>
+                <div>
+                  <strong>{{ block.settings.heading | escape }}</strong>
+                  <p>{{ block.settings.text | escape }}</p>
+                </div>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+
+    {%- if section.settings.fine_print != blank -%}
+      <div class="rewards__fine-print">{{ section.settings.fine_print }}</div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Rewards",
+  "tag": "section",
+  "class": "section-rewards",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Kori Collectors Club"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Rewards points"
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Introduction",
+      "default": "Collect points every time you shop. The more you hunt, the more you save."
+    },
+    {
+      "type": "text",
+      "id": "points_metafield",
+      "label": "Customer points metafield",
+      "default": "custom.loyalty_points",
+      "info": "Must match the customer metafield used by Shopify Flow or your loyalty app."
+    },
+    {
+      "type": "range",
+      "id": "points_per_gbp",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "label": "Points earned per £1 spent",
+      "default": 1
+    },
+    {
+      "type": "number",
+      "id": "redeem_points",
+      "label": "Points needed per reward",
+      "default": 100
+    },
+    {
+      "type": "number",
+      "id": "redeem_value_gbp",
+      "label": "Reward value (GBP)",
+      "default": 5
+    },
+    {
+      "type": "richtext",
+      "id": "fine_print",
+      "label": "Fine print",
+      "default": "<p>Points have no cash value. Rewards apply to eligible products only and cannot be combined with some promotions.</p>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "earn_rule",
+      "name": "Earn rule",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "02" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Use your shop account" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Checkout while signed in so points land on the right account." }
+      ]
+    },
+    {
+      "type": "redeem_rule",
+      "name": "Redeem rule",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "02" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "At checkout" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Apply your discount code or contact us to redeem points on larger orders." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Rewards",
+      "blocks": [
+        {
+          "type": "earn_rule",
+          "settings": {
+            "number": "02",
+            "heading": "Use your shop account",
+            "text": "Checkout while signed in so points land on the right account."
+          }
+        },
+        {
+          "type": "redeem_rule",
+          "settings": {
+            "number": "02",
+            "heading": "At checkout",
+            "text": "Apply your discount code or contact us to redeem points on larger orders."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

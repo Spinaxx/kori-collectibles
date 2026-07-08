@@ -419,8 +419,224 @@ ul {
 }
 
 .icon-btn svg {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 20px;
+  height: 20px;
+}
+
+.header__loyalty {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.header__loyalty:hover {
+  border-color: rgba(45, 212, 191, 0.45);
+  background: var(--surface-2);
+}
+
+.header__loyalty-value {
+  color: var(--accent-2);
+  font-weight: 600;
+}
+
+.header__loyalty-label {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.62rem;
+}
+
+.drawer-nav__loyalty a {
+  color: var(--accent-2);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.cart-drawer__loyalty {
+  margin-bottom: 0.85rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--surface-2);
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.cart-drawer__loyalty strong {
+  color: var(--accent-2);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.cart-drawer__loyalty--guest a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Rewards page */
+
+.rewards {
+  padding: 2rem 0 3.5rem;
+}
+
+.rewards__hero {
+  max-width: 40rem;
+  margin-bottom: 1.75rem;
+}
+
+.rewards__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.55rem;
+}
+
+.rewards__title {
+  font-size: clamp(1.9rem, 3.5vw, 2.6rem);
+  margin-bottom: 0.75rem;
+}
+
+.rewards__intro {
+  color: var(--muted);
+  max-width: 36rem;
+}
+
+.rewards__balance-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.35rem 1.25rem;
+  margin-bottom: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(145deg, rgba(45, 212, 191, 0.1), transparent 55%),
+    var(--surface);
+}
+
+.rewards__balance-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.rewards__balance-value {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.45rem;
+}
+
+.rewards__balance-value--guest {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+}
+
+.rewards__balance-unit {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 500;
+  margin-left: 0.35rem;
+}
+
+.rewards__balance-redeem {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.rewards__balance-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.rewards__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.rewards__panel {
+  padding: 1.15rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.rewards__panel h2 {
+  font-size: 1.05rem;
+  margin-bottom: 0.85rem;
+}
+
+.rewards__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.rewards__list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.rewards__list-num {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent-2);
+  letter-spacing: 0.05em;
+  padding-top: 0.15rem;
+}
+
+.rewards__list strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.rewards__list p {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.rewards__fine-print {
+  margin-top: 1.25rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  max-width: 48rem;
+}
+
+@media (max-width: 749px) {
+  .rewards__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rewards__balance-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header__loyalty-label {
+    display: none;
+  }
 }
 
 .cart-count {

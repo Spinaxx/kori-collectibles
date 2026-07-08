@@ -217,6 +217,15 @@
       }
     };
 
+    const renderLoyalty = (totalPrice) => {
+      const loyalty = qs('[data-cart-loyalty]', drawer);
+      if (!loyalty) return;
+      const rate = Number(loyalty.dataset.pointsRate || 1);
+      const earn = Math.floor((totalPrice * rate) / 100);
+      const earnEl = qs('[data-cart-loyalty-earn]', loyalty);
+      if (earnEl) earnEl.textContent = String(earn);
+    };
+
     const itemImage = (item) => {
       const src =
         item.featured_image && item.featured_image.url
@@ -232,6 +241,7 @@
       const subtotal = qs('[data-cart-subtotal]', drawer);
       if (subtotal) subtotal.textContent = formatMoney(cart.total_price, moneyFormat);
       renderShipping(cart.total_price || 0);
+      renderLoyalty(cart.total_price || 0);
 
       if (!cart.item_count) {
         contents.innerHTML = `

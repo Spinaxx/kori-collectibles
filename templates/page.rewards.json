@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "rewards": {
+      "type": "rewards",
+      "settings": {}
+    }
+  },
+  "order": ["rewards"]
+}
