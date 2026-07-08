@@ -1,3 +1,5 @@
+{%- include 'loyalty-auth-urls' -%}
+
 {%- liquid
   assign balance = 0
 
@@ -66,8 +68,8 @@
           </p>
         </div>
         <div class="rewards__balance-actions">
-          <a class="button" href="{{ routes.account_login_url }}">Sign in</a>
-          <a class="button button--secondary" href="{{ routes.account_register_url }}">Create account</a>
+          <a class="button" href="{{ loyalty_sign_in_url }}">Sign in</a>
+          <a class="button button--secondary" href="{{ loyalty_register_url }}">Create account</a>
         </div>
       </div>
     {%- endif -%}

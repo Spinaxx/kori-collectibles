@@ -1,5 +1,7 @@
 {%- liquid
   assign balance = loyalty_balance | default: 0 | plus: 0
+  assign loyalty_sign_in_url = loyalty_sign_in_url | default: routes.account_login_url
+  assign loyalty_register_url = loyalty_register_url | default: routes.account_register_url
 
   unless settings.loyalty_enable
     break
@@ -114,8 +116,8 @@
           <p class="loyalty-panel__guest-title">Join free &amp; earn on every order</p>
           <p class="loyalty-panel__guest-text">Create a shop account or sign in to collect points automatically when you buy.</p>
           <div class="loyalty-panel__guest-actions">
-            <a class="button button--full" href="{{ routes.account_register_url }}">Create account</a>
-            <a class="button button--secondary button--full" href="{{ routes.account_login_url }}">Sign in</a>
+            <a class="button button--full" href="{{ loyalty_register_url }}">Create account</a>
+            <a class="button button--secondary button--full" href="{{ loyalty_sign_in_url }}">Sign in</a>
           </div>
         </div>
 

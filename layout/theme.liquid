@@ -83,6 +83,7 @@
         assign rewards_url = settings.loyalty_page.url
       endif
     -%}
+    {%- include 'loyalty-auth-urls' -%}
 
     {% sections 'header-group' %}
 
@@ -354,7 +355,7 @@
               </div>
             {%- else -%}
               <div class="cart-drawer__loyalty cart-drawer__loyalty--guest">
-                <a class="cart-drawer__loyalty-link" href="{{ routes.account_login_url }}">Sign in</a> to earn rewards on this order.
+                <a class="cart-drawer__loyalty-link" href="{{ loyalty_sign_in_url }}">Sign in</a> to earn rewards on this order.
               </div>
             {%- endif -%}
           {%- endif -%}
@@ -481,10 +482,19 @@
       </div>
     </footer>
 
-    {%- render 'account-drawer', loyalty_balance: loyalty_balance, rewards_url: rewards_url -%}
+    {%- render 'account-drawer',
+      loyalty_balance: loyalty_balance,
+      rewards_url: rewards_url,
+      loyalty_sign_in_url: loyalty_sign_in_url,
+      loyalty_register_url: loyalty_register_url
+    -%}
 
     {%- if settings.loyalty_enable -%}
-      {%- render 'loyalty-panel', loyalty_balance: loyalty_balance -%}
+      {%- render 'loyalty-panel',
+        loyalty_balance: loyalty_balance,
+        loyalty_sign_in_url: loyalty_sign_in_url,
+        loyalty_register_url: loyalty_register_url
+      -%}
     {%- endif -%}
 
     <script src="{{ 'theme.js' | asset_url }}" defer></script>

@@ -1,0 +1,13 @@
+{%- liquid
+  assign _rewards_url = rewards_url | default: pages.rewards.url | default: '/pages/rewards'
+  if settings.loyalty_page != blank and settings.loyalty_page.url != blank
+    assign _rewards_url = settings.loyalty_page.url
+  endif
+  if _rewards_url == blank
+    assign _rewards_url = '/pages/rewards'
+  endif
+
+  assign _rewards_return = _rewards_url | url_encode
+  assign loyalty_sign_in_url = '/customer_authentication/login?return_to=' | append: _rewards_return
+  assign loyalty_register_url = '/customer_authentication/register?return_to=' | append: _rewards_return
+-%}

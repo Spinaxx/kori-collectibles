@@ -9,6 +9,8 @@
   {%- if rewards_url == blank -%}
     {%- assign rewards_url = '/pages/rewards' -%}
   {%- endif -%}
+  {%- assign loyalty_sign_in_url = loyalty_sign_in_url | default: routes.account_login_url -%}
+  {%- assign loyalty_register_url = loyalty_register_url | default: routes.account_register_url -%}
   <div class="account-drawer__backdrop" data-close-account></div>
   <div class="account-drawer__panel" role="dialog" aria-modal="true" aria-label="Account">
     <div class="account-drawer__top">
@@ -82,8 +84,8 @@
           <p class="account-drawer__guest-title">Sign in to your account</p>
           <p class="account-drawer__guest-text">View order history, track deliveries, and earn rewards when you shop.</p>
           <div class="account-drawer__guest-actions">
-            <a class="button button--full" href="{{ routes.account_login_url }}">Sign in</a>
-            <a class="button button--secondary button--full" href="{{ routes.account_register_url }}">Create account</a>
+            <a class="button button--full" href="{{ loyalty_sign_in_url }}">Sign in</a>
+            <a class="button button--secondary button--full" href="{{ loyalty_register_url }}">Create account</a>
           </div>
           {%- if settings.loyalty_enable -%}
             <a class="account-drawer__rewards account-drawer__rewards--guest" href="{{ rewards_url }}">
