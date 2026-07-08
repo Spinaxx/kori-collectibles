@@ -16,51 +16,12 @@
     "currency_note": "Prices in GBP",
     "cart_free_shipping_threshold": "40",
     "empty_cart_message": "Your cart is empty - the binder awaits.",
-    "sections": {
-      "header": {
-        "type": "header",
-        "blocks": {
-          "announcement_1": {
-            "type": "announcement",
-            "settings": {
-              "text": "Free UK delivery over ",
-              "highlight": "GBP 40",
-              "text_after": ""
-            }
-          },
-          "announcement_2": {
-            "type": "announcement",
-            "settings": {
-              "text": "Singles condition-checked under lamp",
-              "highlight": "",
-              "text_after": ""
-            }
-          },
-          "announcement_3": {
-            "type": "announcement",
-            "settings": {
-              "text": "New sealed drops weekly",
-              "highlight": "",
-              "text_after": ""
-            }
-          }
-        },
-        "block_order": ["announcement_1", "announcement_2", "announcement_3"],
-        "settings": {
-          "show_announcement": true,
-          "logo_text": "Kori Collectibles",
-          "menu": "main-menu"
-        }
-      },
-      "footer": {
-        "type": "footer",
-        "settings": {
-          "brand_name": "Kori Collectibles",
-          "about": "Independent TCG shop for singles, sealed product, and collectors who care about condition.",
-          "disclaimer": "Not affiliated with or endorsed by any card publisher."
-        }
-      }
-    },
+    "show_announcement": true,
+    "logo_text": "Kori Collectibles",
+    "menu": "main-menu",
+    "footer_brand_name": "Kori Collectibles",
+    "footer_about": "Independent TCG shop for singles, sealed product, and collectors who care about condition.",
+    "footer_disclaimer": "Not affiliated with or endorsed by any card publisher.",
     "content_for_index": []
   }
 }

@@ -27,7 +27,6 @@
       <meta name="description" content="{{ page_description | escape }}">
     {% endif %}
 
-    {%- comment -%} Open Graph / Twitter (inlined to avoid missing-snippet sync issues) {%- endcomment -%}
     <meta property="og:site_name" content="{{ shop.name }}">
     <meta property="og:url" content="{{ canonical_url }}">
     <meta property="og:title" content="{{ page_title | escape }}">
@@ -68,13 +67,243 @@
   <body>
     <a class="skip-link" href="#MainContent">Skip to content</a>
 
-    {% section 'header' %}
+    {%- assign main_menu = linklists[settings.menu] -%}
+    {%- if main_menu == blank -%}
+      {%- assign main_menu = linklists['main-menu'] -%}
+    {%- endif -%}
+
+    {%- if settings.show_announcement -%}
+      <div class="announcement">
+        <div class="page-width announcement__inner">
+          <span>Free UK delivery over <b>GBP 40</b></span>
+          <span>Singles condition-checked under lamp</span>
+          <span>New sealed drops weekly</span>
+        </div>
+      </div>
+    {%- endif -%}
+
+    <header class="header" data-header>
+      <div class="page-width header__bar">
+        <button
+          type="button"
+          class="icon-btn menu-toggle"
+          data-open-menu
+          aria-expanded="false"
+          aria-controls="MenuDrawer"
+          aria-label="Open menu"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.5 5.5h13M3.5 10h13M3.5 14.5h13"/>
+          </svg>
+        </button>
+
+        <a class="header__logo" href="{{ routes.root_url }}">
+          {%- if settings.logo != blank -%}
+            <img
+              src="{{ settings.logo | image_url: width: 280 }}"
+              srcset="{{ settings.logo | image_url: width: 140 }} 140w, {{ settings.logo | image_url: width: 280 }} 280w, {{ settings.logo | image_url: width: 400 }} 400w"
+              sizes="(max-width: 749px) 140px, 180px"
+              alt="{{ shop.name | escape }}"
+              width="{{ settings.logo.width }}"
+              height="{{ settings.logo.height }}"
+              loading="eager"
+            >
+          {%- else -%}
+            <span class="logo-mark" aria-hidden="true"></span>
+            <span>{{ settings.logo_text | default: shop.name }}</span>
+          {%- endif -%}
+        </a>
+
+        <nav class="header__nav" aria-label="Primary">
+          <ul class="nav-list" role="list">
+            {%- if main_menu != blank and main_menu.links.size > 0 -%}
+              {%- for link in main_menu.links -%}
+                <li>
+                  {%- if link.links != blank -%}
+                    <details class="nav-item">
+                      <summary class="nav-link">
+                        <span>{{ link.title | escape }}</span>
+                        <svg class="nav-caret" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                      </summary>
+                      <div class="mega">
+                        <div class="mega__grid">
+                          {%- for child in link.links -%}
+                            <div>
+                              <a class="mega__title" href="{{ child.url }}">{{ child.title | escape }}</a>
+                              {%- if child.links != blank -%}
+                                {%- for grand in child.links -%}
+                                  <a class="mega__link" href="{{ grand.url }}">{{ grand.title | escape }}</a>
+                                {%- endfor -%}
+                              {%- endif -%}
+                            </div>
+                          {%- endfor -%}
+                        </div>
+                      </div>
+                    </details>
+                  {%- else -%}
+                    <a
+                      class="nav-link{% if link.current %} is-active{% endif %}"
+                      href="{{ link.url }}"
+                      {% if link.current %}aria-current="page"{% endif %}
+                    >
+                      {{ link.title | escape }}
+                    </a>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            {%- else -%}
+              <li><a class="nav-link" href="{{ routes.all_products_collection_url }}">Shop</a></li>
+              <li><a class="nav-link" href="{{ routes.collections_url }}">Collections</a></li>
+              <li><a class="nav-link" href="{{ routes.cart_url }}">Cart</a></li>
+            {%- endif -%}
+          </ul>
+        </nav>
+
+        <div class="header__actions">
+          <button type="button" class="icon-btn" data-open-search aria-label="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.5 13.5a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM14.5 14.5 12 12"/>
+            </svg>
+          </button>
+          <a href="{{ routes.cart_url }}" class="icon-btn" aria-label="Cart">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M3.4 6.9h13.2v8c0 .57-.22 1.11-.62 1.51-.4.4-.94.63-1.51.63H5.53c-.57 0-1.11-.23-1.51-.63a2.14 2.14 0 0 1-.62-1.51zM8.8 3h2.4c.62 0 1.21.25 1.65.68.43.44.68 1.03.68 1.66v1.56H6.5V5.34c0-.63.24-1.22.68-1.66A2.3 2.3 0 0 1 8.8 3z"/>
+            </svg>
+            {%- if cart.item_count > 0 -%}
+              <span class="cart-count">{{ cart.item_count }}</span>
+            {%- endif -%}
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="drawer" id="MenuDrawer" data-drawer="menu" hidden>
+      <div class="drawer__backdrop" data-close-menu></div>
+      <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu">
+        <div class="drawer__top">
+          <span class="drawer__title">Menu</span>
+          <button type="button" class="icon-btn" data-close-menu aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
+            </svg>
+          </button>
+        </div>
+        <nav class="drawer-nav" aria-label="Mobile">
+          <ul role="list">
+            {%- if main_menu != blank and main_menu.links.size > 0 -%}
+              {%- for link in main_menu.links -%}
+                <li>
+                  {%- if link.links != blank -%}
+                    <details>
+                      <summary>{{ link.title | escape }}</summary>
+                      <ul role="list">
+                        {%- for child in link.links -%}
+                          <li>
+                            <a href="{{ child.url }}">{{ child.title | escape }}</a>
+                            {%- for grand in child.links -%}
+                              <a href="{{ grand.url }}">{{ grand.title | escape }}</a>
+                            {%- endfor -%}
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </details>
+                  {%- else -%}
+                    <a href="{{ link.url }}">{{ link.title | escape }}</a>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            {%- else -%}
+              <li><a href="{{ routes.all_products_collection_url }}">Shop</a></li>
+              <li><a href="{{ routes.collections_url }}">Collections</a></li>
+              <li><a href="{{ routes.cart_url }}">Cart</a></li>
+            {%- endif -%}
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <div class="search-modal" data-search-modal hidden>
+      <div class="search-modal__box" role="dialog" aria-modal="true" aria-label="Search">
+        <form action="{{ routes.search_url }}" method="get" role="search" class="search-modal__form">
+          <input type="hidden" name="type" value="product">
+          <input
+            class="search-modal__input"
+            type="search"
+            name="q"
+            placeholder="Search cards, sets, sealed..."
+            aria-label="Search"
+          >
+          <button type="submit" class="button">Search</button>
+          <button type="button" class="icon-btn" data-close-search aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
 
     <main id="MainContent" class="main-content" role="main">
       {{ content_for_layout }}
     </main>
 
-    {% section 'footer' %}
+    {%- assign shop_menu = linklists[settings.footer_shop_menu] -%}
+    {%- assign help_menu = linklists[settings.footer_help_menu] -%}
+
+    <footer class="footer">
+      <div class="page-width">
+        <div class="footer__grid">
+          <div>
+            <div class="footer__brand">{{ settings.footer_brand_name | default: shop.name }}</div>
+            {%- if settings.footer_about != blank -%}
+              <p class="footer__about">{{ settings.footer_about }}</p>
+            {%- endif -%}
+          </div>
+
+          <div>
+            <h4>Shop</h4>
+            {%- if shop_menu != blank and shop_menu.links.size > 0 -%}
+              {%- for link in shop_menu.links -%}
+                <a href="{{ link.url }}">{{ link.title }}</a>
+              {%- endfor -%}
+            {%- else -%}
+              <a href="{{ routes.all_products_collection_url }}">All products</a>
+              <a href="{{ routes.collections_url }}">Collections</a>
+            {%- endif -%}
+          </div>
+
+          <div>
+            <h4>Help</h4>
+            {%- if help_menu != blank and help_menu.links.size > 0 -%}
+              {%- for link in help_menu.links -%}
+                <a href="{{ link.url }}">{{ link.title }}</a>
+              {%- endfor -%}
+            {%- else -%}
+              <a href="/pages/contact">Contact</a>
+              <a href="/policies/shipping-policy">Shipping</a>
+              <a href="/policies/refund-policy">Returns</a>
+            {%- endif -%}
+          </div>
+
+          <div>
+            <h4>Follow</h4>
+            {%- if settings.social_instagram != blank -%}<a href="{{ settings.social_instagram }}" target="_blank" rel="noopener">Instagram</a>{%- endif -%}
+            {%- if settings.social_discord != blank -%}<a href="{{ settings.social_discord }}" target="_blank" rel="noopener">Discord</a>{%- endif -%}
+            {%- if settings.social_tiktok != blank -%}<a href="{{ settings.social_tiktok }}" target="_blank" rel="noopener">TikTok</a>{%- endif -%}
+            {%- if settings.social_facebook != blank -%}<a href="{{ settings.social_facebook }}" target="_blank" rel="noopener">Facebook</a>{%- endif -%}
+            {%- if settings.footer_address != blank -%}
+              <p class="footer__about" style="margin-top:1rem;">{{ settings.footer_address | newline_to_br }}</p>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <div class="footer__bottom">
+          <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ settings.footer_disclaimer }}</span>
+          <span>{{ settings.currency_note }}</span>
+        </div>
+      </div>
+    </footer>
 
     <script src="{{ 'theme.js' | asset_url }}" defer></script>
   </body>

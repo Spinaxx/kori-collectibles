@@ -98,6 +98,67 @@
     ]
   },
   {
+    "name": "Header",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_announcement",
+        "label": "Show announcement bar",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "logo_text",
+        "label": "Logo text (when no logo image)",
+        "default": "Kori Collectibles"
+      },
+      {
+        "type": "link_list",
+        "id": "menu",
+        "label": "Main menu",
+        "default": "main-menu"
+      }
+    ]
+  },
+  {
+    "name": "Footer",
+    "settings": [
+      {
+        "type": "text",
+        "id": "footer_brand_name",
+        "label": "Brand name",
+        "default": "Kori Collectibles"
+      },
+      {
+        "type": "textarea",
+        "id": "footer_about",
+        "label": "About",
+        "default": "Independent TCG shop for singles, sealed product, and collectors who care about condition."
+      },
+      {
+        "type": "textarea",
+        "id": "footer_address",
+        "label": "Address / hours"
+      },
+      {
+        "type": "link_list",
+        "id": "footer_shop_menu",
+        "label": "Shop menu"
+      },
+      {
+        "type": "link_list",
+        "id": "footer_help_menu",
+        "label": "Help menu"
+      },
+      {
+        "type": "text",
+        "id": "footer_disclaimer",
+        "label": "Disclaimer",
+        "default": "Not affiliated with or endorsed by any card publisher."
+      }
+    ]
+  },
+  {
     "name": "Layout",
     "settings": [
       {
