@@ -25,12 +25,6 @@
     <div class="product-grid">
       {%- for product in products limit: limit -%}
         {%- liquid
-          assign variant = product.selected_or_first_available_variant
-          assign stock = variant.inventory_quantity
-          assign low = false
-          if stock != blank and stock > 0 and stock <= 5
-            assign low = true
-          endif
           assign image_alt = product.featured_image.alt | default: product.title
         -%}
         <a class="card" href="{{ product.url }}">
@@ -63,9 +57,6 @@
           </div>
 
           <div class="card__body">
-            {%- if product.vendor != blank -%}
-              <div class="card__vendor">{{ product.vendor | escape }}</div>
-            {%- endif -%}
             <div class="card__title">{{ product.title | escape }}</div>
             <div class="card__footer">
               <span class="card__price">
@@ -75,15 +66,6 @@
                   {{ product.price | money }}
                 {%- endif -%}
               </span>
-              {%- if settings.show_stock_count -%}
-                {%- if stock != blank and stock > 0 -%}
-                  <span class="card__stock{% if low %} is-low{% endif %}">
-                    {%- if low -%}{{ stock }} left{%- else -%}In stock{%- endif -%}
-                  </span>
-                {%- elsif product.available == false -%}
-                  <span class="card__stock is-low">Sold out</span>
-                {%- endif -%}
-              {%- endif -%}
             </div>
           </div>
         </a>

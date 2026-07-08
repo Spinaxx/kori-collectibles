@@ -108,19 +108,6 @@
           {{ product.variants | json }}
         </script>
       {% endform %}
-
-      <div class="product__meta">
-        <div class="product__meta-item">
-          <span>Availability</span>
-          {%- if product.available -%}{{ 'products.in_stock' | t }}{%- else -%}{{ 'products.sold_out' | t }}{%- endif -%}
-        </div>
-        {%- if product.vendor != blank -%}
-          <div class="product__meta-item">
-            <span>{{ 'products.vendor' | t }}</span>
-            {{ product.vendor | escape }}
-          </div>
-        {%- endif -%}
-      </div>
     </div>
   </div>
 </section>
