@@ -16,7 +16,7 @@
   </div>
 {%- endif -%}
 
-<header class="header">
+<header class="header" data-header>
   <div class="page-width header__bar">
     <button
       type="button"
@@ -24,9 +24,9 @@
       data-open-menu
       aria-expanded="false"
       aria-controls="MenuDrawer"
-      aria-label="{{ 'general.accessibility.menu' | t }}"
+      aria-label="Open menu"
     >
-      {{ 'icon-menu.svg' | inline_asset_content }}
+      {% render 'icon-menu' %}
     </button>
 
     <a class="header__logo" href="{{ routes.root_url }}">
@@ -48,49 +48,55 @@
 
     <nav class="header__nav" aria-label="Primary">
       <ul class="nav-list" role="list">
-        {%- for link in section.settings.menu.links -%}
-          <li>
-            {%- if link.links != blank -%}
-              <details class="nav-item">
-                <summary class="nav-link">
-                  <span>{{ link.title | escape }}</span>
-                  <svg class="nav-caret" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                </summary>
-                <div class="mega">
-                  <div class="mega__grid">
-                    {%- for child in link.links -%}
-                      <div>
-                        <a class="mega__title" href="{{ child.url }}">{{ child.title | escape }}</a>
-                        {%- if child.links != blank -%}
-                          {%- for grand in child.links -%}
-                            <a class="mega__link" href="{{ grand.url }}">{{ grand.title | escape }}</a>
-                          {%- endfor -%}
-                        {%- endif -%}
-                      </div>
-                    {%- endfor -%}
+        {%- if section.settings.menu != blank -%}
+          {%- for link in section.settings.menu.links -%}
+            <li>
+              {%- if link.links != blank -%}
+                <details class="nav-item">
+                  <summary class="nav-link">
+                    <span>{{ link.title | escape }}</span>
+                    <svg class="nav-caret" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  </summary>
+                  <div class="mega">
+                    <div class="mega__grid">
+                      {%- for child in link.links -%}
+                        <div>
+                          <a class="mega__title" href="{{ child.url }}">{{ child.title | escape }}</a>
+                          {%- if child.links != blank -%}
+                            {%- for grand in child.links -%}
+                              <a class="mega__link" href="{{ grand.url }}">{{ grand.title | escape }}</a>
+                            {%- endfor -%}
+                          {%- endif -%}
+                        </div>
+                      {%- endfor -%}
+                    </div>
                   </div>
-                </div>
-              </details>
-            {%- else -%}
-              <a
-                class="nav-link{% if link.current %} is-active{% endif %}"
-                href="{{ link.url }}"
-                {% if link.current %}aria-current="page"{% endif %}
-              >
-                {{ link.title | escape }}
-              </a>
-            {%- endif -%}
-          </li>
-        {%- endfor -%}
+                </details>
+              {%- else -%}
+                <a
+                  class="nav-link{% if link.current %} is-active{% endif %}"
+                  href="{{ link.url }}"
+                  {% if link.current %}aria-current="page"{% endif %}
+                >
+                  {{ link.title | escape }}
+                </a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          <li><a class="nav-link" href="{{ routes.all_products_collection_url }}">Shop</a></li>
+          <li><a class="nav-link" href="{{ routes.collections_url }}">Collections</a></li>
+          <li><a class="nav-link" href="{{ routes.cart_url }}">Cart</a></li>
+        {%- endif -%}
       </ul>
     </nav>
 
     <div class="header__actions">
-      <button type="button" class="icon-btn" data-open-search aria-label="{{ 'general.accessibility.search' | t }}">
-        {{ 'icon-search.svg' | inline_asset_content }}
+      <button type="button" class="icon-btn" data-open-search aria-label="Search">
+        {% render 'icon-search' %}
       </button>
-      <a href="{{ routes.cart_url }}" class="icon-btn" aria-label="{{ 'general.accessibility.cart' | t }}">
-        {{ 'icon-cart.svg' | inline_asset_content }}
+      <a href="{{ routes.cart_url }}" class="icon-btn" aria-label="Cart">
+        {% render 'icon-cart' %}
         {%- if cart.item_count > 0 -%}
           <span class="cart-count">{{ cart.item_count }}</span>
         {%- endif -%}
@@ -101,43 +107,49 @@
 
 <div class="drawer" id="MenuDrawer" data-drawer="menu" hidden>
   <div class="drawer__backdrop" data-close-menu></div>
-  <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="{{ 'general.accessibility.menu' | t }}">
+  <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu">
     <div class="drawer__top">
       <span class="drawer__title">Menu</span>
-      <button type="button" class="icon-btn" data-close-menu aria-label="{{ 'general.accessibility.close' | t }}">
-        {{ 'icon-close.svg' | inline_asset_content }}
+      <button type="button" class="icon-btn" data-close-menu aria-label="Close">
+        {% render 'icon-close' %}
       </button>
     </div>
     <nav class="drawer-nav" aria-label="Mobile">
       <ul role="list">
-        {%- for link in section.settings.menu.links -%}
-          <li>
-            {%- if link.links != blank -%}
-              <details>
-                <summary>{{ link.title | escape }}</summary>
-                <ul role="list">
-                  {%- for child in link.links -%}
-                    <li>
-                      <a href="{{ child.url }}">{{ child.title | escape }}</a>
-                      {%- for grand in child.links -%}
-                        <a href="{{ grand.url }}">{{ grand.title | escape }}</a>
-                      {%- endfor -%}
-                    </li>
-                  {%- endfor -%}
-                </ul>
-              </details>
-            {%- else -%}
-              <a href="{{ link.url }}">{{ link.title | escape }}</a>
-            {%- endif -%}
-          </li>
-        {%- endfor -%}
+        {%- if section.settings.menu != blank -%}
+          {%- for link in section.settings.menu.links -%}
+            <li>
+              {%- if link.links != blank -%}
+                <details>
+                  <summary>{{ link.title | escape }}</summary>
+                  <ul role="list">
+                    {%- for child in link.links -%}
+                      <li>
+                        <a href="{{ child.url }}">{{ child.title | escape }}</a>
+                        {%- for grand in child.links -%}
+                          <a href="{{ grand.url }}">{{ grand.title | escape }}</a>
+                        {%- endfor -%}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </details>
+              {%- else -%}
+                <a href="{{ link.url }}">{{ link.title | escape }}</a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          <li><a href="{{ routes.all_products_collection_url }}">Shop</a></li>
+          <li><a href="{{ routes.collections_url }}">Collections</a></li>
+          <li><a href="{{ routes.cart_url }}">Cart</a></li>
+        {%- endif -%}
       </ul>
     </nav>
   </div>
 </div>
 
 <div class="search-modal" data-search-modal hidden>
-  <div class="search-modal__box" role="dialog" aria-modal="true" aria-label="{{ 'search.title' | t }}">
+  <div class="search-modal__box" role="dialog" aria-modal="true" aria-label="Search">
     <form action="{{ routes.search_url }}" method="get" role="search" class="search-modal__form">
       <input type="hidden" name="type" value="product">
       <input
@@ -145,11 +157,11 @@
         type="search"
         name="q"
         placeholder="{{ 'search.placeholder' | t }}"
-        aria-label="{{ 'search.title' | t }}"
+        aria-label="Search"
       >
       <button type="submit" class="button">{{ 'search.submit' | t }}</button>
-      <button type="button" class="icon-btn" data-close-search aria-label="{{ 'general.accessibility.close' | t }}">
-        {{ 'icon-close.svg' | inline_asset_content }}
+      <button type="button" class="icon-btn" data-close-search aria-label="Close">
+        {% render 'icon-close' %}
       </button>
     </form>
   </div>

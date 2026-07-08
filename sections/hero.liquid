@@ -3,6 +3,7 @@
   assign source = section.settings.source_collection
   assign limit = section.settings.pool_size | default: 50
   assign count = 0
+
   if source != blank
     assign list = source.products
   else
@@ -12,7 +13,7 @@
 
 <section class="hero">
   <div class="page-width hero__grid">
-    <div>
+    <div class="hero__copy">
       {%- if section.settings.eyebrow != blank -%}
         <p class="hero__eyebrow">{{ section.settings.eyebrow | escape }}</p>
       {%- endif -%}
@@ -29,10 +30,14 @@
       {%- endif -%}
       <div class="hero__actions">
         {%- if section.settings.primary_label != blank -%}
-          <a class="button" href="{{ section.settings.primary_link }}">{{ section.settings.primary_label | escape }}</a>
+          <a class="button" href="{% if section.settings.primary_link != blank %}{{ section.settings.primary_link }}{% else %}{{ routes.all_products_collection_url }}{% endif %}">
+            {{ section.settings.primary_label | escape }}
+          </a>
         {%- endif -%}
         {%- if section.settings.secondary_label != blank -%}
-          <a class="button button--secondary" href="{{ section.settings.secondary_link }}">{{ section.settings.secondary_label | escape }}</a>
+          <a class="button button--secondary" href="{% if section.settings.secondary_link != blank %}{{ section.settings.secondary_link }}{% else %}{{ routes.collections_url }}{% endif %}">
+            {{ section.settings.secondary_label | escape }}
+          </a>
         {%- endif -%}
       </div>
       <div class="hero__stats">
@@ -48,9 +53,35 @@
     </div>
 
     <div class="hero__stage">
-      <a class="hero-card" href="{{ routes.all_products_collection_url }}" data-hero-card aria-label="Featured single">
+      <a
+        class="hero-card"
+        href="{{ routes.all_products_collection_url }}"
+        data-hero-card
+        aria-label="Featured product"
+      >
         <span class="hero-card__shine" data-hero-shine></span>
-        <img data-hero-image alt="" width="280" height="392" hidden>
+        {%- if section.settings.fallback_image != blank -%}
+          <img
+            class="hero-card__image"
+            data-hero-image
+            src="{{ section.settings.fallback_image | image_url: width: 800 }}"
+            alt="Featured product"
+            width="280"
+            height="392"
+          >
+        {%- else -%}
+          <img
+            class="hero-card__image"
+            data-hero-image
+            alt="Featured product"
+            width="280"
+            height="392"
+            hidden
+          >
+          <div class="hero-card__placeholder" data-hero-placeholder>
+            {{ 'product-1' | placeholder_svg_tag }}
+          </div>
+        {%- endif -%}
         <span class="hero-card__holo" aria-hidden="true"></span>
       </a>
     </div>
@@ -61,23 +92,24 @@
       {%- for product in list -%}
         {%- if count >= limit -%}{%- break -%}{%- endif -%}
         {%- liquid
-          assign type = product.type | downcase
+          assign type = product.type | downcase | strip
           assign tags = product.tags | join: ',' | downcase
           assign sealed = false
-          if type contains 'sealed' or type contains 'booster' or type contains 'etb' or tags contains 'sealed'
+          if type contains 'sealed' or type contains 'booster' or type contains 'etb' or type contains 'elite trainer' or tags contains 'sealed'
             assign sealed = true
           endif
-          assign single = false
-          if source != blank and sealed == false
-            assign single = true
-          elsif type == 'single' or type == 'singles' or tags contains 'single'
-            assign single = true
-          endif
-          if sealed
-            assign single = false
+          assign include = false
+          if product.available and product.featured_image and product.price > min_cents and sealed == false
+            if source != blank
+              assign include = true
+            elsif type == 'single' or type == 'singles' or type == 'card' or type == 'cards' or tags contains 'single'
+              assign include = true
+            else
+              assign include = true
+            endif
           endif
         -%}
-        {%- if single and product.available and product.price > min_cents and product.featured_image -%}
+        {%- if include -%}
           {%- assign count = count | plus: 1 -%}
           {%- unless count == 1 -%},{%- endunless -%}
           {"title":{{ product.title | json }},"url":{{ product.url | json }},"image":{{ product.featured_image | image_url: width: 800 | json }}}
@@ -101,8 +133,9 @@
     {"type": "url", "id": "primary_link", "label": "Primary link"},
     {"type": "text", "id": "secondary_label", "label": "Secondary CTA", "default": "Browse sealed"},
     {"type": "url", "id": "secondary_link", "label": "Secondary link"},
-    {"type": "collection", "id": "source_collection", "label": "Singles collection for hero card"},
-    {"type": "range", "id": "min_price", "min": 1, "max": 50, "step": 1, "label": "Minimum price (GBP)", "default": 5},
+    {"type": "collection", "id": "source_collection", "label": "Singles collection for hero card", "info": "Recommended. If empty, uses available products over the minimum price."},
+    {"type": "image_picker", "id": "fallback_image", "label": "Fallback card image"},
+    {"type": "range", "id": "min_price", "min": 0, "max": 50, "step": 1, "label": "Minimum price (GBP)", "default": 5},
     {"type": "range", "id": "pool_size", "min": 10, "max": 50, "step": 5, "label": "Candidate pool", "default": 50}
   ],
   "blocks": [

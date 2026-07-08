@@ -86,6 +86,8 @@
       img.src = pick.image;
       img.alt = pick.title;
       img.hidden = false;
+      const placeholder = qs('[data-hero-placeholder]', card);
+      if (placeholder) placeholder.hidden = true;
     }
 
     const shine = qs('[data-hero-shine]', card);

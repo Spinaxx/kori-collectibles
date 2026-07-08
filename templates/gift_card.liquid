@@ -4,18 +4,24 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>{{ 'gift_cards.issued.subtext' | t | default: 'Gift card' }} — {{ shop.name }}</title>
+    <title>Gift card — {{ shop.name }}</title>
     {{ 'theme.css' | asset_url | stylesheet_tag }}
+    {% style %}
+      :root {
+        --color-bg: {{ settings.color_bg | default: '#0c0e14' }};
+        --color-text: {{ settings.color_text | default: '#f2f0eb' }};
+        --color-muted: {{ settings.color_muted | default: '#9a97a8' }};
+        --color-accent-2: {{ settings.color_accent_2 | default: '#f5a524' }};
+        --page-width-setting: 720px;
+      }
+    {% endstyle %}
   </head>
   <body>
     <main class="page-width section" style="text-align:center;">
       <h1>{{ shop.name }}</h1>
-      <p class="product__desc" style="margin:1rem auto;">Gift card</p>
+      <p style="color:var(--muted);margin:1rem 0;">Gift card</p>
       <p class="product__price">{{ gift_card.balance | money }}</p>
-      {%- if gift_card.enabled == false or gift_card.expired -%}
-        <p>{{ 'products.unavailable' | t }}</p>
-      {%- endif -%}
-      <p style="font-family:var(--font-mono);letter-spacing:0.08em;margin-top:1.5rem;">{{ gift_card.code | format_code }}</p>
+      <p style="font-family:var(--font-mono);letter-spacing:0.08em;margin-top:1.5rem;">{{ gift_card.code }}</p>
     </main>
   </body>
 </html>
