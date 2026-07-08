@@ -1,22 +1,56 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero": {
       "type": "hero",
       "blocks": {
-        "s1": {"type": "stat", "settings": {"label": "Free UK delivery", "text": "Over GBP 40"}},
-        "s2": {"type": "stat", "settings": {"label": "Condition first", "text": "Checked under lamp"}},
-        "s3": {"type": "stat", "settings": {"label": "Real stock", "text": "Live inventory counts"}}
+        "s1": {
+          "type": "stat",
+          "settings": {
+            "label": "Free UK delivery",
+            "text": "Over GBP 40"
+          }
+        },
+        "s2": {
+          "type": "stat",
+          "settings": {
+            "label": "Condition first",
+            "text": "Checked under lamp"
+          }
+        },
+        "s3": {
+          "type": "stat",
+          "settings": {
+            "label": "Real stock",
+            "text": "Live inventory counts"
+          }
+        }
       },
-      "block_order": ["s1", "s2", "s3"],
+      "block_order": [
+        "s1",
+        "s2",
+        "s3"
+      ],
       "settings": {
         "eyebrow": "UK Pokemon & TCG shop",
         "heading_line_1": "The hunt is",
-        "heading_line_2": "half the ",
+        "heading_line_2": "half the",
         "heading_em": "foil",
         "heading_after": ".",
         "text": "Singles and sealed, priced for collectors. Condition-checked under lamp - no mystery packs, no guesswork on stock.",
         "primary_label": "Shop singles",
+        "primary_link": "",
         "secondary_label": "Browse sealed",
+        "secondary_link": "",
+        "source_collection": "",
         "min_price": 5,
         "pool_size": 50
       }
@@ -24,14 +58,69 @@
     "games": {
       "type": "game-grid",
       "blocks": {
-        "g1": {"type": "game", "settings": {"title": "Pokemon", "meta": "Singles · Sealed", "logo_key": "pokemon"}},
-        "g2": {"type": "game", "settings": {"title": "Yu-Gi-Oh!", "meta": "Singles · Sealed", "logo_key": "yugioh"}},
-        "g3": {"type": "game", "settings": {"title": "Magic", "meta": "Singles · Sealed", "logo_key": "magic"}},
-        "g4": {"type": "game", "settings": {"title": "One Piece", "meta": "Sealed", "logo_key": "onepiece"}},
-        "g5": {"type": "game", "settings": {"title": "Lorcana", "meta": "Sealed", "logo_key": "lorcana"}},
-        "g6": {"type": "game", "settings": {"title": "Accessories", "meta": "Sleeves · Binders", "logo_key": "accessories"}}
+        "g1": {
+          "type": "game",
+          "settings": {
+            "title": "Pokemon",
+            "meta": "Singles · Sealed",
+            "link": "shopify://collections/pokemon",
+            "logo_key": "pokemon"
+          }
+        },
+        "g2": {
+          "type": "game",
+          "settings": {
+            "title": "Yu-Gi-Oh!",
+            "meta": "Singles · Sealed",
+            "link": "",
+            "logo_key": "yugioh"
+          }
+        },
+        "g3": {
+          "type": "game",
+          "settings": {
+            "title": "Magic",
+            "meta": "Singles · Sealed",
+            "link": "",
+            "logo_key": "magic"
+          }
+        },
+        "g4": {
+          "type": "game",
+          "settings": {
+            "title": "One Piece",
+            "meta": "Sealed",
+            "link": "",
+            "logo_key": "onepiece"
+          }
+        },
+        "g5": {
+          "type": "game",
+          "settings": {
+            "title": "Lorcana",
+            "meta": "Sealed",
+            "link": "",
+            "logo_key": "lorcana"
+          }
+        },
+        "g6": {
+          "type": "game",
+          "settings": {
+            "title": "Accessories",
+            "meta": "Sleeves · Binders",
+            "link": "",
+            "logo_key": "accessories"
+          }
+        }
       },
-      "block_order": ["g1", "g2", "g3", "g4", "g5", "g6"],
+      "block_order": [
+        "g1",
+        "g2",
+        "g3",
+        "g4",
+        "g5",
+        "g6"
+      ],
       "settings": {
         "heading": "Shop by game",
         "subheading": "Jump straight into the catalogue collectors actually browse."
@@ -42,6 +131,7 @@
       "settings": {
         "heading": "New in the binder",
         "subheading": "Fresh stock with live counts - what you see is what is available.",
+        "collection": "",
         "products_to_show": 8,
         "show_view_all": true
       }
@@ -49,11 +139,39 @@
     "promos": {
       "type": "promo-cards",
       "blocks": {
-        "p1": {"type": "promo", "settings": {"title": "Singles", "text": "Condition-checked cards ready to ship.", "cta": "Browse singles"}},
-        "p2": {"type": "promo", "settings": {"title": "Sealed", "text": "ETBs, boxes, and collections.", "cta": "Browse sealed"}},
-        "p3": {"type": "promo", "settings": {"title": "Accessories", "text": "Sleeves, binders, and toploaders.", "cta": "Shop accessories"}}
+        "p1": {
+          "type": "promo",
+          "settings": {
+            "title": "Singles",
+            "text": "Condition-checked cards ready to ship.",
+            "cta": "Browse singles",
+            "link": ""
+          }
+        },
+        "p2": {
+          "type": "promo",
+          "settings": {
+            "title": "Sealed",
+            "text": "ETBs, boxes, and collections.",
+            "cta": "Browse sealed",
+            "link": ""
+          }
+        },
+        "p3": {
+          "type": "promo",
+          "settings": {
+            "title": "Accessories",
+            "text": "Sleeves, binders, and toploaders.",
+            "cta": "Shop accessories",
+            "link": ""
+          }
+        }
       },
-      "block_order": ["p1", "p2", "p3"],
+      "block_order": [
+        "p1",
+        "p2",
+        "p3"
+      ],
       "settings": {
         "heading": "Shop the vault",
         "subheading": "Sealed drops, graded cards, and everyday accessories."
@@ -62,14 +180,53 @@
     "trust": {
       "type": "trust",
       "blocks": {
-        "t1": {"type": "item", "settings": {"number": "01", "heading": "Condition checked", "text": "Every single is inspected under lamp against our reference sheet."}},
-        "t2": {"type": "item", "settings": {"number": "02", "heading": "Live inventory", "text": "Stock counts update with the till - no ghost listings."}},
-        "t3": {"type": "item", "settings": {"number": "03", "heading": "Fast UK dispatch", "text": "Orders before cut-off leave the same week."}},
-        "t4": {"type": "item", "settings": {"number": "04", "heading": "Collector advice", "text": "Not sure on a set or grade path? Ask - we actually play."}}
+        "t1": {
+          "type": "item",
+          "settings": {
+            "number": "01",
+            "heading": "Condition checked",
+            "text": "Every single is inspected under lamp against our reference sheet."
+          }
+        },
+        "t2": {
+          "type": "item",
+          "settings": {
+            "number": "02",
+            "heading": "Live inventory",
+            "text": "Stock counts update with the till - no ghost listings."
+          }
+        },
+        "t3": {
+          "type": "item",
+          "settings": {
+            "number": "03",
+            "heading": "Fast UK dispatch",
+            "text": "Orders before cut-off leave the same week."
+          }
+        },
+        "t4": {
+          "type": "item",
+          "settings": {
+            "number": "04",
+            "heading": "Collector advice",
+            "text": "Not sure on a set or grade path? Ask - we actually play."
+          }
+        }
       },
-      "block_order": ["t1", "t2", "t3", "t4"],
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4"
+      ],
       "settings": {}
     }
   },
-  "order": ["hero", "games", "showcase", "promos", "trust"]
+  "order": [
+    "hero",
+    "games",
+    "showcase",
+    "promos",
+    "trust"
+  ]
 }
