@@ -22,9 +22,8 @@
       "type": "binder-grid",
       "settings": {
         "heading": "New in the binder",
-        "subheading": "Filter by energy type — same way you'd flip through a physical box.",
-        "products_to_show": 8,
-        "show_filters": true
+        "subheading": "Fresh pulls and fresh stock — condition-checked before they hit the site.",
+        "products_to_show": 8
       }
     },
     "trust": {

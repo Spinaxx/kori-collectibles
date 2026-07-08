@@ -50,33 +50,8 @@
     });
   };
 
-  const initFilters = () => {
-    const root = document.querySelector('[data-binder-filters]');
-    if (!root) return;
-
-    const tabs = root.querySelectorAll('.filter-tab');
-    const slots = document.querySelectorAll('[data-binder-grid] .slot');
-
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        tabs.forEach((t) => t.classList.remove('active'));
-        tab.classList.add('active');
-        const energy = tab.dataset.e;
-
-        slots.forEach((slot) => {
-          if (energy === 'all' || slot.dataset.e === energy) {
-            slot.classList.add('show');
-          } else {
-            slot.classList.remove('show');
-          }
-        });
-      });
-    });
-  };
-
   document.addEventListener('DOMContentLoaded', () => {
     initHeroCard();
     initTilt();
-    initFilters();
   });
 })();

@@ -1,18 +1,3 @@
-{%- liquid
-  assign energy = 'colorless'
-  if product.metafields.custom.energy_type != blank
-    assign energy = product.metafields.custom.energy_type | downcase | strip
-  else
-    for tag in product.tags
-      assign tag_down = tag | downcase
-      if tag_down == 'fire' or tag_down == 'water' or tag_down == 'grass' or tag_down == 'electric' or tag_down == 'psychic'
-        assign energy = tag_down
-        break
-      endif
-    endfor
-  endif
--%}
-
 <section class="wrap product-page" {{ section.shopify_attributes }}>
   <div class="product-media">
     <div class="product-media__frame">
@@ -35,7 +20,7 @@
   </div>
 
   <div class="product-info">
-    <div class="eyebrow">{{ energy }} · {{ product.vendor | default: 'Kori Collectibles' }}</div>
+    <div class="eyebrow">{{ product.type | default: product.vendor | default: 'Kori Collectibles' }}</div>
     <h1>{{ product.title }}</h1>
     <div class="product-price">{{ product.price | money }}</div>
 

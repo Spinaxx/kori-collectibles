@@ -1,6 +1,6 @@
 # Kori Collectibles — Shopify theme
 
-A custom Online Store 2.0 theme for **Kori Collectibles**, a Pokémon TCG shop. Dark ink background, holo accents, ticker bar, tilt hero card, energy-type binder filters, and trust strip.
+A custom Online Store 2.0 theme for **Kori Collectibles**, a Pokémon TCG shop. Dark ink background, holo accents, ticker bar, tilt hero card, binder product grid, and trust strip.
 
 ## What’s included
 
@@ -14,15 +14,12 @@ A custom Online Store 2.0 theme for **Kori Collectibles**, a Pokémon TCG shop. 
 
 Demo product cards show until you attach a real collection in the theme editor.
 
-## Product setup (important)
+## Product setup
 
-Energy filters work from **tags** or metafields:
+Optional tags: `rare` or `holo` (adds holographic sweep on product cards).
 
-1. Tag each single with one of: `fire`, `water`, `grass`, `electric`, `psychic`
-2. Optional tags: `rare` or `holo` (adds holographic sweep)
-3. Optional metafields (namespace `custom`):
-   - `energy_type` — text
-   - `set_code` — text (e.g. `HR·07 · 014/165`)
+Optional metafield (namespace `custom`):
+- `set_code` — text (e.g. `SV·04 · 021/198`)
 
 Create a collection (e.g. **Singles**) and select it on the Binder grid section in the theme editor.
 

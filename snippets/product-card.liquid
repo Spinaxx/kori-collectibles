@@ -1,17 +1,4 @@
 {%- liquid
-  assign energy = 'colorless'
-  if product.metafields.custom.energy_type != blank
-    assign energy = product.metafields.custom.energy_type | downcase | strip
-  elsif product.tags.size > 0
-    for tag in product.tags
-      assign tag_down = tag | downcase
-      if tag_down == 'fire' or tag_down == 'water' or tag_down == 'grass' or tag_down == 'electric' or tag_down == 'psychic' or tag_down == 'colorless'
-        assign energy = tag_down
-        break
-      endif
-    endfor
-  endif
-
   assign set_code = product.metafields.custom.set_code
   if set_code == blank
     assign set_code = product.vendor
@@ -32,12 +19,10 @@
 -%}
 
 <a
-  class="slot show{% if is_rare %} slot-rare{% endif %}"
+  class="slot{% if is_rare %} slot-rare{% endif %}"
   href="{{ product.url }}"
-  data-e="{{ energy }}"
 >
   <div class="slot-card">
-    <span class="slot-badge e-{{ energy }}">{{ energy }}</span>
     {% if product.featured_image %}
       {{
         product.featured_image

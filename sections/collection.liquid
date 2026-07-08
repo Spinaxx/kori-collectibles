@@ -4,16 +4,7 @@
     <div class="collection-page__intro">{{ collection.description }}</div>
   {% endif %}
 
-  <div class="filters" data-binder-filters>
-    <button type="button" class="filter-tab active" data-e="all">All</button>
-    <button type="button" class="filter-tab" data-e="fire">Fire</button>
-    <button type="button" class="filter-tab" data-e="water">Water</button>
-    <button type="button" class="filter-tab" data-e="grass">Grass</button>
-    <button type="button" class="filter-tab" data-e="electric">Electric</button>
-    <button type="button" class="filter-tab" data-e="psychic">Psychic</button>
-  </div>
-
-  <div class="binder-grid" data-binder-grid>
+  <div class="binder-grid">
     {% paginate collection.products by 24 %}
       {% for product in collection.products %}
         {% render 'product-card', product: product %}
