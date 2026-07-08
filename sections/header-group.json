@@ -1,0 +1,43 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "announcement_bar": {
+      "type": "announcement-bar",
+      "settings": {
+        "show_announcement": true
+      },
+      "blocks": {
+        "message_1": {
+          "type": "message",
+          "settings": {
+            "text": "Free UK delivery over GBP 40"
+          }
+        },
+        "message_2": {
+          "type": "message",
+          "settings": {
+            "text": "Singles condition-checked under lamp"
+          }
+        },
+        "message_3": {
+          "type": "message",
+          "settings": {
+            "text": "New sealed drops weekly"
+          }
+        }
+      },
+      "block_order": ["message_1", "message_2", "message_3"]
+    }
+  },
+  "order": ["announcement_bar"]
+}

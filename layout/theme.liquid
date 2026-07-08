@@ -72,34 +72,7 @@
       {%- assign main_menu = linklists['main-menu'] -%}
     {%- endif -%}
 
-    {%- if settings.show_announcement -%}
-      {%- liquid
-        assign announcement_raw = settings.announcement_text | default: 'Free UK delivery over GBP 40|Singles condition-checked under lamp|New sealed drops weekly'
-        assign announcement_normalized = announcement_raw | newline_to_br | strip_newlines | replace: '<br />', '|' | replace: '<br/>', '|' | replace: '<br>', '|'
-        assign announcement_messages = announcement_normalized | split: '|'
-      -%}
-      {%- capture announcement_items -%}
-        {%- for message in announcement_messages -%}
-          {%- assign message_text = message | strip -%}
-          {%- if message_text != blank -%}
-            <span>{{ message_text | escape }}</span>
-            <span aria-hidden="true">·</span>
-          {%- endif -%}
-        {%- endfor -%}
-      {%- endcapture -%}
-      {%- if announcement_items != blank -%}
-        <div class="announcement" aria-label="Announcements">
-          <div class="announcement__track">
-            <div class="announcement__inner">
-              {{ announcement_items }}
-            </div>
-            <div class="announcement__inner" aria-hidden="true">
-              {{ announcement_items }}
-            </div>
-          </div>
-        </div>
-      {%- endif -%}
-    {%- endif -%}
+    {% sections 'header-group' %}
 
     <header class="header" data-header>
       <div class="page-width header__bar">

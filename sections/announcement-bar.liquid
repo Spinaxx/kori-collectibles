@@ -1,0 +1,80 @@
+{%- if section.settings.show_announcement -%}
+  {%- capture announcement_items -%}
+    {%- for block in section.blocks -%}
+      {%- if block.settings.text != blank -%}
+        <span {{ block.shopify_attributes }}>{{ block.settings.text | escape }}</span>
+        <span aria-hidden="true">·</span>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+
+  {%- if announcement_items != blank -%}
+    <div class="announcement" aria-label="Announcements">
+      <div class="announcement__track">
+        <div class="announcement__inner">
+          {{ announcement_items }}
+        </div>
+        <div class="announcement__inner" aria-hidden="true">
+          {{ announcement_items }}
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "class": "section-announcement-bar",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement bar",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Announcement message"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement bar",
+      "blocks": [
+        {
+          "type": "message",
+          "settings": {
+            "text": "Free UK delivery over GBP 40"
+          }
+        },
+        {
+          "type": "message",
+          "settings": {
+            "text": "Singles condition-checked under lamp"
+          }
+        },
+        {
+          "type": "message",
+          "settings": {
+            "text": "New sealed drops weekly"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
