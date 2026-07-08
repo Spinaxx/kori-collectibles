@@ -1037,7 +1037,8 @@ ul {
 
 /* Cart drawer */
 
-.cart-drawer {
+.cart-drawer,
+.account-drawer {
   position: fixed;
   inset: 0;
   z-index: 140;
@@ -1045,22 +1046,27 @@ ul {
   pointer-events: none;
 }
 
-.cart-drawer.is-open {
+.cart-drawer.is-open,
+.account-drawer.is-open {
   visibility: visible;
   pointer-events: auto;
 }
 
 /* Keep the drawer in the layout while animating; only hide it fully when closed. */
-.cart-drawer[hidden]:not(.is-animating):not(.is-open) {
+.cart-drawer[hidden]:not(.is-animating):not(.is-open),
+.account-drawer[hidden]:not(.is-animating):not(.is-open) {
   display: none !important;
 }
 
 .cart-drawer.is-animating,
-.cart-drawer.is-open {
+.cart-drawer.is-open,
+.account-drawer.is-animating,
+.account-drawer.is-open {
   display: block !important;
 }
 
-.cart-drawer__backdrop {
+.cart-drawer__backdrop,
+.account-drawer__backdrop {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.65);
@@ -1068,11 +1074,13 @@ ul {
   transition: opacity 0.2s ease;
 }
 
-.cart-drawer.is-open .cart-drawer__backdrop {
+.cart-drawer.is-open .cart-drawer__backdrop,
+.account-drawer.is-open .account-drawer__backdrop {
   opacity: 1;
 }
 
-.cart-drawer__panel {
+.cart-drawer__panel,
+.account-drawer__panel {
   position: absolute;
   top: 0;
   right: 0;
@@ -1089,18 +1097,22 @@ ul {
   will-change: transform;
 }
 
-.cart-drawer.is-open .cart-drawer__panel {
+.cart-drawer.is-open .cart-drawer__panel,
+.account-drawer.is-open .account-drawer__panel {
   transform: translate3d(0, 0, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cart-drawer__backdrop,
-  .cart-drawer__panel {
+  .cart-drawer__panel,
+  .account-drawer__backdrop,
+  .account-drawer__panel {
     transition: none;
   }
 }
 
-.cart-drawer__top {
+.cart-drawer__top,
+.account-drawer__top {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1109,10 +1121,198 @@ ul {
   flex-shrink: 0;
 }
 
-.cart-drawer__title {
+.cart-drawer__title,
+.account-drawer__title {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.15rem;
+}
+
+.account-drawer__body {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem 1.1rem 1.25rem;
+}
+
+.account-drawer__user {
+  margin-bottom: 1rem;
+}
+
+.account-drawer__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.account-drawer__email {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+.account-drawer__rewards {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(145deg, rgba(45, 212, 191, 0.12), transparent 55%),
+    var(--surface);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-drawer__rewards:hover {
+  border-color: var(--accent);
+}
+
+.account-drawer__rewards-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.account-drawer__rewards-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--accent);
+}
+
+.account-drawer__rewards--guest {
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.account-drawer__section + .account-drawer__section {
+  margin-top: 1.25rem;
+}
+
+.account-drawer__section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.account-drawer__section-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.account-drawer__section-link {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.account-drawer__orders {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.account-drawer__order a {
+  display: block;
+  padding: 0.8rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.account-drawer__order a:hover {
+  border-color: var(--accent);
+}
+
+.account-drawer__order-name {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.account-drawer__order-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-bottom: 0.35rem;
+}
+
+.account-drawer__order-status {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.account-drawer__empty {
+  color: var(--muted);
+  font-size: 0.92rem;
+  padding: 0.5rem 0 0.25rem;
+}
+
+.account-drawer__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.account-drawer__nav a {
+  padding: 0.55rem 0;
+  color: var(--muted);
+}
+
+.account-drawer__nav a:hover {
+  color: var(--text);
+}
+
+.account-drawer__guest-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.45rem;
+}
+
+.account-drawer__guest-text {
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.account-drawer__guest-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.drawer-nav button[data-open-account] {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
 .cart-drawer__body {

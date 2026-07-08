@@ -1,0 +1,93 @@
+<div
+  class="account-drawer"
+  id="AccountDrawer"
+  data-account-drawer
+  hidden
+>
+  <div class="account-drawer__backdrop" data-close-account></div>
+  <div class="account-drawer__panel" role="dialog" aria-modal="true" aria-label="Account">
+    <div class="account-drawer__top">
+      <span class="account-drawer__title">Account</span>
+      <button type="button" class="icon-btn" data-close-account aria-label="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5 5l10 10M15 5 5 15"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="account-drawer__body">
+      {%- if customer -%}
+        <div class="account-drawer__user">
+          <p class="account-drawer__name">{{ customer.first_name | default: customer.email | escape }}</p>
+          {%- if customer.first_name != blank -%}
+            <p class="account-drawer__email">{{ customer.email | escape }}</p>
+          {%- endif -%}
+        </div>
+
+        {%- if settings.loyalty_enable -%}
+          {%- render 'loyalty-points' -%}
+          <button type="button" class="account-drawer__rewards" data-open-loyalty-panel>
+            <span class="account-drawer__rewards-label">Rewards balance</span>
+            <span class="account-drawer__rewards-value"><span data-loyalty-balance>{{ balance }}</span> pts</span>
+          </button>
+        {%- endif -%}
+
+        <section class="account-drawer__section">
+          <div class="account-drawer__section-head">
+            <h2 class="account-drawer__section-title">Recent orders</h2>
+            <a class="account-drawer__section-link" href="{{ routes.account_url }}">View all</a>
+          </div>
+
+          {%- if customer.orders.size > 0 -%}
+            <ul class="account-drawer__orders" role="list">
+              {%- for order in customer.orders limit: 5 -%}
+                <li class="account-drawer__order">
+                  <a href="{{ order.customer_url }}">
+                    <span class="account-drawer__order-name">Order {{ order.name }}</span>
+                    <span class="account-drawer__order-meta">
+                      <span>{{ order.created_at | date: '%d %b %Y' }}</span>
+                      <span class="mono">{{ order.total_price | money }}</span>
+                    </span>
+                    <span class="account-drawer__order-status">
+                      {%- if order.fulfillment_status == 'fulfilled' -%}
+                        Fulfilled
+                      {%- elsif order.fulfillment_status == 'partial' -%}
+                        Partially fulfilled
+                      {%- else -%}
+                        {{ order.financial_status | replace: '_', ' ' | capitalize }}
+                      {%- endif -%}
+                    </span>
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- else -%}
+            <p class="account-drawer__empty">You haven't placed any orders yet.</p>
+          {%- endif -%}
+        </section>
+
+        <nav class="account-drawer__nav" aria-label="Account links">
+          <a href="{{ routes.account_url }}">Order history</a>
+          {%- if routes.account_addresses_url != blank -%}
+            <a href="{{ routes.account_addresses_url }}">Addresses</a>
+          {%- endif -%}
+          <a href="{{ routes.account_logout_url }}">Sign out</a>
+        </nav>
+      {%- else -%}
+        <div class="account-drawer__guest">
+          <p class="account-drawer__guest-title">Sign in to your account</p>
+          <p class="account-drawer__guest-text">View order history, track deliveries, and earn rewards when you shop.</p>
+          <div class="account-drawer__guest-actions">
+            <a class="button button--full" href="{{ routes.account_login_url }}">Sign in</a>
+            <a class="button button--secondary button--full" href="{{ routes.account_register_url }}">Create account</a>
+          </div>
+          {%- if settings.loyalty_enable -%}
+            <button type="button" class="account-drawer__rewards account-drawer__rewards--guest" data-open-loyalty-panel>
+              View rewards program
+            </button>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>

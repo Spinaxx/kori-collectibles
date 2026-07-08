@@ -156,28 +156,31 @@
         </nav>
 
         <div class="header__actions">
-          {%- if settings.loyalty_enable -%}
-            {%- if customer -%}
-              <button
-                type="button"
-                class="header__loyalty"
-                data-open-loyalty-panel
-                aria-label="Rewards points"
-              >
-                <span class="header__loyalty-value" data-loyalty-balance>{{ balance }}</span>
-                <span class="header__loyalty-label">pts</span>
-              </button>
-            {%- endif -%}
-            <a
-              class="icon-btn"
-              href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
-              aria-label="{{ 'general.accessibility.account' | t }}"
+          {%- if settings.loyalty_enable and customer -%}
+            <button
+              type="button"
+              class="header__loyalty"
+              data-open-loyalty-panel
+              aria-expanded="false"
+              aria-controls="LoyaltyPanel"
+              aria-label="Rewards points"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 10.5a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5ZM4.75 16.25v-.9c0-1.95 1.58-3.53 3.53-3.53h3.44c1.95 0 3.53 1.58 3.53 3.53v.9"/>
-              </svg>
-            </a>
+              <span class="header__loyalty-value" data-loyalty-balance>{{ balance }}</span>
+              <span class="header__loyalty-label">pts</span>
+            </button>
           {%- endif -%}
+          <button
+            type="button"
+            class="icon-btn"
+            data-open-account
+            aria-expanded="false"
+            aria-controls="AccountDrawer"
+            aria-label="{{ 'general.accessibility.account' | t }}"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 10.5a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5ZM4.75 16.25v-.9c0-1.95 1.58-3.53 3.53-3.53h3.44c1.95 0 3.53 1.58 3.53 3.53v.9"/>
+            </svg>
+          </button>
           <button type="button" class="icon-btn" data-open-search aria-label="Search">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" width="20" height="20">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.5 13.5a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM14.5 14.5 12 12"/>
@@ -241,6 +244,9 @@
               <li><a href="{{ routes.collections_url }}">Collections</a></li>
               <li><a href="{{ routes.cart_url }}" data-open-cart>Cart</a></li>
             {%- endif -%}
+            <li>
+              <button type="button" data-open-account>Account</button>
+            </li>
             {%- if settings.loyalty_enable -%}
               <li class="drawer-nav__loyalty">
                 {%- if customer -%}
@@ -477,6 +483,8 @@
         </div>
       </div>
     </footer>
+
+    {%- render 'account-drawer' -%}
 
     {%- if settings.loyalty_enable -%}
       {%- render 'loyalty-panel' -%}

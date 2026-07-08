@@ -322,6 +322,10 @@
         const menuBtn = qs('[data-open-menu]');
         if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
       }
+      const account = qs('[data-account-drawer]');
+      if (account && typeof account._closeAccountDrawer === 'function') {
+        account._closeAccountDrawer();
+      }
       setOpen(true);
       refresh().catch(() => {});
     };
@@ -823,6 +827,102 @@
     });
   };
 
+  const initAccountDrawer = () => {
+    const drawer = qs('[data-account-drawer]');
+    if (!drawer) return;
+
+    const panel = qs('.account-drawer__panel', drawer);
+    let closeTimer = null;
+
+    const setOpen = (open) => {
+      qsa('[data-open-account]').forEach((btn) => btn.setAttribute('aria-expanded', String(open)));
+      document.documentElement.style.overflow = open ? 'hidden' : '';
+
+      if (closeTimer) {
+        clearTimeout(closeTimer);
+        closeTimer = null;
+      }
+
+      if (open) {
+        const menu = qs('[data-drawer="menu"]');
+        if (menu && !menu.hidden) {
+          menu.hidden = true;
+          const menuBtn = qs('[data-open-menu]');
+          if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+        }
+        const cart = qs('[data-cart-drawer]');
+        if (cart && cart.classList.contains('is-open')) {
+          cart.classList.remove('is-open', 'is-animating');
+          cart.hidden = true;
+          qsa('[data-open-cart]').forEach((btn) => btn.setAttribute('aria-expanded', 'false'));
+        }
+
+        drawer.classList.add('is-animating');
+        drawer.hidden = false;
+        void drawer.offsetWidth;
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            drawer.classList.add('is-open');
+          });
+        });
+        return;
+      }
+
+      const finishClose = () => {
+        drawer.classList.remove('is-open', 'is-animating');
+        drawer.hidden = true;
+        if (panel) panel.removeEventListener('transitionend', onEnd);
+        if (closeTimer) {
+          clearTimeout(closeTimer);
+          closeTimer = null;
+        }
+      };
+      const onEnd = (e) => {
+        if (e.target !== panel) return;
+        if (e.propertyName !== 'transform') return;
+        finishClose();
+      };
+
+      if (!drawer.classList.contains('is-open')) {
+        finishClose();
+        return;
+      }
+
+      drawer.classList.add('is-animating');
+      drawer.classList.remove('is-open');
+      if (!panel) {
+        finishClose();
+        return;
+      }
+      panel.addEventListener('transitionend', onEnd);
+      closeTimer = setTimeout(finishClose, 360);
+    };
+
+    drawer._closeAccountDrawer = () => setOpen(false);
+
+    document.addEventListener(
+      'click',
+      (e) => {
+        const target = e.target instanceof Element ? e.target : e.target.parentElement;
+        const opener = target && target.closest('[data-open-account]');
+        if (!opener) return;
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen(true);
+      },
+      true
+    );
+
+    drawer.addEventListener('click', (e) => {
+      const target = e.target instanceof Element ? e.target : e.target.parentElement;
+      if (target && target.closest('[data-close-account]')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) setOpen(false);
+    });
+  };
+
   const initLoyaltyPanel = () => {
     const widget = qs('[data-loyalty-widget]');
     if (!widget) return;
@@ -849,6 +949,10 @@
     qsa('[data-open-loyalty-panel]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
+        const accountDrawer = qs('[data-account-drawer]');
+        if (accountDrawer && typeof accountDrawer._closeAccountDrawer === 'function') {
+          accountDrawer._closeAccountDrawer();
+        }
         setOpen(true);
       });
     });
@@ -867,6 +971,11 @@
       initAnnouncementMarquee();
     } catch (err) {
       console.error('initAnnouncementMarquee failed', err);
+    }
+    try {
+      initAccountDrawer();
+    } catch (err) {
+      console.error('initAccountDrawer failed', err);
     }
     try {
       initLoyaltyPanel();
