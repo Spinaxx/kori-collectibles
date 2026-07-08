@@ -166,19 +166,6 @@
         </nav>
 
         <div class="header__actions">
-          {%- if settings.loyalty_enable and customer -%}
-            <button
-              type="button"
-              class="header__loyalty"
-              data-open-loyalty-panel
-              aria-expanded="false"
-              aria-controls="LoyaltyPanel"
-              aria-label="Rewards points"
-            >
-              <span class="header__loyalty-value" data-loyalty-balance>{{ loyalty_balance }}</span>
-              <span class="header__loyalty-label">pts</span>
-            </button>
-          {%- endif -%}
           <button
             type="button"
             class="icon-btn"
