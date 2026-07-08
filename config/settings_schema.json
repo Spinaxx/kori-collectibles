@@ -1,9 +1,9 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "Holo Row",
+    "theme_name": "Kori Collectibles",
     "theme_version": "1.0.0",
-    "theme_author": "Holo Row",
+    "theme_author": "Kori Collectibles",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
   },
@@ -14,7 +14,7 @@
         "type": "text",
         "id": "brand_name",
         "label": "Brand name",
-        "default": "Holo Row"
+        "default": "Kori Collectibles"
       }
     ]
   }

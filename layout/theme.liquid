@@ -11,7 +11,7 @@
     >
 
     {% render 'meta-tags' %}
-    {{ 'holo-row.css' | asset_url | stylesheet_tag: preload: true }}
+    {{ 'kori.css' | asset_url | stylesheet_tag: preload: true }}
     {{ content_for_header }}
   </head>
 
@@ -24,6 +24,6 @@
 
     {% sections 'footer-group' %}
 
-    <script src="{{ 'holo-row.js' | asset_url }}" defer></script>
+    <script src="{{ 'kori.js' | asset_url }}" defer></script>
   </body>
 </html>

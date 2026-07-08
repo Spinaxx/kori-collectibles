@@ -41,7 +41,7 @@
       "block_order": ["ticker_1", "ticker_2", "ticker_3", "ticker_4"],
       "settings": {
         "show_ticker": true,
-        "logo_text": "Holo Row",
+        "logo_text": "Kori Collectibles",
         "cta_label": "Shop now",
         "cta_link": "#grid"
       }
