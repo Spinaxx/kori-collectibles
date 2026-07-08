@@ -22,7 +22,8 @@
 //   newLoyaltyPoints: String!
 // }
 //
-// Map `loyaltyPoints` to customer metafield custom.loyalty_points in the Run code input picker.
+// Map loyaltyPoints → customer metafield custom.loyalty_points ONLY.
+// Do NOT map to custom_loyalty_points — that is a different field.
 
 export default function main(input) {
   const order = input.order;

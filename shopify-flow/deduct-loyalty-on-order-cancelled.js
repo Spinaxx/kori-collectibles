@@ -23,8 +23,10 @@
 //   }
 // }
 //
-// In the Run code input mapper, connect loyaltyPoints → customer metafield
-// custom.loyalty_points (key: loyalty_points). Same mapping as the award flow.
+// Map loyaltyPoints → customer metafield custom.loyalty_points ONLY.
+// Do NOT map to custom_loyalty_points — that is a different field.
+//
+// Update customer metafield action must also use key: loyalty_points
 //
 // Define outputs (GraphQL):
 // "The output of Run Code"

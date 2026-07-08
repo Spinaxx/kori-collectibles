@@ -42,6 +42,8 @@ Admin → **Settings → Custom data → Customers → Add definition**
 - Namespace and key: `custom.loyalty_points`
 - Type: **Integer**
 
+**Only use this one definition.** Do not create a second metafield with key `custom_loyalty_points` — that is a different field and causes award/cancel/theme to disagree on the balance.
+
 Admin → **Settings → Custom data → Orders → Add definition**
 
 - Name: `Loyalty points awarded`
@@ -172,3 +174,24 @@ When a customer has enough points, the panel shows **Email to redeem**. Send the
 3. After payment, check the customer metafield and `loyalty_points_awarded` on the order in admin
 4. Cancel the order — customer points should drop by the awarded amount
 5. Sign in on the storefront — balance should show in the account drawer and rewards panel
+
+### Troubleshooting: two different point balances
+
+If `custom.loyalty_points` and Flow’s `loyaltyPoints` show different numbers, you have **two customer metafields** and the workflows are not using the same one.
+
+| What you see | Namespace | Key | Used by |
+|---|---|---|---|
+| **Correct (theme)** | `custom` | `loyalty_points` | Storefront, should be used by both Flows |
+| **Wrong duplicate** | `custom` | `custom_loyalty_points` | Often created by a misconfigured cancel flow |
+
+`loyaltyPoints` in Run code is **not** a separate Shopify field — it is Flow’s alias for whichever customer metafield you map it to in the Run code input picker. If that mapping points at `custom_loyalty_points` while the update step writes to `loyalty_points` (or vice versa), reads and writes hit different fields.
+
+**Fix:**
+
+1. Admin → **Settings → Custom data → Customers** — check for both `loyalty_points` and `custom_loyalty_points`.
+2. Open a test customer in admin — note which field has the real balance (e.g. 286).
+3. Copy that value into **`custom.loyalty_points`** if needed.
+4. In **both** Flow workflows (award + cancel):
+   - Run code input mapper: `loyaltyPoints` → **`loyalty_points`** (not `custom_loyalty_points`)
+   - Update customer metafield action: namespace `custom`, key **`loyalty_points`**
+5. Delete the stray `custom_loyalty_points` definition once balances are consolidated (optional but recommended).
