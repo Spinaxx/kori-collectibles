@@ -1822,12 +1822,17 @@ ul {
 }
 
 @media (max-width: 989px) {
+  .collection-layout {
+    gap: 0.5rem;
+  }
+
   .collection-layout--with-filters {
     grid-template-columns: 1fr;
     grid-template-areas:
       'toolbar'
       'facets'
       'products';
+    gap: 0.5rem;
   }
 
   .collection-toolbar {
@@ -1836,7 +1841,7 @@ ul {
       'actions'
       'count';
     gap: 0.4rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0;
   }
 
   .collection-toolbar__actions {
