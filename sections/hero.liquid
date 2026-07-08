@@ -23,7 +23,7 @@
       assign sealed = true
     endif
 
-    if product.available and product.featured_image and product.price > min_cents and sealed == false
+    if product.available and product.featured_image != blank and product.price >= min_cents and sealed == false
       if handles == blank
         assign handles = product.handle
       else
@@ -40,6 +40,24 @@
     assign idx = seed | modulo: handle_count
     assign chosen_handle = handle_list[idx]
     assign hero_product = all_products[chosen_handle]
+  endif
+
+  if hero_product == blank or hero_product.featured_image == blank
+    for product in list
+      if product.featured_image != blank and product.available and product.price >= min_cents
+        assign hero_product = product
+        break
+      endif
+    endfor
+  endif
+
+  if hero_product == blank or hero_product.featured_image == blank
+    for product in collections.all.products
+      if product.featured_image != blank
+        assign hero_product = product
+        break
+      endif
+    endfor
   endif
 -%}
 
@@ -100,16 +118,23 @@
         >
           <span class="hero-card__shine" data-hero-shine></span>
           {%- assign hero_alt = hero_product.featured_image.alt | default: hero_product.title -%}
-          {{
-            hero_product.featured_image
-            | image_url: width: 900
-            | image_tag:
-              class: 'hero-card__image',
-              widths: '280, 400, 560, 700, 900',
-              sizes: '(max-width: 749px) 70vw, 280px',
-              alt: hero_alt,
-              loading: 'eager'
-          }}
+          <img
+            class="hero-card__image"
+            src="{{ hero_product.featured_image | image_url: width: 700 }}"
+            srcset="
+              {{ hero_product.featured_image | image_url: width: 280 }} 280w,
+              {{ hero_product.featured_image | image_url: width: 400 }} 400w,
+              {{ hero_product.featured_image | image_url: width: 560 }} 560w,
+              {{ hero_product.featured_image | image_url: width: 700 }} 700w,
+              {{ hero_product.featured_image | image_url: width: 900 }} 900w
+            "
+            sizes="(max-width: 749px) 70vw, 280px"
+            width="{{ hero_product.featured_image.width }}"
+            height="{{ hero_product.featured_image.height }}"
+            alt="{{ hero_alt | escape }}"
+            loading="eager"
+            fetchpriority="high"
+          >
           <span class="hero-card__holo" aria-hidden="true"></span>
         </a>
       {%- elsif section.settings.fallback_image != blank -%}
