@@ -1,11 +1,8 @@
+{%- if settings.loyalty_enable -%}
 {%- liquid
   assign balance = loyalty_balance | default: 0 | plus: 0
   assign loyalty_sign_in_url = loyalty_sign_in_url | default: routes.account_login_url
   assign loyalty_register_url = loyalty_register_url | default: routes.account_register_url
-
-  unless settings.loyalty_enable
-    break
-  endif
 
   assign points_rate = settings.loyalty_points_per_gbp | default: 1
   assign redeem_points = settings.loyalty_redeem_points | default: 100
@@ -132,3 +129,4 @@
   </div>
   </div>
 </div>
+{%- endif -%}

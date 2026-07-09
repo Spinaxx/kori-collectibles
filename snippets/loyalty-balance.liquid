@@ -6,10 +6,7 @@
   assign loyalty_balance = 0
   assign loyalty_redeem_code = blank
 
-  unless customer
-    break
-  endunless
-
+  if customer
   for tag in customer.tags
     assign tag_stripped = tag | strip
     if tag_stripped contains 'loyalty-points:'
@@ -62,5 +59,6 @@
       assign code_from_metafield = customer.metafields.custom.loyalty_redeem_code.value
     endif
     assign loyalty_redeem_code = code_from_metafield | strip
+  endif
   endif
 -%}
