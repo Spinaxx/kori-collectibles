@@ -715,6 +715,7 @@
     if (!form) return;
 
     const variantsEl = qs('[data-product-variants]', form);
+    const inventoryEl = qs('[data-product-inventory]', form);
     const priceEl = qs('[data-product-price]');
     const stockEl = qs('[data-product-stock]');
     const submit = qs('[data-product-submit]', form);
@@ -727,10 +728,18 @@
     const soldOutLabel = soldOutEl ? soldOutEl.textContent.trim() : 'Sold out';
 
     let variants = [];
+    let inventory = {};
     try {
       variants = JSON.parse(variantsEl.textContent);
     } catch (err) {
       return;
+    }
+    if (inventoryEl) {
+      try {
+        inventory = JSON.parse(inventoryEl.textContent);
+      } catch (err) {
+        inventory = {};
+      }
     }
 
     const formatVariantPrice = (cents) => {
@@ -738,21 +747,22 @@
       return formatMoney(cents, moneyFormat);
     };
 
-    const updateStock = (variant) => {
-      if (!stockEl || !variant) return;
-      if (variant.inventory_management !== 'shopify') {
+    const updateStock = (variantId) => {
+      if (!stockEl) return;
+      const info = inventory[String(variantId)];
+      if (!info || !info.tracked) {
         stockEl.hidden = true;
         return;
       }
 
-      const qty = variant.inventory_quantity || 0;
+      const qty = info.qty || 0;
       stockEl.hidden = false;
-      stockEl.textContent = variant.available
+      stockEl.textContent = info.available
         ? qty === 1
           ? '1 in stock'
           : `${qty} in stock`
         : 'Out of stock';
-      stockEl.classList.toggle('is-low', variant.available && qty > 0 && qty <= 3);
+      stockEl.classList.toggle('is-low', info.available && qty > 0 && qty <= 3);
     };
 
     const updateVariant = (variantId) => {
@@ -773,7 +783,7 @@
         submit.textContent = variant.available ? addToCartLabel : soldOutLabel;
       }
 
-      updateStock(variant);
+      updateStock(variantId);
     };
 
     if (pills.length) {
@@ -782,14 +792,6 @@
           if (input.checked) updateVariant(input.value);
         });
       });
-
-      const checked = pills.find((input) => input.checked);
-      if (checked) updateVariant(checked.value);
-      return;
-    }
-
-    if (variants.length === 1) {
-      updateVariant(variants[0].id);
     }
   };
 

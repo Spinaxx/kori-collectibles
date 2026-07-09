@@ -123,6 +123,17 @@
         <script type="application/json" data-product-variants>
           {{ product.variants | json }}
         </script>
+        <script type="application/json" data-product-inventory>
+          {
+            {%- for variant in product.variants -%}
+              "{{ variant.id }}": {
+                "qty": {{ variant.inventory_quantity | default: 0 }},
+                "tracked": {% if variant.inventory_management == 'shopify' %}true{% else %}false{% endif %},
+                "available": {% if variant.available %}true{% else %}false{% endif %}
+              }{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          }
+        </script>
       {% endform %}
     </div>
   </div>
