@@ -986,6 +986,21 @@
       document.body.dataset.loyaltyBalance = String(balance);
     };
 
+    const revealModalActiveCode = (code) => {
+      const section = qs('[data-loyalty-modal-codes]');
+      if (!section) return;
+
+      section.hidden = false;
+      const codeEl = qs('[data-loyalty-modal-code]', section);
+      if (codeEl) codeEl.textContent = code;
+
+      const applyBtn = qs('[data-loyalty-modal-apply]', section);
+      if (applyBtn) applyBtn.href = `/discount/${encodeURIComponent(code)}`;
+
+      const copied = qs('[data-loyalty-modal-copied]', section);
+      if (copied) copied.hidden = true;
+    };
+
     const revealActiveCode = (code) => {
       const applyUrl = `/discount/${encodeURIComponent(code)}`;
       let section = qs('[data-loyalty-active-codes]');
@@ -1067,7 +1082,31 @@
           }
         }
       });
+
+      revealModalActiveCode(code);
     };
+
+    document.addEventListener('click', async (e) => {
+      const target = e.target instanceof Element ? e.target : null;
+      if (!target) return;
+
+      const copyBtn = target.closest('[data-loyalty-modal-copy]');
+      if (!copyBtn) return;
+
+      const section = copyBtn.closest('[data-loyalty-modal-codes]');
+      const codeEl = section ? qs('[data-loyalty-modal-code]', section) : null;
+      const code = codeEl ? (codeEl.textContent || '').trim() : '';
+      if (!code) return;
+
+      e.preventDefault();
+      try {
+        await navigator.clipboard.writeText(code);
+        const copied = section ? qs('[data-loyalty-modal-copied]', section) : null;
+        if (copied) copied.hidden = false;
+      } catch {
+        // ignore
+      }
+    });
 
     const showCode = (root, payload) => {
       const displayMode = root.dataset.activeCodeDisplay || 'inline';

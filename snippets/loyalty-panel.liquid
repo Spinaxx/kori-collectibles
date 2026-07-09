@@ -36,9 +36,14 @@
     aria-controls="LoyaltyPanel"
     aria-label="Open rewards"
   >
-    <svg class="loyalty-launcher__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path fill="currentColor" d="M12 2l2.2 6.8H21l-5.5 4 2.1 6.7L12 15.8 6.4 19.5l2.1-6.7L3 8.8h6.8L12 2z"/>
-    </svg>
+    <span class="loyalty-launcher__glyph" aria-hidden="true">
+      <svg class="loyalty-launcher__icon loyalty-launcher__icon--star" viewBox="0 0 24 24" focusable="false">
+        <path fill="currentColor" d="M12 2l2.2 6.8H21l-5.5 4 2.1 6.7L12 15.8 6.4 19.5l2.1-6.7L3 8.8h6.8L12 2z"/>
+      </svg>
+      <svg class="loyalty-launcher__icon loyalty-launcher__icon--close" viewBox="0 0 24 24" focusable="false">
+        <path fill="currentColor" d="M18.3 5.7a1 1 0 0 0-1.4 0L12 10.6 7.1 5.7a1 1 0 1 0-1.4 1.4l4.9 4.9-4.9 4.9a1 1 0 1 0 1.4 1.4l4.9-4.9 4.9 4.9a1 1 0 0 0 1.4-1.4L13.4 12l4.9-4.9a1 1 0 0 0 0-1.4z"/>
+      </svg>
+    </span>
     {%- if customer and balance > 0 -%}
       <span class="loyalty-launcher__badge">{{ balance }}</span>
     {%- endif -%}
@@ -80,6 +85,26 @@
         {%- else -%}
           <p class="loyalty-panel__status">{{ points_needed }} more points until your next reward.</p>
         {%- endif -%}
+
+        <section
+          class="loyalty-panel__section loyalty-panel__codes"
+          data-loyalty-modal-codes
+          {% if active_redeem_code == blank %}hidden{% endif %}
+        >
+          <h3>Your discount code</h3>
+          <div class="loyalty-panel__code-card" data-loyalty-modal-code-card>
+            <div class="loyalty-panel__code-main">
+              <p class="loyalty-panel__code-label">Code</p>
+              <p class="loyalty-panel__code-value" data-loyalty-modal-code>{{ active_redeem_code }}</p>
+              <p class="loyalty-panel__code-meta">Single use · does not expire</p>
+            </div>
+            <div class="loyalty-panel__code-actions">
+              <a class="button button--full" href="{% if active_redeem_code != blank %}/discount/{{ active_redeem_code | url_encode }}{% else %}#{% endif %}" data-loyalty-modal-apply>Apply to cart</a>
+              <button type="button" class="button button--secondary button--full" data-loyalty-modal-copy>Copy code</button>
+            </div>
+            <p class="loyalty-panel__code-copied" data-loyalty-modal-copied hidden role="status">Copied.</p>
+          </div>
+        </section>
 
         <section class="loyalty-panel__section">
           <h3>Ways to earn</h3>

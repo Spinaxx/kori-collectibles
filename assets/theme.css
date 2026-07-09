@@ -514,7 +514,7 @@ ul {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   cursor: pointer;
   pointer-events: auto;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.25s ease, box-shadow 0.15s ease;
 }
 
 .loyalty-launcher:hover {
@@ -522,9 +522,42 @@ ul {
   box-shadow: 0 14px 34px rgba(45, 212, 191, 0.28);
 }
 
-.loyalty-launcher__icon {
+.loyalty-widget.is-open .loyalty-launcher {
+  transform: rotate(135deg);
+}
+
+.loyalty-launcher__glyph {
+  position: relative;
   width: 1.35rem;
   height: 1.35rem;
+}
+
+.loyalty-launcher__icon {
+  position: absolute;
+  inset: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.loyalty-launcher__icon--star {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.loyalty-launcher__icon--close {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.6);
+}
+
+.loyalty-widget.is-open .loyalty-launcher__icon--star {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.6);
+}
+
+.loyalty-widget.is-open .loyalty-launcher__icon--close {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
 }
 
 .loyalty-launcher__badge {
@@ -637,6 +670,51 @@ ul {
   color: var(--muted);
   font-size: 0.84rem;
   margin-bottom: 1rem;
+}
+
+.loyalty-panel__codes {
+  margin-bottom: 1rem;
+}
+
+.loyalty-panel__code-card {
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--surface-2);
+}
+
+.loyalty-panel__code-label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.loyalty-panel__code-value {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.loyalty-panel__code-meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.loyalty-panel__code-actions {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.loyalty-panel__code-copied {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  color: var(--accent);
 }
 
 .loyalty-panel__section + .loyalty-panel__section {

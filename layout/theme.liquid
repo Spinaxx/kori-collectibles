@@ -508,6 +508,7 @@
     {%- if settings.loyalty_enable -%}
       {%- render 'loyalty-panel',
         loyalty_balance: loyalty_balance,
+        loyalty_redeem_code: loyalty_redeem_code,
         loyalty_sign_in_url: loyalty_sign_in_url,
         loyalty_register_url: loyalty_register_url
       -%}
