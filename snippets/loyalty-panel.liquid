@@ -83,26 +83,6 @@
           <p class="loyalty-panel__status">{{ points_needed }} more points until your next reward.</p>
         {%- endif -%}
 
-        <section
-          class="loyalty-panel__section loyalty-panel__codes"
-          data-loyalty-modal-codes
-          {% if active_redeem_code == blank %}hidden{% endif %}
-        >
-          <h3>Your discount code</h3>
-          <div class="loyalty-panel__code-card" data-loyalty-modal-code-card>
-            <div class="loyalty-panel__code-main">
-              <p class="loyalty-panel__code-label">Code</p>
-              <p class="loyalty-panel__code-value" data-loyalty-modal-code>{{ active_redeem_code }}</p>
-              <p class="loyalty-panel__code-meta">Single use · does not expire</p>
-            </div>
-            <div class="loyalty-panel__code-actions">
-              <a class="button button--full" href="{% if active_redeem_code != blank %}/discount/{{ active_redeem_code | url_encode }}{% else %}#{% endif %}" data-loyalty-modal-apply>Apply to cart</a>
-              <button type="button" class="button button--secondary button--full" data-loyalty-modal-copy>Copy code</button>
-            </div>
-            <p class="loyalty-panel__code-copied" data-loyalty-modal-copied hidden role="status">Copied.</p>
-          </div>
-        </section>
-
         <section class="loyalty-panel__section">
           <h3>Ways to earn</h3>
           <ul class="loyalty-panel__list" role="list">
@@ -120,6 +100,28 @@
         <section class="loyalty-panel__section">
           <h3>Ways to redeem</h3>
           {%- render 'loyalty-redeem-card', balance: balance, compact: true, rewards_url: rewards_url -%}
+        </section>
+
+        <section
+          class="loyalty-panel__section rewards__codes"
+          data-loyalty-modal-codes
+          {% if active_redeem_code == blank %}hidden{% endif %}
+        >
+          <h3>Discount code</h3>
+          <div class="rewards__codes-list">
+            <article class="rewards__code-card" data-loyalty-modal-code-card>
+              <div class="rewards__code-card-main">
+                <p class="rewards__code-label">Discount code</p>
+                <p class="rewards__code-value" data-loyalty-modal-code>{{ active_redeem_code }}</p>
+                <p class="rewards__code-meta">Single use · does not expire</p>
+              </div>
+              <div class="rewards__code-actions">
+                <a class="button button--full" href="{% if active_redeem_code != blank %}/discount/{{ active_redeem_code | url_encode }}{% else %}#{% endif %}" data-loyalty-modal-apply>Apply to cart</a>
+                <button type="button" class="button button--secondary button--full" data-loyalty-modal-copy>Copy code</button>
+              </div>
+              <p class="rewards__code-invalid" data-loyalty-modal-copied hidden role="status">Copied.</p>
+            </article>
+          </div>
         </section>
 
         <a class="loyalty-panel__link" href="{{ rewards_url }}">Full program details</a>
