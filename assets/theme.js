@@ -952,7 +952,7 @@
       }
 
       if (widget && modal) {
-        setOpen(true);
+        setOpen(!open);
         return;
       }
 
