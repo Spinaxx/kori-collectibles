@@ -10,11 +10,11 @@
 //         amount
 //       }
 //     }
-//     loyaltyPointsAwarded {
+//     loyalty_points_awarded {
 //       value
 //     }
 //     customer {
-//       loyaltyPoints {
+//       loyalty_points {
 //         value
 //       }
 //       tags
@@ -22,8 +22,12 @@
 //   }
 // }
 //
-// Map loyaltyPoints → customer metafield custom.loyalty_points ONLY.
-// Map loyaltyPointsAwarded → order metafield custom.loyalty_points_awarded
+// Use snake_case in the query — Flow exposes metafields by key name.
+// If loyalty_points_awarded errors on Order, create the order metafield
+// definition first (Settings → Custom data → Orders), save workflow, reopen.
+//
+// Map loyalty_points → customer metafield custom.loyalty_points
+// Map loyalty_points_awarded → order metafield custom.loyalty_points_awarded
 //   (set by the award flow when the order was paid — most reliable deduct amount)
 //
 // Do NOT map to custom_loyalty_points — that is a different field.
@@ -58,8 +62,12 @@ function balanceFromTags(tags) {
   return null;
 }
 
+function readMetafield(obj, snakeKey) {
+  return obj?.[snakeKey]?.value ?? obj?.[snakeKey.replace(/_([a-z])/g, (_, c) => c.toUpperCase())]?.value;
+}
+
 function currentBalance(customer) {
-  const rawMeta = customer?.loyaltyPoints?.value;
+  const rawMeta = readMetafield(customer, 'loyalty_points');
   if (rawMeta !== null && rawMeta !== undefined && String(rawMeta).trim() !== '') {
     const fromMeta = parseInt(String(rawMeta).trim(), 10);
     if (!Number.isNaN(fromMeta)) return fromMeta;
@@ -72,7 +80,7 @@ function currentBalance(customer) {
 }
 
 function pointsToDeduct(order) {
-  const fromOrder = parseInt(String(order?.loyaltyPointsAwarded?.value ?? '').trim(), 10);
+  const fromOrder = parseInt(String(readMetafield(order, 'loyalty_points_awarded') ?? '').trim(), 10);
   if (fromOrder > 0) return fromOrder;
 
   const subtotal = parseFloat(order?.subtotalPriceSet?.shopMoney?.amount) || 0;

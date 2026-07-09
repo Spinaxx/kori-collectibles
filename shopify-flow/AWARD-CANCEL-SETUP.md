@@ -41,7 +41,7 @@ query {
       }
     }
     customer {
-      loyaltyPoints {
+      loyalty_points {
         value
       }
       tags
@@ -50,7 +50,9 @@ query {
 }
 ```
 
-Map **`loyaltyPoints`** → customer metafield **`custom.loyalty_points`**.
+Map **`loyalty_points`** → customer metafield **`custom.loyalty_points`**.
+
+Use **snake_case** in the query (`loyalty_points`, not `loyaltyPoints`). Flow names GraphQL fields after the metafield key.
 
 **Define outputs (GraphQL):**
 
@@ -109,11 +111,11 @@ query {
         amount
       }
     }
-    loyaltyPointsAwarded {
+    loyalty_points_awarded {
       value
     }
     customer {
-      loyaltyPoints {
+      loyalty_points {
         value
       }
       tags
@@ -122,8 +124,10 @@ query {
 }
 ```
 
-Map **`loyaltyPoints`** → customer **`custom.loyalty_points`**.  
-Map **`loyaltyPointsAwarded`** → order **`custom.loyalty_points_awarded`**.
+Map **`loyalty_points`** → customer **`custom.loyalty_points`**.  
+Map **`loyalty_points_awarded`** → order **`custom.loyalty_points_awarded`**.
+
+If you see `Cannot query field "loyalty_points_awarded" on type "Order"`, create the **order** metafield definition first, **save** the workflow, then reopen Run code.
 
 **Define outputs (GraphQL):**
 
@@ -178,6 +182,8 @@ Flow only shows outputs after you paste the **Define outputs** GraphQL block, sa
 | Cancel zeroed balance (871 → 0) | Old script used order **total** when subtotal was 0. Update cancel JS; add order metafield step to **award** flow |
 | Should deduct 144, deducted everything | Add **Update order metafield** on award; map `loyaltyPointsAwarded` on cancel Run code inputs |
 | Tag not updated / old tag remains | `loyaltyPointsTagRemove` used wrong balance (0). Updated script reads metafield + `loyalty-points:` tag |
-| Cancel flow sets balance to 0 | `loyaltyPoints` not mapped to `custom.loyalty_points` |
+| `Cannot query field loyaltyPoints on Customer` | Use **`loyalty_points`** (snake_case) in the GraphQL query, not `loyaltyPoints` |
+| `Cannot query field loyaltyPointsAwarded on Order` | Create order metafield `loyalty_points_awarded`; use **`loyalty_points_awarded`** in query |
+| Cancel flow sets balance to 0 | `loyalty_points` not mapped to `custom.loyalty_points` in input mapper |
 | `Value must be an integer` | Wrong key `custom_loyalty_points`; value has `{{ }}` or blank lines — use **Run code → newLoyaltyPoints** only |
 | Flow writes unstructured metafield | Recreate Update metafield step; pick **Loyalty points** definition from list |

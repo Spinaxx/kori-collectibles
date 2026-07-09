@@ -9,7 +9,7 @@
 //       }
 //     }
 //     customer {
-//       loyaltyPoints {
+//       loyalty_points {
 //         value
 //       }
 //       tags
@@ -17,7 +17,8 @@
 //   }
 // }
 //
-// Map loyaltyPoints → customer metafield custom.loyalty_points ONLY.
+// Use snake_case — Flow exposes metafields by key name (not loyaltyPoints).
+// Map loyalty_points → customer metafield custom.loyalty_points
 //
 // Define outputs (GraphQL):
 // type Output {
@@ -50,8 +51,12 @@ function balanceFromTags(tags) {
   return null;
 }
 
+function readMetafield(obj, snakeKey) {
+  return obj?.[snakeKey]?.value ?? obj?.[snakeKey.replace(/_([a-z])/g, (_, c) => c.toUpperCase())]?.value;
+}
+
 function currentBalance(customer) {
-  const rawMeta = customer?.loyaltyPoints?.value;
+  const rawMeta = readMetafield(customer, 'loyalty_points');
   if (rawMeta !== null && rawMeta !== undefined && String(rawMeta).trim() !== '') {
     const fromMeta = parseInt(String(rawMeta).trim(), 10);
     if (!Number.isNaN(fromMeta)) return fromMeta;
