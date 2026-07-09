@@ -684,6 +684,7 @@
               <div class="card__media">${media}</div>
               <div class="card__body">
                 <div class="card__title">${escapeHtml(product.title)}</div>
+                <span class="card__stock" data-card-stock data-product-handle="${escapeHtml(product.handle)}" hidden></span>
                 <div class="card__footer">
                   <span class="card__price">${escapeHtml(formatSuggestMoney(product.price))}</span>
                 </div>
@@ -692,6 +693,7 @@
           `;
         })
         .join('');
+      initCardStock();
     };
 
     (async () => {
@@ -1420,6 +1422,46 @@
     });
   };
 
+  const initCardStock = () => {
+    const updateStockEl = (el, product) => {
+      const tracked = product.variants.some((variant) => variant.inventory_management);
+      if (!tracked) {
+        el.hidden = true;
+        el.textContent = '';
+        return;
+      }
+
+      const total = product.variants.reduce(
+        (sum, variant) => sum + (variant.inventory_quantity || 0),
+        0
+      );
+      const available = product.available !== false;
+
+      el.hidden = false;
+      el.textContent = available
+        ? total === 1
+          ? '1 in stock'
+          : `${total} in stock`
+        : 'Out of stock';
+      el.classList.toggle('is-low', available && total > 0 && total <= 3);
+    };
+
+    qsa('[data-card-stock][data-product-handle]').forEach(async (el) => {
+      const handle = el.dataset.productHandle;
+      if (!handle || el.dataset.stockLoaded === 'true') return;
+
+      try {
+        const res = await fetch(`/products/${encodeURIComponent(handle)}.js`);
+        if (!res.ok) return;
+        const product = await res.json();
+        updateStockEl(el, product);
+        el.dataset.stockLoaded = 'true';
+      } catch {
+        // ignore
+      }
+    });
+  };
+
   const boot = () => {
     try {
       initLoyaltyRedeem();
@@ -1467,6 +1509,7 @@
       initPredictiveSearch();
       initSearchPageFallback();
       initProductForm();
+      initCardStock();
     } catch (err) {
       console.error('theme boot extras failed', err);
     }

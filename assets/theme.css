@@ -2592,8 +2592,15 @@ html.in-app-browser .search-modal {
 }
 
 .card__stock {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--font-mono);
   font-size: 0.72rem;
   color: var(--muted);
+}
+
+.card__stock[hidden] {
+  display: none !important;
 }
 
 .card__stock.is-low {

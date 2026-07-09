@@ -58,6 +58,7 @@
 
           <div class="card__body">
             <div class="card__title">{{ product.title | escape }}</div>
+            {%- render 'card-stock', product: product -%}
             <div class="card__footer">
               <span class="card__price">
                 {%- if product.price_varies -%}
@@ -66,7 +67,6 @@
                   {{ product.price | money }}
                 {%- endif -%}
               </span>
-              {%- render 'card-stock', product: product -%}
             </div>
           </div>
         </a>

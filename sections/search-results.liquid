@@ -97,9 +97,9 @@
               </div>
               <div class="card__body">
                 <div class="card__title">{{ product.title | escape }}</div>
+                {%- render 'card-stock', product: product -%}
                 <div class="card__footer">
                   <span class="card__price">{{ product.price | money }}</span>
-                  {%- render 'card-stock', product: product -%}
                 </div>
               </div>
             </a>
