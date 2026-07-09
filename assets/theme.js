@@ -960,12 +960,15 @@
       window.location.assign(targetUrl);
     };
 
-    document.addEventListener('click', (e) => {
-      const target = e.target instanceof Element ? e.target : null;
-      const btn = target && target.closest('[data-open-loyalty-panel]');
-      if (!btn) return;
-      e.preventDefault();
-      openFromTrigger(btn);
+    qsa('[data-open-loyalty-panel]').forEach((btn) => {
+      btn.addEventListener(
+        'click',
+        (e) => {
+          e.preventDefault();
+          openFromTrigger(btn);
+        },
+        true
+      );
     });
 
     qsa('[data-close-loyalty-panel]').forEach((btn) => {
