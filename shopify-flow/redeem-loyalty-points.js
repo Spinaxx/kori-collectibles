@@ -2,133 +2,122 @@
 //
 // Trigger: Metaobject entry created (your "Redeem loyalty points" Shopify Form)
 //
-// ⚠️  If you see: Field 'loyaltyPoints' doesn't exist on type 'Customer'
-//     Flow has not registered your metafield aliases yet. Do ONE of the two options
-//     below BEFORE the query will save. The error is normal until you do this.
+// STEP 1 — Register metafields (pick one method before the query will save):
 //
-// OPTION A — Log output (recommended for Forms workflows)
-//   1. On the Yes branch, add Log output BEFORE Run code
-//   2. Click "Add variable" → Metaobject → formSubmittedBy → Metafields → loyalty_points
-//      Alias MUST be exactly: loyaltyPoints
-//   3. Add variable again → same path → loyalty_redeem_code
-//      Alias MUST be exactly: loyaltyRedeemCode
-//   4. Log message: {{ metaobject.formSubmittedBy.id }}
-//   5. Save the workflow, then open Run code — the GraphQL errors should clear
+// Method A — Log output BEFORE Run code (Forms workflows)
+//   Add variable → Metaobject → formSubmittedBy → Metafields → loyalty_points
+//   Add variable → Metaobject → formSubmittedBy → Metafields → loyalty_redeem_code
+//   Log: {{ metaobject.formSubmittedBy.id }}
+//   Save workflow, reopen Run code
 //
-// OPTION B — Run code input mapper (same as award flow)
-//   1. Paste the GraphQL query below (errors are OK for now)
-//   2. Scroll BELOW the query — Flow shows mapping rows for loyaltyPoints / loyaltyRedeemCode
-//   3. Map loyaltyPoints → Metaobject → formSubmittedBy → custom.loyalty_points
-//   4. Map loyaltyRedeemCode → Metaobject → formSubmittedBy → custom.loyalty_redeem_code
-//   5. Do NOT map to custom_loyalty_points — that is a different metafield
+// Method B — Input mapper below the query
+//   loyalty_points → Metaobject → formSubmittedBy → custom.loyalty_points
+//   loyalty_redeem_code → Metaobject → formSubmittedBy → custom.loyalty_redeem_code
 //
-// Input (GraphQL) — only AFTER metafields are registered (Option A or B):
+// STEP 2 — Input (GraphQL) — use snake_case (same as award/cancel flows):
 // query {
 //   metaobject {
 //     formSubmittedBy {
 //       id
-//       loyaltyPoints {
+//       loyalty_points {
 //         value
 //       }
-//       loyaltyRedeemCode {
+//       loyalty_redeem_code {
 //         value
 //       }
 //     }
 //   }
 // }
 //
-// Do NOT use: root "customer", email field, or metafield() aliases in the query.
-//
-// Define outputs (GraphQL):
+// STEP 3 — Define outputs (GraphQL) — paste ALL fields before the script:
 // type Output {
-//   "Discount code to create (empty if not eligible)"
 //   discountCode: String!
-//   "Customer points balance after redemption"
 //   newLoyaltyPoints: String!
-//   "GBP value of the reward"
 //   redeemValueGbp: String!
-//   "true when customer already has an unused code"
 //   reused: String!
-//   "Customer tag for the new balance"
 //   loyaltyPointsTag: String!
-//   "Customer tag to remove before updating balance"
 //   loyaltyPointsTagRemove: String!
-//   "Customer tag for the active discount code"
 //   loyaltyCodeTag: String!
-//   "Previous code tag to remove (empty if none)"
 //   loyaltyCodeTagRemove: String!
 // }
 //
-// Next steps in Flow (after Run code):
-// 1. Condition: discountCode is not empty
-// 2. Condition: reused equals false
-// 3. Send Admin API request → discountCodeBasicCreate (see REDEEM-SETUP.md)
-// 4. Update customer metafield → custom.loyalty_points = newLoyaltyPoints
-// 5. Update customer metafield → custom.loyalty_redeem_code = discountCode
-// 6. Remove customer tags → loyaltyPointsTagRemove (+ loyaltyCodeTagRemove if not empty)
-// 7. Add customer tags → loyaltyPointsTag (+ loyaltyCodeTag if not empty)
+// STEP 4 — Paste ONLY the JavaScript below (from const REDEEM_POINTS to the final }).
+// Do NOT paste the comment block or GraphQL into the script box.
+//
+// "2 validation errors" = Define outputs missing fields (usually loyaltyCodeTag / loyaltyCodeTagRemove)
+// or script pasted without export default function main.
 
 const REDEEM_POINTS = 100;
 const REDEEM_VALUE_GBP = 5;
 
+function readMetafield(obj, snakeKey) {
+  const value = obj?.[snakeKey]?.value;
+  if (value !== null && value !== undefined) return value;
+  const camelKey = snakeKey.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+  return obj?.[camelKey]?.value;
+}
+
+function result(fields) {
+  return {
+    discountCode: fields.discountCode ?? '',
+    newLoyaltyPoints: fields.newLoyaltyPoints ?? '0',
+    redeemValueGbp: fields.redeemValueGbp ?? String(REDEEM_VALUE_GBP),
+    reused: fields.reused ?? 'false',
+    loyaltyPointsTag: fields.loyaltyPointsTag ?? 'loyalty-points:0',
+    loyaltyPointsTagRemove: fields.loyaltyPointsTagRemove ?? 'loyalty-points:0',
+    loyaltyCodeTag: fields.loyaltyCodeTag ?? '',
+    loyaltyCodeTagRemove: fields.loyaltyCodeTagRemove ?? '',
+  };
+}
+
 export default function main(input) {
-  const customer = input.customer ?? input.metaobject?.formSubmittedBy;
+  const customer = input.metaobject?.formSubmittedBy;
 
   if (!customer) {
-    return {
+    return result({
       discountCode: '',
       newLoyaltyPoints: '0',
-      redeemValueGbp: String(REDEEM_VALUE_GBP),
       reused: 'false',
       loyaltyPointsTag: 'loyalty-points:0',
       loyaltyPointsTagRemove: 'loyalty-points:0',
-      loyaltyCodeTag: '',
-      loyaltyCodeTagRemove: '',
-    };
+    });
   }
 
-  const current = Number(customer.loyaltyPoints?.value ?? 0);
-  const existingCode = String(customer.loyaltyRedeemCode?.value ?? '').trim();
+  const current = Number(readMetafield(customer, 'loyalty_points') ?? 0);
+  const existingCode = String(readMetafield(customer, 'loyalty_redeem_code') ?? '').trim();
   const pointsTagRemove = `loyalty-points:${current}`;
 
   if (existingCode) {
-    return {
+    return result({
       discountCode: existingCode,
       newLoyaltyPoints: String(current),
-      redeemValueGbp: String(REDEEM_VALUE_GBP),
       reused: 'true',
       loyaltyPointsTag: `loyalty-points:${current}`,
       loyaltyPointsTagRemove: pointsTagRemove,
       loyaltyCodeTag: `loyalty-code:${existingCode}`,
-      loyaltyCodeTagRemove: '',
-    };
+    });
   }
 
   if (current < REDEEM_POINTS) {
-    return {
+    return result({
       discountCode: '',
       newLoyaltyPoints: String(current),
-      redeemValueGbp: String(REDEEM_VALUE_GBP),
       reused: 'false',
       loyaltyPointsTag: `loyalty-points:${current}`,
       loyaltyPointsTagRemove: pointsTagRemove,
-      loyaltyCodeTag: '',
-      loyaltyCodeTagRemove: '',
-    };
+    });
   }
 
   const customerId = String(customer.id ?? '').replace(/\D/g, '') || '0';
   const code = `KORI-${customerId}-${Date.now().toString(36).toUpperCase()}`;
   const newBalance = Math.max(0, current - REDEEM_POINTS);
 
-  return {
+  return result({
     discountCode: code,
     newLoyaltyPoints: String(newBalance),
-    redeemValueGbp: String(REDEEM_VALUE_GBP),
     reused: 'false',
     loyaltyPointsTag: `loyalty-points:${newBalance}`,
     loyaltyPointsTagRemove: pointsTagRemove,
     loyaltyCodeTag: `loyalty-code:${code}`,
-    loyaltyCodeTagRemove: '',
-  };
+  });
 }
