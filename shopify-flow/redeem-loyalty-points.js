@@ -11,18 +11,20 @@
 //   Save workflow, reopen Run code
 //
 // Method B — Input mapper below the query
-//   loyalty_points → Metaobject → formSubmittedBy → custom.loyalty_points
-//   loyalty_redeem_code → Metaobject → formSubmittedBy → custom.loyalty_redeem_code
+//   loyaltyPoints → Metaobject → formSubmittedBy → custom.loyalty_points
+//   loyaltyRedeemCode → Metaobject → formSubmittedBy → custom.loyalty_redeem_code
 //
-// STEP 2 — Input (GraphQL) — use snake_case (same as award/cancel flows):
+// STEP 2 — Input (GraphQL) — use camelCase on Customer (Forms redeem flow):
+//   loyaltyPoints / loyaltyRedeemCode  ← redeem (Forms)
+//   loyalty_points                     ← award & cancel (order.customer) only
 // query {
 //   metaobject {
 //     formSubmittedBy {
 //       id
-//       loyalty_points {
+//       loyaltyPoints {
 //         value
 //       }
-//       loyalty_redeem_code {
+//       loyaltyRedeemCode {
 //         value
 //       }
 //     }

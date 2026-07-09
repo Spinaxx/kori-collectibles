@@ -51,10 +51,12 @@ You should already have `custom.loyalty_points`. Also add:
 
 If Run code shows:
 
-> Field `loyalty_points` doesn't exist on type `Customer`  
-> Field `loyalty_redeem_code` doesn't exist on type `Customer`
+> Field `loyaltyPoints` doesn't exist on type `Customer`  
+> Field `loyaltyRedeemCode` doesn't exist on type `Customer`
 
-That is **expected** until Flow knows those metafields. Use **snake_case** in the query (same as award/cancel) — not `loyaltyPoints` / `loyaltyRedeemCode`.
+That is **expected** until Flow registers those metafields (step 3 below).
+
+**Redeem uses camelCase** in the GraphQL query (`loyaltyPoints`, `loyaltyRedeemCode`). Award and cancel use **snake_case** (`loyalty_points`) on `order.customer` — different Flow context, different field names.
 
 Pick **one** method:
 
@@ -63,26 +65,24 @@ Pick **one** method:
 On the **Yes** branch from step 2, **before** Run code:
 
 1. **Then → Log output**
-2. Click **Add variable** (do not type metafield paths in the message box)
-3. Path: **Metaobject → formSubmittedBy → Metafields → loyalty_points**
-4. **Add variable** again → **loyalty_redeem_code**
+2. Click **Add variable** → **Metaobject → formSubmittedBy → Metafields → loyalty_points**
+3. When Flow asks for an alias, enter exactly: **`loyaltyPoints`**
+4. **Add variable** again → **loyalty_redeem_code** → alias **`loyaltyRedeemCode`**
 5. Log message: `{{ metaobject.formSubmittedBy.id }}`
 6. **Save** the workflow
 
 #### Method B — Run code mapper
 
 1. Add **Run code** and paste the GraphQL query from step 4 below (errors are OK)
-2. Scroll **below** the Input query — Flow lists unmapped fields
-3. Map **`loyalty_points`** → **Metaobject → formSubmittedBy → `custom.loyalty_points`**
-4. Map **`loyalty_redeem_code`** → **Metaobject → formSubmittedBy → `custom.loyalty_redeem_code`**
-5. Errors should clear once both mappings are set
+2. Scroll **below** the Input query
+3. Map **`loyaltyPoints`** → **Metaobject → formSubmittedBy → `custom.loyalty_points`**
+4. Map **`loyaltyRedeemCode`** → **Metaobject → formSubmittedBy → `custom.loyalty_redeem_code`**
 
 **Common mistakes**
 
 - Log output on the **No** branch instead of **Yes**
-- Log output **after** Run code instead of before
-- Using **`loyaltyPoints`** in the query — use **`loyalty_points`**
-- Mapping to **`custom_loyalty_points`** (wrong key — use **`loyalty_points`** only)
+- Using **`loyalty_points`** in the redeem query — Flow wants **`loyaltyPoints`** here
+- Mapping to **`custom_loyalty_points`** (wrong key — use **`loyalty_points`** metafield only)
 
 You can delete the Log output step after Run code saves successfully.
 
@@ -114,10 +114,10 @@ query {
   metaobject {
     formSubmittedBy {
       id
-      loyalty_points {
+      loyaltyPoints {
         value
       }
-      loyalty_redeem_code {
+      loyaltyRedeemCode {
         value
       }
     }
@@ -125,7 +125,7 @@ query {
 }
 ```
 
-Map **`loyalty_points`** and **`loyalty_redeem_code`** in the input mapper (see step 3).
+Map **`loyaltyPoints`** and **`loyaltyRedeemCode`** in the input mapper (see step 3). Use **camelCase** — not `loyalty_points` (that is for award/cancel only).
 
 #### C — JavaScript — paste only the script
 
@@ -265,7 +265,8 @@ Check **Flow → Run history** if anything fails.
 | Run code GraphQL errors | No root `customer`, no `email`, no `metafield()` aliases in the query |
 | Run code shows `{ "message": "\n" }` | Validation failed — paste all **8** Define outputs; paste script from `const REDEEM_POINTS` through `export default function main` |
 | `2 validation errors` output mismatch | Define outputs missing `loyaltyCodeTag` and `loyaltyCodeTagRemove` — use the full 8-field block in step 4A |
-| `loyaltyPoints` doesn't exist on Customer | Use **`loyalty_points`** (snake_case) in the GraphQL query |
+| `loyalty_points` doesn't exist on Customer (redeem) | Wrong — redeem query must use **`loyaltyPoints`** and **`loyaltyRedeemCode`** (camelCase) |
+| `loyaltyPoints` doesn't exist on Customer | Step 3 not done — add Log output aliases or input mapper, save, reopen Run code |
 | `newLoyaltyPoints` not in metafield step | Pick it from **Run code** outputs in the variable picker — do not type it |
 | `loyaltyPointsTagRemove` not in variable picker | Paste the full **Define outputs** GraphQL block from step 4 (includes all four tag fields). Save workflow, re-paste JS, reopen Run code. |
 | Discount create fails | Store needs discount permissions; try hardcoded `"amount": "5.00"` |
