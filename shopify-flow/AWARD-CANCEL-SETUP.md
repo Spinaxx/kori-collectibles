@@ -18,6 +18,50 @@ The theme reads the customer **tag** `loyalty-points:150` on the storefront (met
 
 Delete **`custom_loyalty_points`** on customers if it exists — wrong duplicate.
 
+### Avoid duplicate unstructured metafields
+
+Shopify stores **defined** metafields (Custom data) and **unstructured** metafields separately. Flow can write to the wrong one even when namespace/key look identical.
+
+**Symptoms:** Defined **Loyalty points** stays stale; a second identical value appears under **Unstructured metafields** on the customer.
+
+**Fix (award, cancel, redeem — all workflows):**
+
+1. **Delete** every **Update customer metafield** step that writes `loyalty_points`.
+2. **Add a new** Update customer metafield step.
+3. For **Metafield**, use the **dropdown / picker** and choose the definition named **Loyalty points** — do not type namespace and key by hand.
+4. Confirm it shows **`custom.loyalty_points`** tied to the **definition** (you should see the definition name, not a blank custom entry).
+5. **Value:** Add variable → **Run code → newLoyaltyPoints** only.
+6. In **Run code input mapper**, map **`loyalty_points`** to the **same defined metafield** (Customer → Metafields → Loyalty points).
+
+**Clean up affected customers:** Admin → Customer → delete the unstructured `loyalty_points` entry → set the **defined** Loyalty points field to the correct total.
+
+**Definition must exist first:** Settings → Custom data → Customers → **Loyalty points** → namespace `custom`, key `loyalty_points`, type **Integer**.
+
+If Update customer metafield keeps creating unstructured copies, use **Send Admin API request** instead (see below).
+
+#### Alternative: Send Admin API request (defined metafield write)
+
+Replace **Update customer metafield** with **Send Admin API request**:
+
+- Mutation: **metafieldsSet**
+- Variables:
+
+```json
+{
+  "metafields": [
+    {
+      "ownerId": "{{ order.customer.id }}",
+      "namespace": "custom",
+      "key": "loyalty_points",
+      "type": "number_integer",
+      "value": "{{ runCode.newLoyaltyPoints }}"
+    }
+  ]
+}
+```
+
+Use the variable picker for `ownerId` and `value` — do not type liquid with blank lines. This writes to the defined integer field when the definition exists.
+
 ---
 
 ## Award points (order paid)
@@ -186,4 +230,4 @@ Flow only shows outputs after you paste the **Define outputs** GraphQL block, sa
 | `Cannot query field loyaltyPointsAwarded on Order` | Create order metafield `loyalty_points_awarded`; use **`loyalty_points_awarded`** in query |
 | Cancel flow sets balance to 0 | `loyalty_points` not mapped to `custom.loyalty_points` in input mapper |
 | `Value must be an integer` | Wrong key `custom_loyalty_points`; value has `{{ }}` or blank lines — use **Run code → newLoyaltyPoints** only |
-| Flow writes unstructured metafield | Recreate Update metafield step; pick **Loyalty points** definition from list |
+| Flow writes unstructured metafield | Recreate Update step; pick **Loyalty points** definition from dropdown; or use **metafieldsSet** Admin API mutation |
