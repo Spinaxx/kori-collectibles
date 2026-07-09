@@ -34,6 +34,7 @@ html {
 
 body {
   margin: 0;
+  min-height: 100vh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -1228,6 +1229,37 @@ ul {
   }
 }
 
+/* Instagram / Facebook in-app browsers — backdrop-filter can blank the viewport */
+
+html.in-app-browser .header,
+html.in-app-browser .search-modal,
+html.in-app-browser .loyalty-redeem-modal__backdrop,
+html.in-app-browser .game-tile__banner {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.in-app-browser .header {
+  background: var(--bg);
+}
+
+html.in-app-browser .search-modal {
+  background: rgba(8, 10, 14, 0.96);
+}
+
+/* Keep closed overlays fully hidden in strict WebViews */
+
+.drawer[hidden],
+.search-modal[hidden],
+.cart-drawer[hidden],
+.account-drawer[hidden],
+.loyalty-widget__modal[hidden],
+.loyalty-redeem-modal[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 /* Mobile drawer */
 
 .drawer {
@@ -1237,7 +1269,7 @@ ul {
 }
 
 .drawer[hidden] {
-  display: none;
+  display: none !important;
 }
 
 .drawer__backdrop {
@@ -1746,7 +1778,7 @@ ul {
 /* Search modal */
 
 .search-modal[hidden] {
-  display: none;
+  display: none !important;
 }
 
 .search-modal {
