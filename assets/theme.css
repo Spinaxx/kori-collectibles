@@ -529,19 +529,22 @@ ul {
 
 .loyalty-launcher__glyph {
   position: relative;
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .loyalty-launcher__icon {
   position: absolute;
   inset: 0;
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1.5rem;
+  height: 1.5rem;
   transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
 .loyalty-launcher__icon--star {
+  width: 1.65rem;
+  height: 1.65rem;
+  inset: -0.075rem;
   opacity: 1;
   transform: rotate(0deg) scale(1);
 }
