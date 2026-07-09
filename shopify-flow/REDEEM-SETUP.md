@@ -60,18 +60,25 @@ That is **expected** until Flow registers those metafields (step 3 below).
 
 Pick **one** method:
 
-#### Method A — Log output (recommended)
+#### Method A — Log output (optional — skip if Method B works)
 
 On the **Yes** branch from step 2, **before** Run code:
 
 1. **Then → Log output**
-2. Click **Add variable** → **Metaobject → formSubmittedBy → Metafields → loyalty_points**
-3. When Flow asks for an alias, enter exactly: **`loyaltyPoints`**
-4. **Add variable** again → **loyalty_redeem_code** → alias **`loyaltyRedeemCode`**
-5. Log message: `{{ metaobject.formSubmittedBy.id }}`
-6. **Save** the workflow
+2. In the message box, **delete everything** (no blank lines — empty message logs as `"\n"` and looks broken)
+3. Type: `Customer ` then click **Add variable** → **Metaobject → formSubmittedBy → id** (inserts a chip)
+4. Click **Add variable** again (separate from the message — use the step’s variable list if shown):
+   - Path: **Metaobject → formSubmittedBy → Metafields → loyalty_points**
+   - Alias: **`loyaltyPoints`** (exact spelling)
+5. **Add variable** again:
+   - Path: **loyalty_redeem_code**
+   - Alias: **`loyaltyRedeemCode`**
+6. Message should look like: `Customer ` + `[formSubmittedBy id chip]` — not empty, not only newlines
+7. **Save** the workflow → reopen **Run code** → query errors should clear
 
-#### Method B — Run code mapper
+**Log output run history showing `{ "message": "\n" }`** = message field was empty or only whitespace. Clear it and add the customer id chip as above. You can **delete** this step once Run code saves.
+
+#### Method B — Run code mapper (try this first — no Log step needed)
 
 1. Add **Run code** and paste the GraphQL query from step 4 below (errors are OK)
 2. Scroll **below** the Input query
@@ -80,6 +87,7 @@ On the **Yes** branch from step 2, **before** Run code:
 
 **Common mistakes**
 
+- Log message empty or only blank lines → run history shows `{ "message": "\n" }` — add customer id variable chip to message
 - Log output on the **No** branch instead of **Yes**
 - Using **`loyalty_points`** in the redeem query — Flow wants **`loyaltyPoints`** here
 - Mapping to **`custom_loyalty_points`** (wrong key — use **`loyalty_points`** metafield only)
