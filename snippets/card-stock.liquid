@@ -1,0 +1,26 @@
+{%- comment -%}
+  Inventory count for product cards on listing grids.
+  Sums tracked variant quantities; hides when sold out (badge covers that).
+{%- endcomment -%}
+{%- liquid
+  assign stock_qty = 0
+  assign stock_tracked = false
+
+  for variant in product.variants
+    if variant.inventory_management != blank
+      assign stock_tracked = true
+      if variant.inventory_quantity > 0
+        assign stock_qty = stock_qty | plus: variant.inventory_quantity
+      endif
+    endif
+  endfor
+-%}
+{%- if product.available and stock_tracked -%}
+  <span class="card__stock{% if stock_qty > 0 and stock_qty <= 3 %} is-low{% endif %}">
+    {%- if stock_qty == 1 -%}
+      1 in stock
+    {%- else -%}
+      {{ stock_qty }} in stock
+    {%- endif -%}
+  </span>
+{%- endif -%}

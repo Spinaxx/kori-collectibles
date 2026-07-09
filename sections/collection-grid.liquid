@@ -261,6 +261,7 @@
                     {{ product.price | money }}
                   {%- endif -%}
                 </span>
+                {%- render 'card-stock', product: product -%}
               </div>
             </div>
           </a>
