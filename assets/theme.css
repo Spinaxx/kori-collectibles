@@ -529,39 +529,42 @@ ul {
 
 .loyalty-launcher__glyph {
   position: relative;
-  width: 1.65rem;
-  height: 1.65rem;
+  display: grid;
+  place-items: center;
+  width: 2.05rem;
+  height: 2.05rem;
 }
 
 .loyalty-launcher__icon {
   position: absolute;
-  inset: 0;
-  width: 1.5rem;
-  height: 1.5rem;
+  top: 50%;
+  left: 50%;
+  display: block;
   transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
 .loyalty-launcher__icon--star {
   width: 2.05rem;
   height: 2.05rem;
-  inset: -0.2rem;
   opacity: 1;
-  transform: rotate(0deg) scale(1);
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
 }
 
 .loyalty-launcher__icon--close {
+  width: 1.5rem;
+  height: 1.5rem;
   opacity: 0;
-  transform: rotate(-90deg) scale(0.6);
+  transform: translate(-50%, -50%) rotate(-90deg) scale(0.6);
 }
 
 .loyalty-widget.is-open .loyalty-launcher__icon--star {
   opacity: 0;
-  transform: rotate(90deg) scale(0.6);
+  transform: translate(-50%, -50%) rotate(90deg) scale(0.6);
 }
 
 .loyalty-widget.is-open .loyalty-launcher__icon--close {
   opacity: 1;
-  transform: rotate(0deg) scale(1);
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
 }
 
 .loyalty-launcher__badge {
