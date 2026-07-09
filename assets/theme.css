@@ -523,7 +523,8 @@ ul {
 }
 
 .loyalty-widget.is-open .loyalty-launcher {
-  transform: rotate(135deg);
+  /* Keep the open-state icon reading as an X (135deg can read like a +) */
+  transform: rotate(90deg);
 }
 
 .loyalty-launcher__glyph {
