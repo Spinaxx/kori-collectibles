@@ -684,7 +684,6 @@
               <div class="card__media">${media}</div>
               <div class="card__body">
                 <div class="card__title">${escapeHtml(product.title)}</div>
-                <span class="card__stock" data-card-stock data-product-handle="${escapeHtml(product.handle)}" hidden></span>
                 <div class="card__footer">
                   <span class="card__price">${escapeHtml(formatSuggestMoney(product.price))}</span>
                 </div>
@@ -693,7 +692,6 @@
           `;
         })
         .join('');
-      initCardStock();
     };
 
     (async () => {
@@ -718,9 +716,10 @@
 
     const variantsEl = qs('[data-product-variants]', form);
     const priceEl = qs('[data-product-price]');
+    const stockEl = qs('[data-product-stock]');
     const submit = qs('[data-product-submit]', form);
     const pills = qsa('.product-form__pill-input', form);
-    if (!variantsEl || !pills.length) return;
+    if (!variantsEl) return;
 
     const addToCartEl = qs('[data-add-to-cart]', form);
     const soldOutEl = qs('[data-sold-out]', form);
@@ -737,6 +736,23 @@
     const formatVariantPrice = (cents) => {
       const moneyFormat = (window.Shopify && Shopify.money_format) || '£{{amount}}';
       return formatMoney(cents, moneyFormat);
+    };
+
+    const updateStock = (variant) => {
+      if (!stockEl || !variant) return;
+      if (variant.inventory_management !== 'shopify') {
+        stockEl.hidden = true;
+        return;
+      }
+
+      const qty = variant.inventory_quantity || 0;
+      stockEl.hidden = false;
+      stockEl.textContent = variant.available
+        ? qty === 1
+          ? '1 in stock'
+          : `${qty} in stock`
+        : 'Out of stock';
+      stockEl.classList.toggle('is-low', variant.available && qty > 0 && qty <= 3);
     };
 
     const updateVariant = (variantId) => {
@@ -756,16 +772,25 @@
         submit.disabled = !variant.available;
         submit.textContent = variant.available ? addToCartLabel : soldOutLabel;
       }
+
+      updateStock(variant);
     };
 
-    pills.forEach((input) => {
-      input.addEventListener('change', () => {
-        if (input.checked) updateVariant(input.value);
+    if (pills.length) {
+      pills.forEach((input) => {
+        input.addEventListener('change', () => {
+          if (input.checked) updateVariant(input.value);
+        });
       });
-    });
 
-    const checked = pills.find((input) => input.checked);
-    if (checked) updateVariant(checked.value);
+      const checked = pills.find((input) => input.checked);
+      if (checked) updateVariant(checked.value);
+      return;
+    }
+
+    if (variants.length === 1) {
+      updateVariant(variants[0].id);
+    }
   };
 
   const initAnnouncementMarquee = () => {
@@ -1422,46 +1447,6 @@
     });
   };
 
-  const initCardStock = () => {
-    const updateStockEl = (el, product) => {
-      const tracked = product.variants.some((variant) => variant.inventory_management);
-      if (!tracked) {
-        el.hidden = true;
-        el.textContent = '';
-        return;
-      }
-
-      const total = product.variants.reduce(
-        (sum, variant) => sum + (variant.inventory_quantity || 0),
-        0
-      );
-      const available = product.available !== false;
-
-      el.hidden = false;
-      el.textContent = available
-        ? total === 1
-          ? '1 in stock'
-          : `${total} in stock`
-        : 'Out of stock';
-      el.classList.toggle('is-low', available && total > 0 && total <= 3);
-    };
-
-    qsa('[data-card-stock][data-product-handle]').forEach(async (el) => {
-      const handle = el.dataset.productHandle;
-      if (!handle || el.dataset.stockLoaded === 'true') return;
-
-      try {
-        const res = await fetch(`/products/${encodeURIComponent(handle)}.js`);
-        if (!res.ok) return;
-        const product = await res.json();
-        updateStockEl(el, product);
-        el.dataset.stockLoaded = 'true';
-      } catch {
-        // ignore
-      }
-    });
-  };
-
   const boot = () => {
     try {
       initLoyaltyRedeem();
@@ -1509,7 +1494,6 @@
       initPredictiveSearch();
       initSearchPageFallback();
       initProductForm();
-      initCardStock();
     } catch (err) {
       console.error('theme boot extras failed', err);
     }

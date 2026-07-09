@@ -3057,7 +3057,22 @@ html.in-app-browser .search-modal {
   font-family: var(--font-mono);
   font-size: 1.35rem;
   color: var(--accent-2);
-  margin-bottom: 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.product__stock {
+  margin: 0 0 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.product__stock.is-low {
+  color: var(--accent-2);
+}
+
+.product__stock[hidden] {
+  display: none !important;
 }
 
 .product__desc {

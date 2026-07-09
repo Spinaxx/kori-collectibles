@@ -52,6 +52,24 @@
         {%- endif -%}
       </div>
 
+      {%- assign current = product.selected_or_first_available_variant -%}
+      {%- if current.inventory_management == 'shopify' -%}
+        <p
+          class="product__stock{% if current.available and current.inventory_quantity > 0 and current.inventory_quantity <= 3 %} is-low{% endif %}"
+          data-product-stock
+        >
+          {%- if current.available -%}
+            {%- if current.inventory_quantity == 1 -%}
+              1 in stock
+            {%- else -%}
+              {{ current.inventory_quantity }} in stock
+            {%- endif -%}
+          {%- else -%}
+            Out of stock
+          {%- endif -%}
+        </p>
+      {%- endif -%}
+
       {%- if product_desc != blank -%}
         <div class="product__desc">{{ product_desc }}</div>
       {%- endif -%}
@@ -61,8 +79,6 @@
       {% form 'product', product, class: 'product-form' %}
         <span class="visually-hidden" data-add-to-cart>{{ product_add_label }}</span>
         <span class="visually-hidden" data-sold-out>{{ product_sold_label }}</span>
-        {%- assign current = product.selected_or_first_available_variant -%}
-
         {%- unless product.has_only_default_variant -%}
           <div class="product-form__field">
             <span class="product-form__label" id="VariantLabel-{{ section.id }}">Variant</span>
