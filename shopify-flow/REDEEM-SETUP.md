@@ -120,12 +120,15 @@ query {
       loyaltyRedeemCode {
         value
       }
+      tags
     }
   }
 }
 ```
 
 Map **`loyaltyPoints`** and **`loyaltyRedeemCode`** in the input mapper (see step 3). Use **camelCase** — not `loyalty_points` (that is for award/cancel only).
+
+Add **`tags`** so Run code can read `loyalty-points:XXX` when the defined metafield is empty but the tag is set.
 
 #### C — JavaScript — paste only the script
 
@@ -266,7 +269,7 @@ Check **Flow → Run history** if anything fails.
 | Run code shows `{ "message": "\n" }` | Validation failed — paste all **8** Define outputs; paste script from `const REDEEM_POINTS` through `export default function main` |
 | `2 validation errors` output mismatch | Define outputs missing `loyaltyCodeTag` and `loyaltyCodeTagRemove` — use the full 8-field block in step 4A |
 | `loyalty_points` doesn't exist on Customer (redeem) | Wrong — redeem query must use **`loyaltyPoints`** and **`loyaltyRedeemCode`** (camelCase) |
-| `loyaltyPoints` doesn't exist on Customer | Step 3 not done — add Log output aliases or input mapper, save, reopen Run code |
+| `loyaltyPoints` is null in run history | Mapper points at empty/wrong metafield, or balance only on **tag** — add `tags` to query; fix mapper to **Loyalty points** definition; set defined field value on customer |
 | `newLoyaltyPoints` not in metafield step | Pick it from **Run code** outputs in the variable picker — do not type it |
 | `loyaltyPointsTagRemove` not in variable picker | Paste the full **Define outputs** GraphQL block from step 4 (includes all four tag fields). Save workflow, re-paste JS, reopen Run code. |
 | Discount create fails | Store needs discount permissions; try hardcoded `"amount": "5.00"` |

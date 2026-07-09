@@ -27,9 +27,14 @@
 //       loyaltyRedeemCode {
 //         value
 //       }
+//       tags
 //     }
 //   }
 // }
+//
+// If loyaltyPoints is null in run history but the customer has points, either:
+// - Input mapper points at the wrong/empty metafield (fix mapper or defined field value)
+// - Points only exist on the loyalty-points: tag (add tags to query — script reads tag fallback)
 //
 // STEP 3 — Define outputs (GraphQL) — paste ALL fields before the script:
 // type Output {
@@ -53,10 +58,59 @@ const REDEEM_POINTS = 100;
 const REDEEM_VALUE_GBP = 5;
 
 function readMetafield(obj, snakeKey) {
-  const value = obj?.[snakeKey]?.value;
-  if (value !== null && value !== undefined) return value;
   const camelKey = snakeKey.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
-  return obj?.[camelKey]?.value;
+
+  for (const key of [snakeKey, camelKey]) {
+    const raw = obj?.[key]?.value;
+    if (raw !== null && raw !== undefined && String(raw).trim() !== '') {
+      return raw;
+    }
+  }
+
+  return null;
+}
+
+function balanceFromTags(tags) {
+  if (!Array.isArray(tags)) return null;
+
+  for (const tag of tags) {
+    const stripped = String(tag).trim();
+    if (!stripped.includes('loyalty-points:')) continue;
+    const value = parseInt(stripped.split('loyalty-points:')[1]?.trim(), 10);
+    if (!Number.isNaN(value)) return value;
+  }
+
+  return null;
+}
+
+function codeFromTags(tags) {
+  if (!Array.isArray(tags)) return '';
+
+  for (const tag of tags) {
+    const stripped = String(tag).trim();
+    if (!stripped.includes('loyalty-code:')) continue;
+    const code = stripped.split('loyalty-code:')[1]?.trim();
+    if (code) return code;
+  }
+
+  return '';
+}
+
+function currentBalance(customer) {
+  const fromMeta = readMetafield(customer, 'loyalty_points');
+  if (fromMeta !== null) return Number(fromMeta) || 0;
+
+  const fromTag = balanceFromTags(customer?.tags);
+  if (fromTag !== null) return fromTag;
+
+  return 0;
+}
+
+function activeRedeemCode(customer) {
+  const fromMeta = readMetafield(customer, 'loyalty_redeem_code');
+  if (fromMeta !== null) return String(fromMeta).trim();
+
+  return codeFromTags(customer?.tags);
 }
 
 function result(fields) {
@@ -85,8 +139,8 @@ export default function main(input) {
     });
   }
 
-  const current = Number(readMetafield(customer, 'loyalty_points') ?? 0);
-  const existingCode = String(readMetafield(customer, 'loyalty_redeem_code') ?? '').trim();
+  const current = currentBalance(customer);
+  const existingCode = activeRedeemCode(customer);
   const pointsTagRemove = `loyalty-points:${current}`;
 
   if (existingCode) {
