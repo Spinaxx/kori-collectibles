@@ -219,6 +219,18 @@
         "heading": "New in the binder",
         "subheading": "Fresh stock with live counts - what you see is what is available.",
         "collection": "",
+        "product_filter": "singles",
+        "products_to_show": 8,
+        "show_view_all": true
+      }
+    },
+    "sealed_showcase": {
+      "type": "product-showcase",
+      "settings": {
+        "heading": "New from the case",
+        "subheading": "ETBs, boxes, and collections — still sealed, live stock.",
+        "collection": "",
+        "product_filter": "sealed",
         "products_to_show": 8,
         "show_view_all": true
       }
@@ -270,6 +282,7 @@
     "games",
     "trust",
     "showcase",
+    "sealed_showcase",
     "promos"
   ]
 }

@@ -1,6 +1,7 @@
 {%- liquid
   assign source = section.settings.collection
   assign limit = section.settings.products_to_show | default: 8
+  assign product_filter = section.settings.product_filter | default: 'singles'
   if source != blank
     assign products = source.products
   else
@@ -38,7 +39,10 @@
             assign sealed = true
           endif
 
-          if sealed
+          if product_filter == 'singles' and sealed
+            continue
+          endif
+          if product_filter == 'sealed' and sealed == false
             continue
           endif
 
@@ -91,10 +95,18 @@
 
       {%- if shown == 0 -%}
         <div class="empty-state" style="grid-column:1/-1">
-          {%- if source != blank -%}
-            No singles in this collection yet.
+          {%- if product_filter == 'sealed' -%}
+            {%- if source != blank -%}
+              No sealed products in this collection yet.
+            {%- else -%}
+              Add sealed stock, then choose a collection in this section.
+            {%- endif -%}
           {%- else -%}
-            Add singles, then choose a collection in this section.
+            {%- if source != blank -%}
+              No singles in this collection yet.
+            {%- else -%}
+              Add singles, then choose a collection in this section.
+            {%- endif -%}
           {%- endif -%}
         </div>
       {%- endif -%}
@@ -123,8 +135,18 @@
     {
       "type": "collection",
       "id": "collection",
-      "label": "Collection",
-      "info": "Only singles are shown. Sealed products are skipped automatically."
+      "label": "Collection"
+    },
+    {
+      "type": "select",
+      "id": "product_filter",
+      "label": "Show products",
+      "options": [
+        { "value": "singles", "label": "Singles only" },
+        { "value": "sealed", "label": "Sealed only" },
+        { "value": "all", "label": "All products" }
+      ],
+      "default": "singles"
     },
     {
       "type": "range",
