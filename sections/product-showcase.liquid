@@ -6,6 +6,8 @@
   else
     assign products = collections.all.products
   endif
+
+  assign shown = 0
 -%}
 
 <section class="section">
@@ -23,8 +25,24 @@
     </div>
 
     <div class="product-grid">
-      {%- for product in products limit: limit -%}
+      {%- for product in products -%}
         {%- liquid
+          if shown >= limit
+            break
+          endif
+
+          assign type_lc = product.type | downcase | strip
+          assign tags_lc = product.tags | join: ',' | downcase
+          assign sealed = false
+          if type_lc contains 'sealed' or type_lc contains 'booster' or type_lc contains 'etb' or type_lc contains 'elite trainer' or tags_lc contains 'sealed'
+            assign sealed = true
+          endif
+
+          if sealed
+            continue
+          endif
+
+          assign shown = shown | plus: 1
           assign image_alt = product.featured_image.alt | default: product.title
         -%}
         <a class="card" href="{{ product.url }}">
@@ -69,15 +87,17 @@
             </div>
           </div>
         </a>
-      {%- else -%}
+      {%- endfor -%}
+
+      {%- if shown == 0 -%}
         <div class="empty-state" style="grid-column:1/-1">
           {%- if source != blank -%}
-            No products in this collection yet.
+            No singles in this collection yet.
           {%- else -%}
-            Add products, then choose a collection in this section.
+            Add singles, then choose a collection in this section.
           {%- endif -%}
         </div>
-      {%- endfor -%}
+      {%- endif -%}
     </div>
   </div>
 </section>
@@ -103,7 +123,8 @@
     {
       "type": "collection",
       "id": "collection",
-      "label": "Collection"
+      "label": "Collection",
+      "info": "Only singles are shown. Sealed products are skipped automatically."
     },
     {
       "type": "range",
