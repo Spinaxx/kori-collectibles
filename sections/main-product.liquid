@@ -16,6 +16,33 @@
       assign product_desc = product_desc | split: 'Catalog ID:' | first
     endif
   endif
+
+  assign tcg_label = product.vendor | strip
+  if tcg_label == blank or tcg_label == 'Trading Card'
+    assign tcg_label = blank
+  endif
+
+  assign set_name = blank
+  if product.metafields.custom.set_name != blank
+    assign set_name = product.metafields.custom.set_name.value | default: product.metafields.custom.set_name | strip
+  endif
+  if set_name == blank and product.title contains ' - '
+    assign title_parts = product.title | split: ' - '
+    if title_parts.size > 1
+      assign set_name = title_parts[1] | strip
+    endif
+  endif
+
+  assign product_eyebrow = blank
+  if tcg_label != blank and set_name != blank
+    assign product_eyebrow = tcg_label | append: ' • ' | append: set_name
+  elsif tcg_label != blank
+    assign product_eyebrow = tcg_label
+  elsif set_name != blank
+    assign product_eyebrow = set_name
+  else
+    assign product_eyebrow = product.type | default: 'Kori Collectibles'
+  endif
 -%}
 
 <section class="page-width">
@@ -41,7 +68,7 @@
 
     <div>
       <p class="product__eyebrow">
-        {{ product.type | default: product.vendor | default: 'Kori Collectibles' | escape }}
+        {{ product_eyebrow | escape }}
       </p>
       <h1 class="product__title">{{ product.title | escape }}</h1>
       <div class="product__price" data-product-price>
