@@ -149,11 +149,37 @@
                       <div class="mega">
                         <div class="mega__grid">
                           {%- for child in link.links -%}
+                            {%- liquid
+                              assign child_title_lc = child.title | downcase
+                              assign child_new_tab = false
+                              if child_title_lc contains 'buy' and child_title_lc contains 'sell'
+                                assign child_new_tab = true
+                              endif
+                            -%}
                             <div>
-                              <a class="mega__title" href="{{ child.url }}">{{ child.title | escape }}</a>
+                              <a
+                                class="mega__title"
+                                href="{{ child.url }}"
+                                {% if child_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+                              >
+                                {{ child.title | escape }}
+                              </a>
                               {%- if child.links != blank -%}
                                 {%- for grand in child.links -%}
-                                  <a class="mega__link" href="{{ grand.url }}">{{ grand.title | escape }}</a>
+                                  {%- liquid
+                                    assign grand_title_lc = grand.title | downcase
+                                    assign grand_new_tab = false
+                                    if grand_title_lc contains 'buy' and grand_title_lc contains 'sell'
+                                      assign grand_new_tab = true
+                                    endif
+                                  -%}
+                                  <a
+                                    class="mega__link"
+                                    href="{{ grand.url }}"
+                                    {% if grand_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+                                  >
+                                    {{ grand.title | escape }}
+                                  </a>
                                 {%- endfor -%}
                               {%- endif -%}
                             </div>
@@ -162,10 +188,18 @@
                       </div>
                     </details>
                   {%- else -%}
+                    {%- liquid
+                      assign link_title_lc = link.title | downcase
+                      assign link_new_tab = false
+                      if link_title_lc contains 'buy' and link_title_lc contains 'sell'
+                        assign link_new_tab = true
+                      endif
+                    -%}
                     <a
                       class="nav-link{% if link.current %} is-active{% endif %}"
                       href="{{ link.url }}"
                       {% if link.current %}aria-current="page"{% endif %}
+                      {% if link_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
                     >
                       {{ link.title | escape }}
                     </a>
@@ -237,17 +271,53 @@
                       <summary>{{ link.title | escape }}</summary>
                       <ul role="list">
                         {%- for child in link.links -%}
+                          {%- liquid
+                            assign child_title_lc = child.title | downcase
+                            assign child_new_tab = false
+                            if child_title_lc contains 'buy' and child_title_lc contains 'sell'
+                              assign child_new_tab = true
+                            endif
+                          -%}
                           <li>
-                            <a href="{{ child.url }}">{{ child.title | escape }}</a>
+                            <a
+                              href="{{ child.url }}"
+                              {% if child_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+                            >
+                              {{ child.title | escape }}
+                            </a>
                             {%- for grand in child.links -%}
-                              <a href="{{ grand.url }}">{{ grand.title | escape }}</a>
+                              {%- liquid
+                                assign grand_title_lc = grand.title | downcase
+                                assign grand_new_tab = false
+                                if grand_title_lc contains 'buy' and grand_title_lc contains 'sell'
+                                  assign grand_new_tab = true
+                                endif
+                              -%}
+                              <a
+                                href="{{ grand.url }}"
+                                {% if grand_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+                              >
+                                {{ grand.title | escape }}
+                              </a>
                             {%- endfor -%}
                           </li>
                         {%- endfor -%}
                       </ul>
                     </details>
                   {%- else -%}
-                    <a href="{{ link.url }}">{{ link.title | escape }}</a>
+                    {%- liquid
+                      assign link_title_lc = link.title | downcase
+                      assign link_new_tab = false
+                      if link_title_lc contains 'buy' and link_title_lc contains 'sell'
+                        assign link_new_tab = true
+                      endif
+                    -%}
+                    <a
+                      href="{{ link.url }}"
+                      {% if link_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+                    >
+                      {{ link.title | escape }}
+                    </a>
                   {%- endif -%}
                 </li>
               {%- endfor -%}
