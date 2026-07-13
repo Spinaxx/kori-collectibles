@@ -47,50 +47,8 @@
           endif
 
           assign shown = shown | plus: 1
-          assign image_alt = product.featured_image.alt | default: product.title
         -%}
-        <a class="card" href="{{ product.url }}">
-          <div class="card__media">
-            {%- if product.available == false -%}
-              <span class="card__badge card__badge--sold">Sold out</span>
-            {%- elsif product.tags contains 'preorder' or product.tags contains 'Preorder' or product.tags contains 'pre-order' -%}
-              <span class="card__badge">Pre-order</span>
-            {%- endif -%}
-
-            {%- if product.featured_image != blank -%}
-              <img
-                class="card__image"
-                src="{{ product.featured_image | image_url: width: 480 }}"
-                srcset="
-                  {{ product.featured_image | image_url: width: 240 }} 240w,
-                  {{ product.featured_image | image_url: width: 360 }} 360w,
-                  {{ product.featured_image | image_url: width: 480 }} 480w,
-                  {{ product.featured_image | image_url: width: 700 }} 700w
-                "
-                sizes="(max-width: 749px) 45vw, 23vw"
-                alt="{{ image_alt | escape }}"
-                width="{{ product.featured_image.width }}"
-                height="{{ product.featured_image.height }}"
-                loading="lazy"
-              >
-            {%- else -%}
-              {{ 'product-1' | placeholder_svg_tag }}
-            {%- endif -%}
-          </div>
-
-          <div class="card__body">
-            <div class="card__title">{{ product.title | escape }}</div>
-            <div class="card__footer">
-              <span class="card__price">
-                {%- if product.price_varies -%}
-                  From {{ product.price_min | money }}
-                {%- else -%}
-                  {{ product.price | money }}
-                {%- endif -%}
-              </span>
-            </div>
-          </div>
-        </a>
+        {%- render 'product-card', product: product, sizes: '(max-width: 749px) 45vw, 23vw' -%}
       {%- endfor -%}
 
       {%- if shown == 0 -%}

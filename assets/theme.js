@@ -1452,6 +1452,95 @@
     });
   };
 
+  const initProductCards = () => {
+    const moneyFormat = (window.Shopify && Shopify.money_format) || '£{{amount}}';
+
+    const selectVariant = (card, pill) => {
+      if (!card || !pill || pill.disabled) return;
+      const priceEl = qs('[data-card-price]', card);
+      const addBtn = qs('[data-card-add]', card);
+      const cents = Number(pill.dataset.variantPrice || 0);
+      const available = pill.dataset.variantAvailable === 'true';
+      const variantId = pill.dataset.variantId;
+
+      qsa('[data-card-variant]', card).forEach((btn) => {
+        const selected = btn === pill;
+        btn.classList.toggle('is-selected', selected);
+        btn.setAttribute('aria-pressed', String(selected));
+      });
+
+      if (priceEl) priceEl.textContent = formatMoney(cents, moneyFormat);
+      if (addBtn) {
+        addBtn.dataset.variantId = variantId || '';
+        addBtn.disabled = !available;
+        addBtn.textContent = available ? 'Add to basket' : 'Sold out';
+      }
+    };
+
+    const addToCart = async (card, addBtn) => {
+      const variantId = addBtn.dataset.variantId;
+      if (!variantId || addBtn.disabled) return;
+
+      addBtn.classList.add('is-loading');
+      addBtn.disabled = true;
+      const previousLabel = addBtn.textContent;
+      addBtn.textContent = 'Adding…';
+
+      try {
+        const res = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: Number(variantId), quantity: 1 }),
+        });
+        if (!res.ok) throw new Error('Add to cart failed');
+
+        if (window.KoriCart && typeof window.KoriCart.refresh === 'function') {
+          await window.KoriCart.refresh();
+          window.KoriCart.open();
+        } else {
+          window.location.assign('/cart');
+        }
+        addBtn.textContent = 'Added';
+        setTimeout(() => {
+          addBtn.textContent = previousLabel || 'Add to basket';
+        }, 1200);
+      } catch {
+        addBtn.textContent = previousLabel || 'Add to basket';
+        window.location.assign(`/cart/add?id=${encodeURIComponent(variantId)}&quantity=1`);
+      } finally {
+        addBtn.classList.remove('is-loading');
+        const selected = qs('[data-card-variant].is-selected', card) || qs('[data-card-variant]', card);
+        const available = selected
+          ? selected.dataset.variantAvailable === 'true'
+          : addBtn.dataset.variantId !== '';
+        addBtn.disabled = !available;
+      }
+    };
+
+    document.addEventListener('click', (e) => {
+      const target = e.target instanceof Element ? e.target : null;
+      if (!target) return;
+
+      const pill = target.closest('[data-card-variant]');
+      if (pill) {
+        e.preventDefault();
+        e.stopPropagation();
+        selectVariant(pill.closest('[data-product-card]'), pill);
+        return;
+      }
+
+      const addBtn = target.closest('[data-card-add]');
+      if (addBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        addToCart(addBtn.closest('[data-product-card]'), addBtn);
+      }
+    });
+  };
+
   const boot = () => {
     try {
       initLoyaltyRedeem();
@@ -1499,6 +1588,7 @@
       initPredictiveSearch();
       initSearchPageFallback();
       initProductForm();
+      initProductCards();
     } catch (err) {
       console.error('theme boot extras failed', err);
     }

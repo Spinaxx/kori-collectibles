@@ -67,41 +67,7 @@
       {%- paginate search.results by 24 -%}
         {%- for item in search.results -%}
           {%- if item.object_type == 'product' -%}
-            {%- liquid
-              assign product = item
-              assign image_alt = product.featured_image.alt | default: product.title
-            -%}
-            <a class="card" href="{{ product.url }}" data-product-handle="{{ product.handle }}">
-              <div class="card__media">
-                {%- if product.available == false -%}
-                  <span class="card__badge card__badge--sold">Sold out</span>
-                {%- endif -%}
-                {%- if product.featured_image != blank -%}
-                  <img
-                    src="{{ product.featured_image | image_url: width: 480 }}"
-                    srcset="
-                      {{ product.featured_image | image_url: width: 240 }} 240w,
-                      {{ product.featured_image | image_url: width: 360 }} 360w,
-                      {{ product.featured_image | image_url: width: 480 }} 480w,
-                      {{ product.featured_image | image_url: width: 700 }} 700w
-                    "
-                    sizes="(max-width: 749px) 45vw, 23vw"
-                    alt="{{ image_alt | escape }}"
-                    width="{{ product.featured_image.width }}"
-                    height="{{ product.featured_image.height }}"
-                    loading="lazy"
-                  >
-                {%- else -%}
-                  {{ 'product-1' | placeholder_svg_tag }}
-                {%- endif -%}
-              </div>
-              <div class="card__body">
-                <div class="card__title">{{ product.title | escape }}</div>
-                <div class="card__footer">
-                  <span class="card__price">{{ product.price | money }}</span>
-                </div>
-              </div>
-            </a>
+            {%- render 'product-card', product: item, sizes: '(max-width: 749px) 45vw, 23vw' -%}
           {%- endif -%}
         {%- endfor -%}
 
