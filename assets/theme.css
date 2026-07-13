@@ -2119,12 +2119,16 @@ html.in-app-browser .search-modal {
   transform-style: preserve-3d;
   transform: rotateX(0) rotateY(0) scale(1);
   will-change: transform;
-  transition: transform 0.18s ease-out;
+  transition: transform 0.18s ease-out, opacity 0.2s ease;
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
   cursor: grab;
   outline: none;
+}
+
+.hero-card.is-pending {
+  opacity: 0;
 }
 
 .hero-card.is-tilting {
