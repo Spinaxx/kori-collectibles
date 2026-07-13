@@ -427,55 +427,12 @@
 
   const initHeroTilt = () => {
     const card = qs('[data-hero-card]');
-    if (!card) return;
-
-    const poolEl = qs('[data-hero-pool]');
-    const image = qs('[data-hero-image]', card);
-    if (poolEl && image) {
-      let pool = [];
-      try {
-        pool = JSON.parse(poolEl.textContent || '[]');
-      } catch {
-        pool = [];
-      }
-
-      if (Array.isArray(pool) && pool.length > 0) {
-        const storageKey = 'kori-hero-handle';
-        let lastHandle = '';
-        try {
-          lastHandle = sessionStorage.getItem(storageKey) || '';
-        } catch {
-          lastHandle = '';
-        }
-
-        let choices = pool;
-        if (pool.length > 1 && lastHandle) {
-          const filtered = pool.filter((item) => item && item.handle !== lastHandle);
-          if (filtered.length) choices = filtered;
-        }
-
-        const pick = choices[Math.floor(Math.random() * choices.length)];
-        if (pick && pick.src) {
-          image.src = pick.src;
-          if (pick.srcset) image.srcset = pick.srcset;
-          if (pick.width) image.width = pick.width;
-          if (pick.height) image.height = pick.height;
-          image.alt = pick.alt || pick.title || '';
-          card.setAttribute('data-hero-url', pick.url || '');
-          card.setAttribute('data-hero-handle', pick.handle || '');
-          card.setAttribute('aria-label', pick.title || 'Featured card');
-          try {
-            sessionStorage.setItem(storageKey, pick.handle || '');
-          } catch {
-            // ignore
-          }
-        }
-      }
-    }
+    if (!card || card.dataset.heroTiltBound === 'true') return;
+    card.dataset.heroTiltBound = 'true';
 
     const shine = qs('[data-hero-shine]', card);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let productUrl = () => card.getAttribute('data-hero-url');
+    const productUrl = () => card.getAttribute('data-hero-url');
     let dragging = false;
     let moved = false;
     let startX = 0;

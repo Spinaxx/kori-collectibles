@@ -139,7 +139,7 @@
 
       {%- if hero_product != blank and hero_product.featured_image -%}
         <div
-          class="hero-card"
+          class="hero-card{% if handle_count > 1 %} is-pending{% endif %}"
           data-hero-card
           data-hero-url="{{ hero_product.url }}"
           data-hero-handle="{{ hero_product.handle }}"
@@ -170,6 +170,65 @@
           >
           <span class="hero-card__holo" aria-hidden="true"></span>
         </div>
+        {%- if handle_count > 0 -%}
+          <script>
+            (function () {
+              if (window.__koriHeroPicked) return;
+              window.__koriHeroPicked = true;
+
+              var poolEl = document.querySelector('[data-hero-pool]');
+              var card = document.querySelector('[data-hero-card]');
+              var image = card && card.querySelector('[data-hero-image]');
+              if (!poolEl || !card || !image) {
+                if (card) card.classList.remove('is-pending');
+                return;
+              }
+
+              var pool = [];
+              try {
+                pool = JSON.parse(poolEl.textContent || '[]');
+              } catch (e) {
+                pool = [];
+              }
+              if (!pool.length) {
+                card.classList.remove('is-pending');
+                return;
+              }
+
+              var storageKey = 'kori-hero-handle';
+              var lastHandle = '';
+              try {
+                lastHandle = sessionStorage.getItem(storageKey) || '';
+              } catch (e) {}
+
+              var choices = pool;
+              if (pool.length > 1 && lastHandle) {
+                var filtered = pool.filter(function (item) {
+                  return item && item.handle !== lastHandle;
+                });
+                if (filtered.length) choices = filtered;
+              }
+
+              var pick = choices[Math.floor(Math.random() * choices.length)];
+              if (pick && pick.src) {
+                image.src = pick.src;
+                if (pick.srcset) image.srcset = pick.srcset;
+                if (pick.width) image.width = pick.width;
+                if (pick.height) image.height = pick.height;
+                image.alt = pick.alt || pick.title || '';
+                card.setAttribute('data-hero-url', pick.url || '');
+                card.setAttribute('data-hero-handle', pick.handle || '');
+                card.setAttribute('aria-label', pick.title || 'Featured card');
+                try {
+                  sessionStorage.setItem(storageKey, pick.handle || '');
+                } catch (e) {}
+              }
+
+              card.classList.remove('is-pending');
+              card.setAttribute('data-hero-picked', 'true');
+            })();
+          </script>
+        {%- endif -%}
       {%- elsif section.settings.fallback_image != blank -%}
         <div class="hero-card" data-hero-card aria-hidden="true">
           <span class="hero-card__shine" data-hero-shine></span>
