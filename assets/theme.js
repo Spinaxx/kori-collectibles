@@ -429,9 +429,53 @@
     const card = qs('[data-hero-card]');
     if (!card) return;
 
+    const poolEl = qs('[data-hero-pool]');
+    const image = qs('[data-hero-image]', card);
+    if (poolEl && image) {
+      let pool = [];
+      try {
+        pool = JSON.parse(poolEl.textContent || '[]');
+      } catch {
+        pool = [];
+      }
+
+      if (Array.isArray(pool) && pool.length > 0) {
+        const storageKey = 'kori-hero-handle';
+        let lastHandle = '';
+        try {
+          lastHandle = sessionStorage.getItem(storageKey) || '';
+        } catch {
+          lastHandle = '';
+        }
+
+        let choices = pool;
+        if (pool.length > 1 && lastHandle) {
+          const filtered = pool.filter((item) => item && item.handle !== lastHandle);
+          if (filtered.length) choices = filtered;
+        }
+
+        const pick = choices[Math.floor(Math.random() * choices.length)];
+        if (pick && pick.src) {
+          image.src = pick.src;
+          if (pick.srcset) image.srcset = pick.srcset;
+          if (pick.width) image.width = pick.width;
+          if (pick.height) image.height = pick.height;
+          image.alt = pick.alt || pick.title || '';
+          card.setAttribute('data-hero-url', pick.url || '');
+          card.setAttribute('data-hero-handle', pick.handle || '');
+          card.setAttribute('aria-label', pick.title || 'Featured card');
+          try {
+            sessionStorage.setItem(storageKey, pick.handle || '');
+          } catch {
+            // ignore
+          }
+        }
+      }
+    }
+
     const shine = qs('[data-hero-shine]', card);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const productUrl = card.getAttribute('data-hero-url');
+    let productUrl = () => card.getAttribute('data-hero-url');
     let dragging = false;
     let moved = false;
     let startX = 0;
@@ -486,8 +530,9 @@
       if (!dragging) return;
       dragging = false;
       resetTilt();
-      if (!moved && productUrl) {
-        window.location.assign(productUrl);
+      const url = productUrl();
+      if (!moved && url) {
+        window.location.assign(url);
       }
       moved = false;
     };
@@ -526,10 +571,11 @@
     window.addEventListener('mouseup', onEnd);
 
     card.addEventListener('keydown', (e) => {
-      if (!productUrl) return;
+      const url = productUrl();
+      if (!url) return;
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        window.location.assign(productUrl);
+        window.location.assign(url);
       }
     });
   };

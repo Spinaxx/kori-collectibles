@@ -2,8 +2,8 @@
   assign min_cents = section.settings.min_price | default: 5 | times: 100
   assign source = section.settings.source_collection
   assign limit = section.settings.pool_size | default: 50
-  assign handles = ''
   assign handle_count = 0
+  assign pool_handles = ''
 
   if source != blank
     assign list = source.products
@@ -24,10 +24,10 @@
     endif
 
     if product.available and product.featured_image != blank and product.price >= min_cents and sealed == false
-      if handles == blank
-        assign handles = product.handle
+      if pool_handles == blank
+        assign pool_handles = product.handle
       else
-        assign handles = handles | append: ',' | append: product.handle
+        assign pool_handles = pool_handles | append: '|' | append: product.handle
       endif
       assign handle_count = handle_count | plus: 1
     endif
@@ -35,11 +35,8 @@
 
   assign hero_product = nil
   if handle_count > 0
-    assign handle_list = handles | split: ','
-    assign seed = 'now' | date: '%S' | plus: 0
-    assign idx = seed | modulo: handle_count
-    assign chosen_handle = handle_list[idx]
-    assign hero_product = all_products[chosen_handle]
+    assign pool_list = pool_handles | split: '|'
+    assign hero_product = all_products[pool_list.first]
   endif
 
   if hero_product == blank or hero_product.featured_image == blank
@@ -109,11 +106,43 @@
     </div>
 
     <div class="hero__stage">
+      {%- if handle_count > 0 -%}
+        <script type="application/json" data-hero-pool>
+          [
+            {%- assign pool_list = pool_handles | split: '|' -%}
+            {%- for handle in pool_list -%}
+              {%- assign p = all_products[handle] -%}
+              {%- if p != blank and p.featured_image != blank -%}
+                {%- assign hero_alt = p.featured_image.alt | default: p.title -%}
+                {%- capture hero_srcset -%}
+                  {{- p.featured_image | image_url: width: 280 }} 280w,
+                  {{- p.featured_image | image_url: width: 400 }} 400w,
+                  {{- p.featured_image | image_url: width: 560 }} 560w,
+                  {{- p.featured_image | image_url: width: 700 }} 700w,
+                  {{- p.featured_image | image_url: width: 900 }} 900w
+                {%- endcapture -%}
+                {
+                  "handle": {{ p.handle | json }},
+                  "url": {{ p.url | json }},
+                  "title": {{ p.title | json }},
+                  "alt": {{ hero_alt | json }},
+                  "src": {{ p.featured_image | image_url: width: 700 | json }},
+                  "srcset": {{ hero_srcset | strip_newlines | strip | json }},
+                  "width": {{ p.featured_image.width }},
+                  "height": {{ p.featured_image.height }}
+                }{%- unless forloop.last -%},{%- endunless -%}
+              {%- endif -%}
+            {%- endfor -%}
+          ]
+        </script>
+      {%- endif -%}
+
       {%- if hero_product != blank and hero_product.featured_image -%}
         <div
           class="hero-card"
           data-hero-card
           data-hero-url="{{ hero_product.url }}"
+          data-hero-handle="{{ hero_product.handle }}"
           role="link"
           tabindex="0"
           aria-label="{{ hero_product.title | escape }}"
@@ -122,6 +151,7 @@
           {%- assign hero_alt = hero_product.featured_image.alt | default: hero_product.title -%}
           <img
             class="hero-card__image"
+            data-hero-image
             src="{{ hero_product.featured_image | image_url: width: 700 }}"
             srcset="
               {{ hero_product.featured_image | image_url: width: 280 }} 280w,
