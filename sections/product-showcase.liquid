@@ -1,6 +1,10 @@
 {%- liquid
   assign source = section.settings.collection
+  assign fill_two_rows = section.settings.fill_two_rows
   assign limit = section.settings.products_to_show | default: 8
+  if fill_two_rows
+    assign limit = 14
+  endif
   assign product_filter = section.settings.product_filter | default: 'singles'
   if source != blank
     assign products = source.products
@@ -25,7 +29,7 @@
       {%- endif -%}
     </div>
 
-    <div class="product-grid">
+    <div class="product-grid{% if fill_two_rows %} product-grid--two-rows{% endif %}">
       {%- for product in products -%}
         {%- liquid
           if shown >= limit
@@ -107,13 +111,21 @@
       "default": "singles"
     },
     {
+      "type": "checkbox",
+      "id": "fill_two_rows",
+      "label": "Fill exactly two rows",
+      "default": true,
+      "info": "Shows 4 / 8 / 10 / 14 products depending on screen width so the grid always ends on two full rows."
+    },
+    {
       "type": "range",
       "id": "products_to_show",
       "min": 4,
       "max": 16,
       "step": 1,
       "label": "Products",
-      "default": 8
+      "default": 8,
+      "info": "Used only when “Fill exactly two rows” is off."
     },
     {
       "type": "checkbox",

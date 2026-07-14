@@ -2502,6 +2502,57 @@ html.in-app-browser .search-modal {
   }
 }
 
+/* Showcase grids that always fill exactly two rows */
+.product-grid--two-rows {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.product-grid--two-rows > *:nth-child(n + 5) {
+  display: none;
+}
+
+@media (min-width: 750px) {
+  .product-grid--two-rows {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .product-grid--two-rows > *:nth-child(n + 5) {
+    display: flex;
+  }
+
+  .product-grid--two-rows > *:nth-child(n + 9) {
+    display: none;
+  }
+}
+
+@media (min-width: 990px) {
+  .product-grid--two-rows {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .product-grid--two-rows > *:nth-child(n + 9) {
+    display: flex;
+  }
+
+  .product-grid--two-rows > *:nth-child(n + 11) {
+    display: none;
+  }
+}
+
+@media (min-width: 1200px) {
+  .product-grid--two-rows {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .product-grid--two-rows > *:nth-child(n + 11) {
+    display: flex;
+  }
+
+  .product-grid--two-rows > *:nth-child(n + 15) {
+    display: none;
+  }
+}
+
 .card {
   display: flex;
   flex-direction: column;
