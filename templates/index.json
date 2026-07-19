@@ -230,7 +230,7 @@
       "settings": {
         "heading": "New from the case",
         "subheading": "ETBs, boxes, and collections — still sealed, live stock.",
-        "collection": "",
+        "collection": "kori-pokemon-sealed",
         "product_filter": "sealed",
         "fill_two_rows": true,
         "products_to_show": 14,
