@@ -3511,6 +3511,38 @@ html.in-app-browser .search-modal {
   color: var(--text);
 }
 
+.footer__social {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.footer__social-link {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-bottom: 0 !important;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.02);
+  transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.footer__social-link:hover {
+  color: var(--text);
+  border-color: rgba(45, 212, 191, 0.4);
+  background: rgba(45, 212, 191, 0.08);
+  transform: translateY(-1px);
+}
+
+.footer__social-link svg {
+  display: block;
+}
+
 .footer__bottom {
   border-top: 1px solid var(--border);
   padding-top: 1.1rem;
