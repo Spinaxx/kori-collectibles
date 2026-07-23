@@ -67,8 +67,7 @@
       <h1 class="hero__title">
         {{ section.settings.heading_line_1 | escape }}
         {%- if section.settings.heading_line_2 != blank -%}
-          <br>{{ section.settings.heading_line_2 | escape -}}
-          {%- if section.settings.heading_em != blank -%}<em>{{ section.settings.heading_em | escape }}</em>{%- endif -%}
+          <br>{{ section.settings.heading_line_2 | escape }}{% if section.settings.heading_em != blank %} <em>{{ section.settings.heading_em | escape }}</em>{% endif -%}
           {{- section.settings.heading_after | escape -}}
         {%- endif -%}
       </h1>
