@@ -47,7 +47,6 @@
         "eyebrow": "TCG",
         "heading": "Pokémon",
         "intro": "Singles, sealed, and the latest sets — condition-checked with live stock.",
-        "logo_key": "pokemon",
         "categories_heading": "Shop by type",
         "singles_collection": "kori-pokemon-singles",
         "singles_label": "Singles",
@@ -63,9 +62,7 @@
         "auto_latest_sets": true,
         "latest_sets_count": 3,
         "set_filter_param": "filter.p.m.app--373890449409.card_set",
-        "set_metafield": "app--373890449409.card_set",
-        "cta_label": "Browse all singles",
-        "cta_link": "shopify://collections/kori-pokemon-singles"
+        "set_metafield": "app--373890449409.card_set"
       }
     }
   },

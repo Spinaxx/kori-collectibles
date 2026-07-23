@@ -3898,32 +3898,8 @@ html.in-app-browser .search-modal {
 }
 
 .tcg-landing__hero {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 1.25rem 1.5rem;
-  align-items: center;
+  max-width: 40rem;
   margin-bottom: 2.25rem;
-}
-
-.tcg-landing__brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 7.5rem;
-  min-height: 4.5rem;
-  padding: 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background:
-    linear-gradient(160deg, rgba(45, 212, 191, 0.1), transparent 50%),
-    var(--surface);
-}
-
-.tcg-landing__brand img {
-  width: 100%;
-  height: auto;
-  max-height: 2.75rem;
-  object-fit: contain;
 }
 
 .tcg-landing__eyebrow {
@@ -4087,19 +4063,7 @@ html.in-app-browser .search-modal {
   font-size: 0.86rem;
 }
 
-.tcg-landing__footer-cta {
-  margin: 0.5rem 0 0;
-}
-
 @media (max-width: 749px) {
-  .tcg-landing__hero {
-    grid-template-columns: 1fr;
-  }
-
-  .tcg-landing__brand {
-    width: 6.5rem;
-  }
-
   .tcg-landing__categories,
   .tcg-landing__sets {
     grid-template-columns: 1fr;

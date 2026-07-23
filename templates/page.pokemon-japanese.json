@@ -21,7 +21,6 @@
         "eyebrow": "TCG",
         "heading": "Japanese Pokémon",
         "intro": "Japanese singles and sealed — live stock, ready to ship from the UK.",
-        "logo_key": "japanese_pokemon",
         "categories_heading": "Shop by type",
         "singles_collection": "kori-pokemon-ja-singles",
         "singles_label": "Singles",
@@ -33,9 +32,7 @@
         "auto_latest_sets": true,
         "latest_sets_count": 3,
         "set_filter_param": "filter.p.m.app--373890449409.card_set",
-        "set_metafield": "app--373890449409.card_set",
-        "cta_label": "Browse all singles",
-        "cta_link": "shopify://collections/kori-pokemon-ja-singles"
+        "set_metafield": "app--373890449409.card_set"
       }
     }
   },
