@@ -51,45 +51,61 @@
 
   assign auto_sets = ''
   assign auto_set_count = 0
-  if manual_set_count == 0 and section.settings.auto_latest_sets and singles != blank
-    for product in singles.products limit: 50
-      if auto_set_count >= max_sets
-        break
-      endif
-
-      assign product_set = blank
-      if product.metafields[metafield_ns][metafield_key] != blank
-        assign product_set = product.metafields[metafield_ns][metafield_key].value | default: product.metafields[metafield_ns][metafield_key] | strip
-      endif
-      if product_set == blank and product.metafields.custom.set_name != blank
-        assign product_set = product.metafields.custom.set_name.value | default: product.metafields.custom.set_name | strip
-      endif
-      if product_set == blank and product.title contains ' - '
-        assign title_parts = product.title | split: ' - '
-        if title_parts.size > 1
-          assign product_set = title_parts[1] | strip
-        endif
-      endif
-
-      if product_set == blank
-        continue
-      endif
-
-      assign set_token = '||' | append: product_set | append: '||'
-      if auto_sets contains set_token
-        continue
-      endif
-
-      if auto_sets == blank
-        assign auto_sets = set_token
-      else
-        assign auto_sets = auto_sets | append: product_set | append: '||'
-      endif
-      assign auto_set_count = auto_set_count | plus: 1
-    endfor
-  endif
-
+  assign set_image_map = ''
   assign show_sets = false
+-%}
+
+{%- if singles != blank -%}
+  {%- paginate singles.products by 250 -%}
+    {%- for product in singles.products -%}
+      {%- liquid
+        assign product_set = blank
+        if product.metafields[metafield_ns][metafield_key] != blank
+          assign product_set = product.metafields[metafield_ns][metafield_key].value | default: product.metafields[metafield_ns][metafield_key] | strip
+        endif
+        if product_set == blank and product.metafields.custom.set_name != blank
+          assign product_set = product.metafields.custom.set_name.value | default: product.metafields.custom.set_name | strip
+        endif
+        if product_set == blank and product.title contains ' - '
+          assign title_parts = product.title | split: ' - '
+          if title_parts.size > 1
+            assign product_set = title_parts[1] | strip
+          endif
+        endif
+
+        if product_set == blank
+          continue
+        endif
+
+        assign product_image = product.featured_image
+        if product_image == blank and product.images.size > 0
+          assign product_image = product.images.first
+        endif
+
+        if product_image != blank
+          assign map_key = '||' | append: product_set | downcase | append: '::'
+          unless set_image_map contains map_key
+            assign set_image_map = set_image_map | append: map_key | append: product.handle | append: '||'
+          endunless
+        endif
+
+        if manual_set_count == 0 and section.settings.auto_latest_sets and auto_set_count < max_sets
+          assign set_token = '||' | append: product_set | append: '||'
+          unless auto_sets contains set_token
+            if auto_sets == blank
+              assign auto_sets = set_token
+            else
+              assign auto_sets = auto_sets | append: product_set | append: '||'
+            endif
+            assign auto_set_count = auto_set_count | plus: 1
+          endunless
+        endif
+      -%}
+    {%- endfor -%}
+  {%- endpaginate -%}
+{%- endif -%}
+
+{%- liquid
   if manual_set_count > 0 or auto_set_count > 0
     assign show_sets = true
   endif
@@ -202,26 +218,18 @@
                 assign set_encoded = set_value | url_encode | replace: '%20', '+'
                 assign set_url = singles.url | append: '?sort_by=most-relevant&' | append: filter_param | append: '=' | append: set_encoded
 
-                if set_image == blank
-                  for product in singles.products limit: 50
-                    assign product_set = blank
-                    if product.metafields[metafield_ns][metafield_key] != blank
-                      assign product_set = product.metafields[metafield_ns][metafield_key].value | default: product.metafields[metafield_ns][metafield_key] | strip
-                    endif
-                    if product_set == blank and product.metafields.custom.set_name != blank
-                      assign product_set = product.metafields.custom.set_name.value | default: product.metafields.custom.set_name | strip
-                    endif
-                    if product_set == blank and product.title contains ' - '
-                      assign title_parts = product.title | split: ' - '
-                      if title_parts.size > 1
-                        assign product_set = title_parts[1] | strip
+                if set_image == blank and set_image_map != blank
+                  assign map_key = '||' | append: set_value | downcase | append: '::'
+                  if set_image_map contains map_key
+                    assign map_rest = set_image_map | split: map_key | last
+                    assign image_handle = map_rest | split: '||' | first
+                    if image_handle != blank and all_products[image_handle] != blank
+                      assign set_image = all_products[image_handle].featured_image
+                      if set_image == blank
+                        assign set_image = all_products[image_handle].images.first
                       endif
                     endif
-                    if product_set == set_value and product.featured_image != blank
-                      assign set_image = product.featured_image
-                      break
-                    endif
-                  endfor
+                  endif
                 endif
               -%}
               <a class="tcg-landing__set" href="{{ set_url }}" {{ block.shopify_attributes }}>
@@ -262,25 +270,19 @@
                 assign set_encoded = set_value | url_encode | replace: '%20', '+'
                 assign set_url = singles.url | append: '?sort_by=most-relevant&' | append: filter_param | append: '=' | append: set_encoded
 
-                for product in singles.products limit: 50
-                  assign product_set = blank
-                  if product.metafields[metafield_ns][metafield_key] != blank
-                    assign product_set = product.metafields[metafield_ns][metafield_key].value | default: product.metafields[metafield_ns][metafield_key] | strip
-                  endif
-                  if product_set == blank and product.metafields.custom.set_name != blank
-                    assign product_set = product.metafields.custom.set_name.value | default: product.metafields.custom.set_name | strip
-                  endif
-                  if product_set == blank and product.title contains ' - '
-                    assign title_parts = product.title | split: ' - '
-                    if title_parts.size > 1
-                      assign product_set = title_parts[1] | strip
+                if set_image_map != blank
+                  assign map_key = '||' | append: set_value | downcase | append: '::'
+                  if set_image_map contains map_key
+                    assign map_rest = set_image_map | split: map_key | last
+                    assign image_handle = map_rest | split: '||' | first
+                    if image_handle != blank and all_products[image_handle] != blank
+                      assign set_image = all_products[image_handle].featured_image
+                      if set_image == blank
+                        assign set_image = all_products[image_handle].images.first
+                      endif
                     endif
                   endif
-                  if product_set == set_value and product.featured_image != blank
-                    assign set_image = product.featured_image
-                    break
-                  endif
-                endfor
+                endif
               -%}
               <a class="tcg-landing__set" href="{{ set_url }}">
                 <span class="tcg-landing__set-media">
