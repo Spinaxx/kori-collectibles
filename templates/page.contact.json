@@ -1,0 +1,18 @@
+{
+  "sections": {
+    "contact": {
+      "type": "contact",
+      "settings": {
+        "eyebrow": "Support",
+        "heading": "Get in touch",
+        "intro": "Questions about an order, a card, or stocking up? Reach us by email or hop into Discord.",
+        "email": "support@koricollectibles.co.uk",
+        "discord_url": "https://discord.gg/8CJVeuAdEv",
+        "show_form": true,
+        "form_heading": "Send a message",
+        "form_text": "We’ll reply to the email you leave below."
+      }
+    }
+  },
+  "order": ["contact"]
+}

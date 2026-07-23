@@ -1,0 +1,172 @@
+{%- liquid
+  assign contact_email = section.settings.email | default: 'support@koricollectibles.co.uk' | strip
+  assign discord_url = section.settings.discord_url | default: settings.social_discord | strip
+  if discord_url == blank
+    assign discord_url = 'https://discord.gg/8CJVeuAdEv'
+  endif
+-%}
+
+<section class="section contact">
+  <div class="page-width">
+    <div class="contact__hero">
+      <p class="contact__eyebrow">{{ section.settings.eyebrow | default: 'Support' | escape }}</p>
+      <h1 class="contact__title">{{ section.settings.heading | default: page.title | default: 'Contact' | escape }}</h1>
+      {%- if section.settings.intro != blank -%}
+        <p class="contact__intro">{{ section.settings.intro | escape }}</p>
+      {%- else -%}
+        <p class="contact__intro">Questions about an order, a card, or stocking up? Reach us by email or hop into Discord.</p>
+      {%- endif -%}
+    </div>
+
+    <div class="contact__channels">
+      <a class="contact__channel" href="mailto:{{ contact_email | escape }}">
+        <span class="contact__channel-label">Email</span>
+        <span class="contact__channel-value">{{ contact_email | escape }}</span>
+        <span class="contact__channel-hint">Best for orders, returns, and account help</span>
+      </a>
+
+      <a class="contact__channel" href="{{ discord_url }}" target="_blank" rel="noopener noreferrer">
+        <span class="contact__channel-label">Discord</span>
+        <span class="contact__channel-value">Join the Kori community</span>
+        <span class="contact__channel-hint">Chat with us and other collectors</span>
+      </a>
+    </div>
+
+    {%- if section.settings.show_form -%}
+      <div class="contact__form-wrap">
+        <h2 class="contact__form-title">{{ section.settings.form_heading | default: 'Send a message' | escape }}</h2>
+        {%- if section.settings.form_text != blank -%}
+          <p class="contact__form-text">{{ section.settings.form_text | escape }}</p>
+        {%- endif -%}
+
+        {%- form 'contact', class: 'contact-form' -%}
+          {%- if form.posted_successfully? -%}
+            <p class="contact-form__success" role="status">Thanks — we’ll get back to you soon.</p>
+          {%- endif -%}
+
+          {%- if form.errors -%}
+            <div class="contact-form__errors" role="alert">
+              {{ form.errors | default_errors }}
+            </div>
+          {%- endif -%}
+
+          <div class="contact-form__row">
+            <label class="contact-form__label" for="ContactName-{{ section.id }}">Name</label>
+            <input
+              id="ContactName-{{ section.id }}"
+              class="contact-form__input"
+              type="text"
+              name="contact[name]"
+              value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+              autocomplete="name"
+              required
+            >
+          </div>
+
+          <div class="contact-form__row">
+            <label class="contact-form__label" for="ContactEmail-{{ section.id }}">Email</label>
+            <input
+              id="ContactEmail-{{ section.id }}"
+              class="contact-form__input"
+              type="email"
+              name="contact[email]"
+              value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+              autocomplete="email"
+              required
+              spellcheck="false"
+              autocapitalize="off"
+            >
+          </div>
+
+          <div class="contact-form__row">
+            <label class="contact-form__label" for="ContactPhone-{{ section.id }}">Phone <span class="contact-form__optional">(optional)</span></label>
+            <input
+              id="ContactPhone-{{ section.id }}"
+              class="contact-form__input"
+              type="tel"
+              name="contact[phone]"
+              value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+              autocomplete="tel"
+            >
+          </div>
+
+          <div class="contact-form__row">
+            <label class="contact-form__label" for="ContactBody-{{ section.id }}">Message</label>
+            <textarea
+              id="ContactBody-{{ section.id }}"
+              class="contact-form__input contact-form__textarea"
+              name="contact[body]"
+              rows="6"
+              required
+            >{% if form.body %}{{ form.body }}{% endif %}</textarea>
+          </div>
+
+          <button type="submit" class="button">Send message</button>
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Contact",
+  "tag": "section",
+  "class": "section-contact",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Support"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Get in touch"
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro",
+      "default": "Questions about an order, a card, or stocking up? Reach us by email or hop into Discord."
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Support email",
+      "default": "support@koricollectibles.co.uk"
+    },
+    {
+      "type": "text",
+      "id": "discord_url",
+      "label": "Discord URL",
+      "default": "https://discord.gg/8CJVeuAdEv"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_form",
+      "label": "Show contact form",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "form_heading",
+      "label": "Form heading",
+      "default": "Send a message"
+    },
+    {
+      "type": "textarea",
+      "id": "form_text",
+      "label": "Form text",
+      "default": "We’ll reply to the email you leave below."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact"
+    }
+  ]
+}
+{% endschema %}
