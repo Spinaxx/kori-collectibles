@@ -4049,6 +4049,21 @@ html.in-app-browser .search-modal {
     var(--surface-2);
 }
 
+@media (min-width: 750px) {
+  .tcg-landing__set-media--banner {
+    padding: 0.85rem 1rem;
+  }
+
+  .tcg-landing__set-media--banner img {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
 .tcg-landing__set-placeholder {
   padding: 0 1rem;
   font-family: var(--font-display);
