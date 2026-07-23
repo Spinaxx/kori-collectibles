@@ -273,6 +273,7 @@
         "p2",
         "p3"
       ],
+      "disabled": true,
       "settings": {
         "heading": "Shop the vault",
         "subheading": "Sealed drops, graded cards, and everyday accessories."
