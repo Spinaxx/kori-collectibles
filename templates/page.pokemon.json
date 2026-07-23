@@ -24,6 +24,7 @@
         "set_2": {
           "type": "set",
           "settings": {
+            "image": "shopify://shop_images/ME4_Logo_EN.png",
             "set_name": "Chaos Rising",
             "title": "ME4 - Chaos Rising",
             "meta": ""
@@ -32,6 +33,7 @@
         "set_3": {
           "type": "set",
           "settings": {
+            "image": "shopify://shop_images/ME3_Logo_EN.png",
             "set_name": "Perfect Order",
             "title": "ME3 - Perfect Order",
             "meta": ""
@@ -47,7 +49,6 @@
         "eyebrow": "TCG",
         "heading": "Pokémon",
         "intro": "Singles, sealed, and the latest sets — condition-checked with live stock.",
-        "logo_key": "pokemon",
         "categories_heading": "Shop by type",
         "singles_collection": "kori-pokemon-singles",
         "singles_label": "Singles",
