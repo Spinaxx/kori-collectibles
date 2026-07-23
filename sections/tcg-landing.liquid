@@ -40,7 +40,7 @@
   endif
 
   # Build latest-set tiles from:
-  # 1) Manual Set blocks (set_name = filter value)
+  # 1) Manual Set blocks (set_name = filter value + optional set banner image)
   # 2) Else auto from product metafield / title on the singles collection
   assign manual_set_count = 0
   for block in section.blocks
@@ -51,14 +51,17 @@
 
   assign auto_sets = ''
   assign auto_set_count = 0
-  assign set_image_map = ''
   assign show_sets = false
 -%}
 
-{%- if singles != blank -%}
+{%- if singles != blank and manual_set_count == 0 and section.settings.auto_latest_sets -%}
   {%- paginate singles.products by 250 -%}
     {%- for product in singles.products -%}
       {%- liquid
+        if auto_set_count >= max_sets
+          break
+        endif
+
         assign product_set = blank
         if product.metafields[metafield_ns][metafield_key] != blank
           assign product_set = product.metafields[metafield_ns][metafield_key].value | default: product.metafields[metafield_ns][metafield_key] | strip
@@ -77,29 +80,15 @@
           continue
         endif
 
-        assign product_image = product.featured_image
-        if product_image == blank and product.images.size > 0
-          assign product_image = product.images.first
-        endif
-
-        if product_image != blank
-          assign map_key = '||' | append: product_set | downcase | append: '::'
-          unless set_image_map contains map_key
-            assign set_image_map = set_image_map | append: map_key | append: product.handle | append: '||'
-          endunless
-        endif
-
-        if manual_set_count == 0 and section.settings.auto_latest_sets and auto_set_count < max_sets
-          assign set_token = '||' | append: product_set | append: '||'
-          unless auto_sets contains set_token
-            if auto_sets == blank
-              assign auto_sets = set_token
-            else
-              assign auto_sets = auto_sets | append: product_set | append: '||'
-            endif
-            assign auto_set_count = auto_set_count | plus: 1
-          endunless
-        endif
+        assign set_token = '||' | append: product_set | append: '||'
+        unless auto_sets contains set_token
+          if auto_sets == blank
+            assign auto_sets = set_token
+          else
+            assign auto_sets = auto_sets | append: product_set | append: '||'
+          endif
+          assign auto_set_count = auto_set_count | plus: 1
+        endunless
       -%}
     {%- endfor -%}
   {%- endpaginate -%}
@@ -217,35 +206,21 @@
                 assign set_image = block.settings.image
                 assign set_encoded = set_value | url_encode | replace: '%20', '+'
                 assign set_url = singles.url | append: '?sort_by=most-relevant&' | append: filter_param | append: '=' | append: set_encoded
-
-                if set_image == blank and set_image_map != blank
-                  assign map_key = '||' | append: set_value | downcase | append: '::'
-                  if set_image_map contains map_key
-                    assign map_rest = set_image_map | split: map_key | last
-                    assign image_handle = map_rest | split: '||' | first
-                    if image_handle != blank and all_products[image_handle] != blank
-                      assign set_image = all_products[image_handle].featured_image
-                      if set_image == blank
-                        assign set_image = all_products[image_handle].images.first
-                      endif
-                    endif
-                  endif
-                endif
               -%}
               <a class="tcg-landing__set" href="{{ set_url }}" {{ block.shopify_attributes }}>
-                <span class="tcg-landing__set-media{% if block.settings.image != blank %} tcg-landing__set-media--logo{% endif %}">
+                <span class="tcg-landing__set-media{% if set_image != blank %} tcg-landing__set-media--banner{% endif %}">
                   {%- if set_image != blank -%}
                     <img
-                      src="{{ set_image | image_url: width: 600 }}"
-                      srcset="{{ set_image | image_url: width: 300 }} 300w, {{ set_image | image_url: width: 480 }} 480w, {{ set_image | image_url: width: 600 }} 600w"
-                      sizes="(max-width: 749px) 45vw, 280px"
+                      src="{{ set_image | image_url: width: 800 }}"
+                      srcset="{{ set_image | image_url: width: 400 }} 400w, {{ set_image | image_url: width: 600 }} 600w, {{ set_image | image_url: width: 800 }} 800w"
+                      sizes="(max-width: 749px) 90vw, 280px"
                       alt="{{ set_title | escape }}"
                       width="{{ set_image.width }}"
                       height="{{ set_image.height }}"
                       loading="lazy"
                     >
                   {%- else -%}
-                    <span class="tcg-landing__set-placeholder">{{ set_title | slice: 0, 1 | upcase }}</span>
+                    <span class="tcg-landing__set-placeholder">{{ set_title | escape }}</span>
                   {%- endif -%}
                 </span>
                 <span class="tcg-landing__set-body">
@@ -266,39 +241,12 @@
               {%- if forloop.index > max_sets -%}{%- break -%}{%- endif -%}
               {%- liquid
                 assign set_title = set_value
-                assign set_image = nil
                 assign set_encoded = set_value | url_encode | replace: '%20', '+'
                 assign set_url = singles.url | append: '?sort_by=most-relevant&' | append: filter_param | append: '=' | append: set_encoded
-
-                if set_image_map != blank
-                  assign map_key = '||' | append: set_value | downcase | append: '::'
-                  if set_image_map contains map_key
-                    assign map_rest = set_image_map | split: map_key | last
-                    assign image_handle = map_rest | split: '||' | first
-                    if image_handle != blank and all_products[image_handle] != blank
-                      assign set_image = all_products[image_handle].featured_image
-                      if set_image == blank
-                        assign set_image = all_products[image_handle].images.first
-                      endif
-                    endif
-                  endif
-                endif
               -%}
               <a class="tcg-landing__set" href="{{ set_url }}">
                 <span class="tcg-landing__set-media">
-                  {%- if set_image != blank -%}
-                    <img
-                      src="{{ set_image | image_url: width: 600 }}"
-                      srcset="{{ set_image | image_url: width: 300 }} 300w, {{ set_image | image_url: width: 480 }} 480w, {{ set_image | image_url: width: 600 }} 600w"
-                      sizes="(max-width: 749px) 45vw, 280px"
-                      alt="{{ set_title | escape }}"
-                      width="{{ set_image.width }}"
-                      height="{{ set_image.height }}"
-                      loading="lazy"
-                    >
-                  {%- else -%}
-                    <span class="tcg-landing__set-placeholder">{{ set_title | slice: 0, 1 | upcase }}</span>
-                  {%- endif -%}
+                  <span class="tcg-landing__set-placeholder">{{ set_title | escape }}</span>
                 </span>
                 <span class="tcg-landing__set-body">
                   <span class="tcg-landing__set-title">{{ set_title | escape }}</span>
@@ -429,7 +377,7 @@
     },
     {
       "type": "paragraph",
-      "content": "Add Set blocks below to choose which sets appear and upload a tile image for each. If every Set block has an empty set name, and auto-detect is on, the theme picks unique sets from products in the singles collection (first unique card_set values it finds)."
+      "content": "Add Set tiles below. Set name must match the collection Set filter (e.g. Chaos Rising). Upload each set’s banner image on the tile — card product photos are not used."
     },
     {
       "type": "text",
@@ -499,8 +447,8 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Tile image",
-          "info": "Upload a set logo or promo art. If blank, uses a card image from that set when available."
+          "label": "Set banner",
+          "info": "Official set logo/banner art for this tile."
         },
         {
           "type": "text",

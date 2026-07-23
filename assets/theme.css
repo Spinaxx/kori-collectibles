@@ -4033,7 +4033,7 @@ html.in-app-browser .search-modal {
   display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   background: var(--surface-2);
   overflow: hidden;
 }
@@ -4044,14 +4044,14 @@ html.in-app-browser .search-modal {
   object-fit: cover;
 }
 
-.tcg-landing__set-media--logo {
-  padding: 1rem 1.1rem;
+.tcg-landing__set-media--banner {
+  padding: 1.1rem 1.25rem;
   background:
-    linear-gradient(160deg, rgba(45, 212, 191, 0.08), transparent 50%),
+    linear-gradient(160deg, rgba(45, 212, 191, 0.1), transparent 55%),
     var(--surface-2);
 }
 
-.tcg-landing__set-media--logo img {
+.tcg-landing__set-media--banner img {
   width: auto;
   max-width: 100%;
   height: auto;
@@ -4060,9 +4060,11 @@ html.in-app-browser .search-modal {
 }
 
 .tcg-landing__set-placeholder {
+  padding: 0 1rem;
   font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 650;
+  text-align: center;
   color: var(--accent-2);
 }
 
