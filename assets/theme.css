@@ -3522,8 +3522,8 @@ html.in-app-browser .search-modal {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 2.5rem;
+  height: 2.5rem;
   margin-bottom: 0 !important;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -3541,6 +3541,7 @@ html.in-app-browser .search-modal {
 
 .footer__social-link svg {
   display: block;
+  flex-shrink: 0;
 }
 
 .footer__bottom {
