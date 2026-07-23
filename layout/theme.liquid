@@ -320,20 +320,6 @@
               <li><a href="{{ routes.collections_url }}">Collections</a></li>
               <li><a href="{{ routes.cart_url }}" data-open-cart>Cart</a></li>
             {%- endif -%}
-            <li>
-              <button type="button" data-open-account>Account</button>
-            </li>
-            {%- if settings.loyalty_enable -%}
-              <li class="drawer-nav__loyalty">
-                {%- if customer -%}
-                  <button type="button" data-open-loyalty-panel>
-                    Rewards · <span data-loyalty-balance>{{ loyalty_balance | default: 0 }}</span> pts
-                  </button>
-                {%- else -%}
-                  <button type="button" data-open-loyalty-panel>Sign in for rewards</button>
-                {%- endif -%}
-              </li>
-            {%- endif -%}
           </ul>
         </nav>
       </div>
