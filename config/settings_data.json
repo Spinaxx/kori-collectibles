@@ -31,7 +31,7 @@
     "social_discord": "https://discord.gg/8CJVeuAdEv",
     "page_width": 1360,
     "show_stock_count": true,
-    "currency_note": "Prices in GBP",
+    "currency_note": "",
     "loyalty_enable": true,
     "loyalty_show_launcher": true,
     "loyalty_program_name": "Kori Collectors Club",
