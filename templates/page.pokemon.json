@@ -15,27 +15,33 @@
         "set_1": {
           "type": "set",
           "settings": {
-            "set_name": "Chaos Rising",
-            "title": "ME4 — Chaos Rising",
+            "set_name": "Pitch Black",
+            "title": "ME5 - Pitch Black",
             "meta": "Latest Mega Evolution set"
           }
         },
         "set_2": {
           "type": "set",
           "settings": {
-            "set_name": "Perfect Order",
-            "title": "ME3 — Perfect Order"
+            "set_name": "Chaos Rising",
+            "title": "ME4 - Chaos Rising",
+            "meta": ""
           }
         },
         "set_3": {
           "type": "set",
           "settings": {
-            "set_name": "Ascended Heroes",
-            "title": "ME2.5 — Ascended Heroes"
+            "set_name": "Perfect Order",
+            "title": "ME3 - Perfect Order",
+            "meta": ""
           }
         }
       },
-      "block_order": ["set_1", "set_2", "set_3"],
+      "block_order": [
+        "set_1",
+        "set_2",
+        "set_3"
+      ],
       "settings": {
         "eyebrow": "TCG",
         "heading": "Pokémon",
@@ -48,7 +54,9 @@
         "sealed_collection": "kori-pokemon-sealed",
         "sealed_label": "Sealed",
         "sealed_meta": "ETBs, boxes, and packs",
+        "graded_collection": "",
         "graded_label": "Graded",
+        "graded_meta": "",
         "sets_heading": "Latest sets",
         "sets_subheading": "Jump into the newest releases.",
         "auto_latest_sets": true,
@@ -60,5 +68,7 @@
       }
     }
   },
-  "order": ["tcg_landing"]
+  "order": [
+    "tcg_landing"
+  ]
 }
