@@ -3905,14 +3905,15 @@ html.in-app-browser .search-modal {
   margin-bottom: 2.25rem;
 }
 
-.tcg-landing__logo {
+.tcg-landing__brand {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 7.5rem;
+  min-height: 4.5rem;
 }
 
-.tcg-landing__logo img {
+.tcg-landing__brand img {
   display: block;
   width: 100%;
   height: auto;
@@ -4086,8 +4087,9 @@ html.in-app-browser .search-modal {
     grid-template-columns: 1fr;
   }
 
-  .tcg-landing__logo {
+  .tcg-landing__brand {
     width: 6.5rem;
+    min-height: 0;
   }
 
   .tcg-landing__categories,
