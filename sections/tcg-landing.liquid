@@ -24,12 +24,11 @@
   assign sealed = section.settings.sealed_collection
   assign graded = section.settings.graded_collection
 
-  assign set_count = 0
-  for block in section.blocks
-    if block.type == 'set' and block.settings.collection != blank
-      assign set_count = set_count | plus: 1
-    endif
-  endfor
+  assign filter_param = section.settings.set_filter_param | default: 'filter.p.m.app--373890449409.card_set' | strip
+  assign metafield_path = section.settings.set_metafield | default: 'app--373890449409.card_set' | strip
+  assign metafield_ns = metafield_path | split: '.' | first
+  assign metafield_key = metafield_path | split: '.' | last
+  assign max_sets = section.settings.latest_sets_count | default: 3 | plus: 0
 
   assign cta_label = section.settings.cta_label
   assign cta_link = section.settings.cta_link
@@ -38,6 +37,61 @@
   endif
   if cta_label == blank and singles != blank
     assign cta_label = 'Browse all singles'
+  endif
+
+  # Build latest-set tiles from:
+  # 1) Manual Set blocks (set_name = filter value)
+  # 2) Else auto from product metafield / title on the singles collection
+  assign manual_set_count = 0
+  for block in section.blocks
+    if block.type == 'set' and block.settings.set_name != blank
+      assign manual_set_count = manual_set_count | plus: 1
+    endif
+  endfor
+
+  assign auto_sets = ''
+  assign auto_set_count = 0
+  if manual_set_count == 0 and section.settings.auto_latest_sets and singles != blank
+    for product in singles.products limit: 50
+      if auto_set_count >= max_sets
+        break
+      endif
+
+      assign product_set = blank
+      if product.metafields[metafield_ns][metafield_key] != blank
+        assign product_set = product.metafields[metafield_ns][metafield_key].value | default: product.metafields[metafield_ns][metafield_key] | strip
+      endif
+      if product_set == blank and product.metafields.custom.set_name != blank
+        assign product_set = product.metafields.custom.set_name.value | default: product.metafields.custom.set_name | strip
+      endif
+      if product_set == blank and product.title contains ' - '
+        assign title_parts = product.title | split: ' - '
+        if title_parts.size > 1
+          assign product_set = title_parts[1] | strip
+        endif
+      endif
+
+      if product_set == blank
+        continue
+      endif
+
+      assign set_token = '||' | append: product_set | append: '||'
+      if auto_sets contains set_token
+        continue
+      endif
+
+      if auto_sets == blank
+        assign auto_sets = set_token
+      else
+        assign auto_sets = auto_sets | append: product_set | append: '||'
+      endif
+      assign auto_set_count = auto_set_count | plus: 1
+    endfor
+  endif
+
+  assign show_sets = false
+  if manual_set_count > 0 or auto_set_count > 0
+    assign show_sets = true
   endif
 -%}
 
@@ -127,7 +181,7 @@
       </div>
     {%- endif -%}
 
-    {%- if set_count > 0 -%}
+    {%- if show_sets and singles != blank -%}
       <div class="tcg-landing__band">
         <div class="section-head section-head--inline">
           <h2>{{ section.settings.sets_heading | default: 'Latest sets' | escape }}</h2>
@@ -136,45 +190,122 @@
           {%- endif -%}
         </div>
         <div class="tcg-landing__sets">
-          {%- for block in section.blocks -%}
-            {%- if block.type != 'set' -%}{%- continue -%}{%- endif -%}
-            {%- assign set_collection = block.settings.collection -%}
-            {%- if set_collection == blank -%}{%- continue -%}{%- endif -%}
-            {%- liquid
-              assign set_image = set_collection.image
-              if set_image == blank and set_collection.products.first != blank
-                assign set_image = set_collection.products.first.featured_image
-              endif
-              assign set_title = block.settings.title | default: set_collection.title
-              assign set_meta = block.settings.meta
-            -%}
-            <a class="tcg-landing__set" href="{{ set_collection.url }}" {{ block.shopify_attributes }}>
-              <span class="tcg-landing__set-media">
-                {%- if set_image != blank -%}
-                  <img
-                    src="{{ set_image | image_url: width: 600 }}"
-                    srcset="{{ set_image | image_url: width: 300 }} 300w, {{ set_image | image_url: width: 480 }} 480w, {{ set_image | image_url: width: 600 }} 600w"
-                    sizes="(max-width: 749px) 45vw, 280px"
-                    alt="{{ set_title | escape }}"
-                    width="{{ set_image.width }}"
-                    height="{{ set_image.height }}"
-                    loading="lazy"
-                  >
-                {%- else -%}
-                  <span class="tcg-landing__set-placeholder">{{ set_title | slice: 0, 1 | upcase }}</span>
-                {%- endif -%}
-              </span>
-              <span class="tcg-landing__set-body">
-                <span class="tcg-landing__set-title">{{ set_title | escape }}</span>
-                {%- if set_meta != blank -%}
-                  <span class="tcg-landing__set-meta">{{ set_meta | escape }}</span>
-                {%- else -%}
-                  <span class="tcg-landing__set-meta">{{ set_collection.all_products_count }} products</span>
-                {%- endif -%}
-                <span class="tcg-landing__card-cta">Shop set</span>
-              </span>
-            </a>
-          {%- endfor -%}
+          {%- if manual_set_count > 0 -%}
+            {%- for block in section.blocks -%}
+              {%- if block.type != 'set' -%}{%- continue -%}{%- endif -%}
+              {%- assign set_value = block.settings.set_name | strip -%}
+              {%- if set_value == blank -%}{%- continue -%}{%- endif -%}
+              {%- liquid
+                assign set_title = block.settings.title | default: set_value
+                assign set_meta = block.settings.meta
+                assign set_image = block.settings.image
+                assign set_encoded = set_value | url_encode | replace: '%20', '+'
+                assign set_url = singles.url | append: '?sort_by=most-relevant&' | append: filter_param | append: '=' | append: set_encoded
+
+                if set_image == blank
+                  for product in singles.products limit: 50
+                    assign product_set = blank
+                    if product.metafields[metafield_ns][metafield_key] != blank
+                      assign product_set = product.metafields[metafield_ns][metafield_key].value | default: product.metafields[metafield_ns][metafield_key] | strip
+                    endif
+                    if product_set == blank and product.metafields.custom.set_name != blank
+                      assign product_set = product.metafields.custom.set_name.value | default: product.metafields.custom.set_name | strip
+                    endif
+                    if product_set == blank and product.title contains ' - '
+                      assign title_parts = product.title | split: ' - '
+                      if title_parts.size > 1
+                        assign product_set = title_parts[1] | strip
+                      endif
+                    endif
+                    if product_set == set_value and product.featured_image != blank
+                      assign set_image = product.featured_image
+                      break
+                    endif
+                  endfor
+                endif
+              -%}
+              <a class="tcg-landing__set" href="{{ set_url }}" {{ block.shopify_attributes }}>
+                <span class="tcg-landing__set-media">
+                  {%- if set_image != blank -%}
+                    <img
+                      src="{{ set_image | image_url: width: 600 }}"
+                      srcset="{{ set_image | image_url: width: 300 }} 300w, {{ set_image | image_url: width: 480 }} 480w, {{ set_image | image_url: width: 600 }} 600w"
+                      sizes="(max-width: 749px) 45vw, 280px"
+                      alt="{{ set_title | escape }}"
+                      width="{{ set_image.width }}"
+                      height="{{ set_image.height }}"
+                      loading="lazy"
+                    >
+                  {%- else -%}
+                    <span class="tcg-landing__set-placeholder">{{ set_title | slice: 0, 1 | upcase }}</span>
+                  {%- endif -%}
+                </span>
+                <span class="tcg-landing__set-body">
+                  <span class="tcg-landing__set-title">{{ set_title | escape }}</span>
+                  {%- if set_meta != blank -%}
+                    <span class="tcg-landing__set-meta">{{ set_meta | escape }}</span>
+                  {%- else -%}
+                    <span class="tcg-landing__set-meta">Shop singles from this set</span>
+                  {%- endif -%}
+                  <span class="tcg-landing__card-cta">Shop set</span>
+                </span>
+              </a>
+            {%- endfor -%}
+          {%- else -%}
+            {%- assign auto_list = auto_sets | remove_first: '||' | split: '||' -%}
+            {%- for set_value in auto_list -%}
+              {%- if set_value == blank -%}{%- continue -%}{%- endif -%}
+              {%- if forloop.index > max_sets -%}{%- break -%}{%- endif -%}
+              {%- liquid
+                assign set_title = set_value
+                assign set_image = nil
+                assign set_encoded = set_value | url_encode | replace: '%20', '+'
+                assign set_url = singles.url | append: '?sort_by=most-relevant&' | append: filter_param | append: '=' | append: set_encoded
+
+                for product in singles.products limit: 50
+                  assign product_set = blank
+                  if product.metafields[metafield_ns][metafield_key] != blank
+                    assign product_set = product.metafields[metafield_ns][metafield_key].value | default: product.metafields[metafield_ns][metafield_key] | strip
+                  endif
+                  if product_set == blank and product.metafields.custom.set_name != blank
+                    assign product_set = product.metafields.custom.set_name.value | default: product.metafields.custom.set_name | strip
+                  endif
+                  if product_set == blank and product.title contains ' - '
+                    assign title_parts = product.title | split: ' - '
+                    if title_parts.size > 1
+                      assign product_set = title_parts[1] | strip
+                    endif
+                  endif
+                  if product_set == set_value and product.featured_image != blank
+                    assign set_image = product.featured_image
+                    break
+                  endif
+                endfor
+              -%}
+              <a class="tcg-landing__set" href="{{ set_url }}">
+                <span class="tcg-landing__set-media">
+                  {%- if set_image != blank -%}
+                    <img
+                      src="{{ set_image | image_url: width: 600 }}"
+                      srcset="{{ set_image | image_url: width: 300 }} 300w, {{ set_image | image_url: width: 480 }} 480w, {{ set_image | image_url: width: 600 }} 600w"
+                      sizes="(max-width: 749px) 45vw, 280px"
+                      alt="{{ set_title | escape }}"
+                      width="{{ set_image.width }}"
+                      height="{{ set_image.height }}"
+                      loading="lazy"
+                    >
+                  {%- else -%}
+                    <span class="tcg-landing__set-placeholder">{{ set_title | slice: 0, 1 | upcase }}</span>
+                  {%- endif -%}
+                </span>
+                <span class="tcg-landing__set-body">
+                  <span class="tcg-landing__set-title">{{ set_title | escape }}</span>
+                  <span class="tcg-landing__set-meta">Shop singles from this set</span>
+                  <span class="tcg-landing__card-cta">Shop set</span>
+                </span>
+              </a>
+            {%- endfor -%}
+          {%- endif -%}
         </div>
       </div>
     {%- endif -%}
@@ -307,6 +438,36 @@
       "default": "Jump into the newest releases."
     },
     {
+      "type": "checkbox",
+      "id": "auto_latest_sets",
+      "label": "Auto-detect sets from product metadata",
+      "default": true,
+      "info": "Used when Set blocks below have no set names. Reads card_set / set_name from products in the singles collection."
+    },
+    {
+      "type": "range",
+      "id": "latest_sets_count",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Auto set count",
+      "default": 3
+    },
+    {
+      "type": "text",
+      "id": "set_filter_param",
+      "label": "Set filter query param",
+      "default": "filter.p.m.app--373890449409.card_set",
+      "info": "From a filtered collection URL, e.g. filter.p.m.app--….card_set"
+    },
+    {
+      "type": "text",
+      "id": "set_metafield",
+      "label": "Set metafield (namespace.key)",
+      "default": "app--373890449409.card_set",
+      "info": "Falls back to custom.set_name, then the set segment in the product title."
+    },
+    {
       "type": "header",
       "content": "Footer CTA"
     },
@@ -327,22 +488,29 @@
     {
       "type": "set",
       "name": "Set",
-      "limit": 3,
+      "limit": 6,
       "settings": [
         {
-          "type": "collection",
-          "id": "collection",
-          "label": "Set collection"
+          "type": "text",
+          "id": "set_name",
+          "label": "Set name (filter value)",
+          "info": "Exact Set filter value, e.g. Pitch Black or Chaos Rising."
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title override"
+          "label": "Display title",
+          "info": "Optional. Defaults to the set name."
         },
         {
           "type": "text",
           "id": "meta",
-          "label": "Meta override"
+          "label": "Meta"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image override"
         }
       ]
     }

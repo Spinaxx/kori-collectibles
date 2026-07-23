@@ -12,9 +12,28 @@
     "tcg_landing": {
       "type": "tcg-landing",
       "blocks": {
-        "set_1": { "type": "set", "settings": {} },
-        "set_2": { "type": "set", "settings": {} },
-        "set_3": { "type": "set", "settings": {} }
+        "set_1": {
+          "type": "set",
+          "settings": {
+            "set_name": "Chaos Rising",
+            "title": "ME4 — Chaos Rising",
+            "meta": "Latest Mega Evolution set"
+          }
+        },
+        "set_2": {
+          "type": "set",
+          "settings": {
+            "set_name": "Perfect Order",
+            "title": "ME3 — Perfect Order"
+          }
+        },
+        "set_3": {
+          "type": "set",
+          "settings": {
+            "set_name": "Ascended Heroes",
+            "title": "ME2.5 — Ascended Heroes"
+          }
+        }
       },
       "block_order": ["set_1", "set_2", "set_3"],
       "settings": {
@@ -32,6 +51,10 @@
         "graded_label": "Graded",
         "sets_heading": "Latest sets",
         "sets_subheading": "Jump into the newest releases.",
+        "auto_latest_sets": true,
+        "latest_sets_count": 3,
+        "set_filter_param": "filter.p.m.app--373890449409.card_set",
+        "set_metafield": "app--373890449409.card_set",
         "cta_label": "Browse all singles",
         "cta_link": "shopify://collections/kori-pokemon-singles"
       }

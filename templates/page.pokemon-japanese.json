@@ -30,6 +30,10 @@
         "graded_label": "Graded",
         "sets_heading": "Latest sets",
         "sets_subheading": "Jump into the newest Japanese releases.",
+        "auto_latest_sets": true,
+        "latest_sets_count": 3,
+        "set_filter_param": "filter.p.m.app--373890449409.card_set",
+        "set_metafield": "app--373890449409.card_set",
         "cta_label": "Browse all singles",
         "cta_link": "shopify://collections/kori-pokemon-ja-singles"
       }
