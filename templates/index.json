@@ -66,7 +66,7 @@
             "title": "Pokemon",
             "show_title": false,
             "meta": "Singles · Sealed",
-            "link": "shopify://collections/kori-pokemon-singles",
+            "link": "shopify://pages/pokemon",
             "logo": "shopify://shop_images/Pokemon_Trading_Card_Game_logo_svg.webp",
             "logo_key": "pokemon"
           }
@@ -79,7 +79,7 @@
             "title": "Japanese Pokemon",
             "show_title": true,
             "meta": "Singles · Sealed",
-            "link": "shopify://collections/kori-pokemon-ja-singles",
+            "link": "shopify://pages/pokemon-japanese",
             "logo": "shopify://shop_images/Pokemon_Trading_Card_Game_logo_svg.webp",
             "logo_key": "pokemon"
           }

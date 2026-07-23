@@ -3891,6 +3891,211 @@ html.in-app-browser .search-modal {
   }
 }
 
+/* TCG landing */
+
+.tcg-landing {
+  padding: 2rem 0 3.5rem;
+}
+
+.tcg-landing__hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.25rem 1.5rem;
+  align-items: center;
+  margin-bottom: 2.25rem;
+}
+
+.tcg-landing__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 7.5rem;
+  min-height: 4.5rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(160deg, rgba(45, 212, 191, 0.1), transparent 50%),
+    var(--surface);
+}
+
+.tcg-landing__brand img {
+  width: 100%;
+  height: auto;
+  max-height: 2.75rem;
+  object-fit: contain;
+}
+
+.tcg-landing__eyebrow {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.tcg-landing__title {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+}
+
+.tcg-landing__intro {
+  margin: 0;
+  max-width: 36rem;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.tcg-landing__intro.rte > *:last-child {
+  margin-bottom: 0;
+}
+
+.tcg-landing__band {
+  margin-bottom: 2.25rem;
+}
+
+.tcg-landing__band .section-head {
+  margin-bottom: 1rem;
+}
+
+.tcg-landing__categories {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.tcg-landing__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.15rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(160deg, rgba(45, 212, 191, 0.08), transparent 45%),
+    var(--surface);
+  transition: border-color 0.15s, transform 0.15s, background 0.15s;
+}
+
+.tcg-landing__card:hover {
+  border-color: rgba(45, 212, 191, 0.45);
+  transform: translateY(-2px);
+  background:
+    linear-gradient(160deg, rgba(45, 212, 191, 0.14), transparent 50%),
+    var(--surface);
+}
+
+.tcg-landing__card-label {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.tcg-landing__card-meta {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.tcg-landing__card-cta {
+  margin-top: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.tcg-landing__sets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.tcg-landing__set {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.tcg-landing__set:hover {
+  border-color: rgba(45, 212, 191, 0.45);
+  transform: translateY(-2px);
+}
+
+.tcg-landing__set-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 10;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.tcg-landing__set-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tcg-landing__set-placeholder {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+
+.tcg-landing__set-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.95rem 1rem 1.05rem;
+}
+
+.tcg-landing__set-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.tcg-landing__set-meta {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.tcg-landing__footer-cta {
+  margin: 0.5rem 0 0;
+}
+
+@media (max-width: 749px) {
+  .tcg-landing__hero {
+    grid-template-columns: 1fr;
+  }
+
+  .tcg-landing__brand {
+    width: 6.5rem;
+  }
+
+  .tcg-landing__categories,
+  .tcg-landing__sets {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 750px) and (max-width: 989px) {
+  .tcg-landing__categories,
+  .tcg-landing__sets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* Utilities */
 
 .empty-state {

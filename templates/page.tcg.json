@@ -1,0 +1,27 @@
+{
+  "sections": {
+    "tcg_landing": {
+      "type": "tcg-landing",
+      "blocks": {
+        "set_1": { "type": "set", "settings": {} },
+        "set_2": { "type": "set", "settings": {} },
+        "set_3": { "type": "set", "settings": {} }
+      },
+      "block_order": ["set_1", "set_2", "set_3"],
+      "settings": {
+        "eyebrow": "Shop",
+        "heading": "",
+        "intro": "Pick a category or jump into the latest sets.",
+        "logo_key": "pokemon",
+        "categories_heading": "Shop by type",
+        "singles_label": "Singles",
+        "sealed_label": "Sealed",
+        "graded_label": "Graded",
+        "sets_heading": "Latest sets",
+        "sets_subheading": "Jump into the newest releases.",
+        "cta_label": "Browse all singles"
+      }
+    }
+  },
+  "order": ["tcg_landing"]
+}

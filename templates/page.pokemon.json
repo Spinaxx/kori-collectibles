@@ -1,0 +1,32 @@
+{
+  "sections": {
+    "tcg_landing": {
+      "type": "tcg-landing",
+      "blocks": {
+        "set_1": { "type": "set", "settings": {} },
+        "set_2": { "type": "set", "settings": {} },
+        "set_3": { "type": "set", "settings": {} }
+      },
+      "block_order": ["set_1", "set_2", "set_3"],
+      "settings": {
+        "eyebrow": "TCG",
+        "heading": "Pokémon",
+        "intro": "Singles, sealed, and the latest sets — condition-checked with live stock.",
+        "logo_key": "pokemon",
+        "categories_heading": "Shop by type",
+        "singles_collection": "kori-pokemon-singles",
+        "singles_label": "Singles",
+        "singles_meta": "Condition-checked cards",
+        "sealed_collection": "kori-pokemon-sealed",
+        "sealed_label": "Sealed",
+        "sealed_meta": "ETBs, boxes, and packs",
+        "graded_label": "Graded",
+        "sets_heading": "Latest sets",
+        "sets_subheading": "Jump into the newest releases.",
+        "cta_label": "Browse all singles",
+        "cta_link": "shopify://collections/kori-pokemon-singles"
+      }
+    }
+  },
+  "order": ["tcg_landing"]
+}

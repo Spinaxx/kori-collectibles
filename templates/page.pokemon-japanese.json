@@ -1,0 +1,30 @@
+{
+  "sections": {
+    "tcg_landing": {
+      "type": "tcg-landing",
+      "blocks": {
+        "set_1": { "type": "set", "settings": {} },
+        "set_2": { "type": "set", "settings": {} },
+        "set_3": { "type": "set", "settings": {} }
+      },
+      "block_order": ["set_1", "set_2", "set_3"],
+      "settings": {
+        "eyebrow": "TCG",
+        "heading": "Japanese Pokémon",
+        "intro": "Japanese singles and sealed — live stock, ready to ship from the UK.",
+        "logo_key": "japanese_pokemon",
+        "categories_heading": "Shop by type",
+        "singles_collection": "kori-pokemon-ja-singles",
+        "singles_label": "Singles",
+        "singles_meta": "Japanese cards",
+        "sealed_label": "Sealed",
+        "graded_label": "Graded",
+        "sets_heading": "Latest sets",
+        "sets_subheading": "Jump into the newest Japanese releases.",
+        "cta_label": "Browse all singles",
+        "cta_link": "shopify://collections/kori-pokemon-ja-singles"
+      }
+    }
+  },
+  "order": ["tcg_landing"]
+}

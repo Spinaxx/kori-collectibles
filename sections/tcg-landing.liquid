@@ -1,0 +1,361 @@
+{%- liquid
+  assign heading = section.settings.heading | default: page.title | default: 'Shop'
+  assign logo_key = section.settings.logo_key | default: 'pokemon'
+  case logo_key
+    when 'pokemon'
+      assign logo_asset = 'logo-pokemon.svg'
+    when 'japanese_pokemon'
+      assign logo_asset = 'logo-pokemon.svg'
+    when 'yugioh'
+      assign logo_asset = 'logo-yugioh.png'
+    when 'magic'
+      assign logo_asset = 'logo-magic.svg'
+    when 'onepiece'
+      assign logo_asset = 'logo-onepiece.svg'
+    when 'lorcana'
+      assign logo_asset = 'logo-lorcana.svg'
+    when 'accessories'
+      assign logo_asset = 'logo-accessories.svg'
+    else
+      assign logo_asset = 'logo-pokemon.svg'
+  endcase
+
+  assign singles = section.settings.singles_collection
+  assign sealed = section.settings.sealed_collection
+  assign graded = section.settings.graded_collection
+
+  assign set_count = 0
+  for block in section.blocks
+    if block.type == 'set' and block.settings.collection != blank
+      assign set_count = set_count | plus: 1
+    endif
+  endfor
+
+  assign cta_label = section.settings.cta_label
+  assign cta_link = section.settings.cta_link
+  if cta_link == blank and singles != blank
+    assign cta_link = singles.url
+  endif
+  if cta_label == blank and singles != blank
+    assign cta_label = 'Browse all singles'
+  endif
+-%}
+
+<section class="section tcg-landing">
+  <div class="page-width">
+    <div class="tcg-landing__hero">
+      <div class="tcg-landing__brand" aria-hidden="true">
+        {%- if section.settings.logo != blank -%}
+          <img
+            src="{{ section.settings.logo | image_url: width: 360 }}"
+            srcset="{{ section.settings.logo | image_url: width: 180 }} 180w, {{ section.settings.logo | image_url: width: 280 }} 280w, {{ section.settings.logo | image_url: width: 360 }} 360w"
+            sizes="140px"
+            alt=""
+            width="140"
+            height="56"
+            loading="eager"
+          >
+        {%- else -%}
+          <img
+            src="{{ logo_asset | asset_url }}"
+            alt=""
+            width="140"
+            height="56"
+            loading="eager"
+          >
+        {%- endif -%}
+      </div>
+      <div class="tcg-landing__copy">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="tcg-landing__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        <h1 class="tcg-landing__title">{{ heading | escape }}</h1>
+        {%- if section.settings.intro != blank -%}
+          <p class="tcg-landing__intro">{{ section.settings.intro | escape }}</p>
+        {%- elsif page.content != blank -%}
+          <div class="tcg-landing__intro rte">{{ page.content }}</div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if singles != blank or sealed != blank or graded != blank -%}
+      <div class="tcg-landing__band">
+        <div class="section-head section-head--inline">
+          <h2>{{ section.settings.categories_heading | default: 'Shop by type' | escape }}</h2>
+        </div>
+        <div class="tcg-landing__categories">
+          {%- if singles != blank -%}
+            <a class="tcg-landing__card" href="{{ singles.url }}">
+              <span class="tcg-landing__card-label">{{ section.settings.singles_label | default: 'Singles' | escape }}</span>
+              <span class="tcg-landing__card-meta">
+                {%- if section.settings.singles_meta != blank -%}
+                  {{ section.settings.singles_meta | escape }}
+                {%- else -%}
+                  {{ singles.all_products_count }} cards
+                {%- endif -%}
+              </span>
+              <span class="tcg-landing__card-cta">Browse</span>
+            </a>
+          {%- endif -%}
+          {%- if sealed != blank -%}
+            <a class="tcg-landing__card" href="{{ sealed.url }}">
+              <span class="tcg-landing__card-label">{{ section.settings.sealed_label | default: 'Sealed' | escape }}</span>
+              <span class="tcg-landing__card-meta">
+                {%- if section.settings.sealed_meta != blank -%}
+                  {{ section.settings.sealed_meta | escape }}
+                {%- else -%}
+                  {{ sealed.all_products_count }} products
+                {%- endif -%}
+              </span>
+              <span class="tcg-landing__card-cta">Browse</span>
+            </a>
+          {%- endif -%}
+          {%- if graded != blank -%}
+            <a class="tcg-landing__card" href="{{ graded.url }}">
+              <span class="tcg-landing__card-label">{{ section.settings.graded_label | default: 'Graded' | escape }}</span>
+              <span class="tcg-landing__card-meta">
+                {%- if section.settings.graded_meta != blank -%}
+                  {{ section.settings.graded_meta | escape }}
+                {%- else -%}
+                  {{ graded.all_products_count }} cards
+                {%- endif -%}
+              </span>
+              <span class="tcg-landing__card-cta">Browse</span>
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if set_count > 0 -%}
+      <div class="tcg-landing__band">
+        <div class="section-head section-head--inline">
+          <h2>{{ section.settings.sets_heading | default: 'Latest sets' | escape }}</h2>
+          {%- if section.settings.sets_subheading != blank -%}
+            <p>{{ section.settings.sets_subheading | escape }}</p>
+          {%- endif -%}
+        </div>
+        <div class="tcg-landing__sets">
+          {%- for block in section.blocks -%}
+            {%- if block.type != 'set' -%}{%- continue -%}{%- endif -%}
+            {%- assign set_collection = block.settings.collection -%}
+            {%- if set_collection == blank -%}{%- continue -%}{%- endif -%}
+            {%- liquid
+              assign set_image = set_collection.image
+              if set_image == blank and set_collection.products.first != blank
+                assign set_image = set_collection.products.first.featured_image
+              endif
+              assign set_title = block.settings.title | default: set_collection.title
+              assign set_meta = block.settings.meta
+            -%}
+            <a class="tcg-landing__set" href="{{ set_collection.url }}" {{ block.shopify_attributes }}>
+              <span class="tcg-landing__set-media">
+                {%- if set_image != blank -%}
+                  <img
+                    src="{{ set_image | image_url: width: 600 }}"
+                    srcset="{{ set_image | image_url: width: 300 }} 300w, {{ set_image | image_url: width: 480 }} 480w, {{ set_image | image_url: width: 600 }} 600w"
+                    sizes="(max-width: 749px) 45vw, 280px"
+                    alt="{{ set_title | escape }}"
+                    width="{{ set_image.width }}"
+                    height="{{ set_image.height }}"
+                    loading="lazy"
+                  >
+                {%- else -%}
+                  <span class="tcg-landing__set-placeholder">{{ set_title | slice: 0, 1 | upcase }}</span>
+                {%- endif -%}
+              </span>
+              <span class="tcg-landing__set-body">
+                <span class="tcg-landing__set-title">{{ set_title | escape }}</span>
+                {%- if set_meta != blank -%}
+                  <span class="tcg-landing__set-meta">{{ set_meta | escape }}</span>
+                {%- else -%}
+                  <span class="tcg-landing__set-meta">{{ set_collection.all_products_count }} products</span>
+                {%- endif -%}
+                <span class="tcg-landing__card-cta">Shop set</span>
+              </span>
+            </a>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if cta_label != blank and cta_link != blank -%}
+      <p class="tcg-landing__footer-cta">
+        <a class="button" href="{{ cta_link }}">{{ cta_label | escape }}</a>
+      </p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TCG landing",
+  "tag": "section",
+  "class": "section-tcg-landing",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Shop"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Defaults to the page title if blank."
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro",
+      "default": "Pick a category or jump into the latest sets."
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo override"
+    },
+    {
+      "type": "select",
+      "id": "logo_key",
+      "label": "Built-in logo",
+      "default": "pokemon",
+      "options": [
+        { "value": "pokemon", "label": "Pokemon" },
+        { "value": "japanese_pokemon", "label": "Japanese Pokemon" },
+        { "value": "yugioh", "label": "Yu-Gi-Oh!" },
+        { "value": "magic", "label": "Magic" },
+        { "value": "onepiece", "label": "One Piece" },
+        { "value": "lorcana", "label": "Lorcana" },
+        { "value": "accessories", "label": "Accessories" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Shop by type"
+    },
+    {
+      "type": "text",
+      "id": "categories_heading",
+      "label": "Heading",
+      "default": "Shop by type"
+    },
+    {
+      "type": "collection",
+      "id": "singles_collection",
+      "label": "Singles collection"
+    },
+    {
+      "type": "text",
+      "id": "singles_label",
+      "label": "Singles label",
+      "default": "Singles"
+    },
+    {
+      "type": "text",
+      "id": "singles_meta",
+      "label": "Singles meta",
+      "info": "Optional. Defaults to product count."
+    },
+    {
+      "type": "collection",
+      "id": "sealed_collection",
+      "label": "Sealed collection"
+    },
+    {
+      "type": "text",
+      "id": "sealed_label",
+      "label": "Sealed label",
+      "default": "Sealed"
+    },
+    {
+      "type": "text",
+      "id": "sealed_meta",
+      "label": "Sealed meta"
+    },
+    {
+      "type": "collection",
+      "id": "graded_collection",
+      "label": "Graded collection"
+    },
+    {
+      "type": "text",
+      "id": "graded_label",
+      "label": "Graded label",
+      "default": "Graded"
+    },
+    {
+      "type": "text",
+      "id": "graded_meta",
+      "label": "Graded meta"
+    },
+    {
+      "type": "header",
+      "content": "Latest sets"
+    },
+    {
+      "type": "text",
+      "id": "sets_heading",
+      "label": "Heading",
+      "default": "Latest sets"
+    },
+    {
+      "type": "text",
+      "id": "sets_subheading",
+      "label": "Subheading",
+      "default": "Jump into the newest releases."
+    },
+    {
+      "type": "header",
+      "content": "Footer CTA"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Browse all singles"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link",
+      "info": "Defaults to the singles collection."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "set",
+      "name": "Set",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Set collection"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title override"
+        },
+        {
+          "type": "text",
+          "id": "meta",
+          "label": "Meta override"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TCG landing",
+      "blocks": [
+        { "type": "set" },
+        { "type": "set" },
+        { "type": "set" }
+      ]
+    }
+  ]
+}
+{% endschema %}
