@@ -195,6 +195,11 @@
         "type": "text",
         "id": "social_facebook",
         "label": "Facebook URL"
+      },
+      {
+        "type": "text",
+        "id": "social_trustpilot",
+        "label": "Trustpilot URL"
       }
     ]
   },
