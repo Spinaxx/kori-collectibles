@@ -3902,6 +3902,19 @@ html.in-app-browser .search-modal {
   margin-bottom: 2.25rem;
 }
 
+.tcg-landing__logo {
+  margin: 0 0 0.85rem;
+}
+
+.tcg-landing__logo img {
+  display: block;
+  width: auto;
+  max-width: 11rem;
+  height: auto;
+  max-height: 3rem;
+  object-fit: contain;
+}
+
 .tcg-landing__eyebrow {
   margin: 0 0 0.45rem;
   font-family: var(--font-mono);

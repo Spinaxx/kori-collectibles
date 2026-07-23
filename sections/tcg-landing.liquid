@@ -1,5 +1,24 @@
 {%- liquid
   assign heading = section.settings.heading | default: page.title | default: 'Shop'
+  assign logo_key = section.settings.logo_key | default: 'pokemon'
+  case logo_key
+    when 'pokemon'
+      assign logo_asset = 'logo-pokemon.svg'
+    when 'japanese_pokemon'
+      assign logo_asset = 'logo-pokemon.svg'
+    when 'yugioh'
+      assign logo_asset = 'logo-yugioh.png'
+    when 'magic'
+      assign logo_asset = 'logo-magic.svg'
+    when 'onepiece'
+      assign logo_asset = 'logo-onepiece.svg'
+    when 'lorcana'
+      assign logo_asset = 'logo-lorcana.svg'
+    when 'accessories'
+      assign logo_asset = 'logo-accessories.svg'
+    else
+      assign logo_asset = 'logo-pokemon.svg'
+  endcase
 
   assign singles = section.settings.singles_collection
   assign sealed = section.settings.sealed_collection
@@ -75,6 +94,27 @@
 <section class="section tcg-landing">
   <div class="page-width">
     <div class="tcg-landing__hero">
+      <div class="tcg-landing__logo" aria-hidden="true">
+        {%- if section.settings.logo != blank -%}
+          <img
+            src="{{ section.settings.logo | image_url: width: 360 }}"
+            srcset="{{ section.settings.logo | image_url: width: 180 }} 180w, {{ section.settings.logo | image_url: width: 280 }} 280w, {{ section.settings.logo | image_url: width: 360 }} 360w"
+            sizes="160px"
+            alt=""
+            width="160"
+            height="64"
+            loading="eager"
+          >
+        {%- else -%}
+          <img
+            src="{{ logo_asset | asset_url }}"
+            alt=""
+            width="160"
+            height="64"
+            loading="eager"
+          >
+        {%- endif -%}
+      </div>
       {%- if section.settings.eyebrow != blank -%}
         <p class="tcg-landing__eyebrow">{{ section.settings.eyebrow | escape }}</p>
       {%- endif -%}
@@ -234,6 +274,26 @@
       "id": "intro",
       "label": "Intro",
       "default": "Pick a category or jump into the latest sets."
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo override"
+    },
+    {
+      "type": "select",
+      "id": "logo_key",
+      "label": "Built-in logo",
+      "default": "pokemon",
+      "options": [
+        { "value": "pokemon", "label": "Pokemon" },
+        { "value": "japanese_pokemon", "label": "Japanese Pokemon" },
+        { "value": "yugioh", "label": "Yu-Gi-Oh!" },
+        { "value": "magic", "label": "Magic" },
+        { "value": "onepiece", "label": "One Piece" },
+        { "value": "lorcana", "label": "Lorcana" },
+        { "value": "accessories", "label": "Accessories" }
+      ]
     },
     {
       "type": "header",
