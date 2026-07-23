@@ -3898,20 +3898,25 @@ html.in-app-browser .search-modal {
 }
 
 .tcg-landing__hero {
-  max-width: 40rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.25rem 1.5rem;
+  align-items: center;
   margin-bottom: 2.25rem;
 }
 
 .tcg-landing__logo {
-  margin: 0 0 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 7.5rem;
 }
 
 .tcg-landing__logo img {
   display: block;
-  width: auto;
-  max-width: 11rem;
+  width: 100%;
   height: auto;
-  max-height: 3rem;
+  max-height: 2.75rem;
   object-fit: contain;
 }
 
@@ -4077,6 +4082,14 @@ html.in-app-browser .search-modal {
 }
 
 @media (max-width: 749px) {
+  .tcg-landing__hero {
+    grid-template-columns: 1fr;
+  }
+
+  .tcg-landing__logo {
+    width: 6.5rem;
+  }
+
   .tcg-landing__categories,
   .tcg-landing__sets {
     grid-template-columns: 1fr;

@@ -99,31 +99,33 @@
           <img
             src="{{ section.settings.logo | image_url: width: 360 }}"
             srcset="{{ section.settings.logo | image_url: width: 180 }} 180w, {{ section.settings.logo | image_url: width: 280 }} 280w, {{ section.settings.logo | image_url: width: 360 }} 360w"
-            sizes="160px"
+            sizes="140px"
             alt=""
-            width="160"
-            height="64"
+            width="140"
+            height="56"
             loading="eager"
           >
         {%- else -%}
           <img
             src="{{ logo_asset | asset_url }}"
             alt=""
-            width="160"
-            height="64"
+            width="140"
+            height="56"
             loading="eager"
           >
         {%- endif -%}
       </div>
-      {%- if section.settings.eyebrow != blank -%}
-        <p class="tcg-landing__eyebrow">{{ section.settings.eyebrow | escape }}</p>
-      {%- endif -%}
-      <h1 class="tcg-landing__title">{{ heading | escape }}</h1>
-      {%- if section.settings.intro != blank -%}
-        <p class="tcg-landing__intro">{{ section.settings.intro | escape }}</p>
-      {%- elsif page.content != blank -%}
-        <div class="tcg-landing__intro rte">{{ page.content }}</div>
-      {%- endif -%}
+      <div class="tcg-landing__copy">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="tcg-landing__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        <h1 class="tcg-landing__title">{{ heading | escape }}</h1>
+        {%- if section.settings.intro != blank -%}
+          <p class="tcg-landing__intro">{{ section.settings.intro | escape }}</p>
+        {%- elsif page.content != blank -%}
+          <div class="tcg-landing__intro rte">{{ page.content }}</div>
+        {%- endif -%}
+      </div>
     </div>
 
     {%- if singles != blank or sealed != blank or graded != blank -%}
