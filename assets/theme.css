@@ -4044,6 +4044,21 @@ html.in-app-browser .search-modal {
   object-fit: cover;
 }
 
+.tcg-landing__set-media--logo {
+  padding: 1rem 1.1rem;
+  background:
+    linear-gradient(160deg, rgba(45, 212, 191, 0.08), transparent 50%),
+    var(--surface-2);
+}
+
+.tcg-landing__set-media--logo img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 .tcg-landing__set-placeholder {
   font-family: var(--font-display);
   font-size: 2rem;

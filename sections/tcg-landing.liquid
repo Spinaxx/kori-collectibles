@@ -225,7 +225,7 @@
                 endif
               -%}
               <a class="tcg-landing__set" href="{{ set_url }}" {{ block.shopify_attributes }}>
-                <span class="tcg-landing__set-media">
+                <span class="tcg-landing__set-media{% if block.settings.image != blank %} tcg-landing__set-media--logo{% endif %}">
                   {%- if set_image != blank -%}
                     <img
                       src="{{ set_image | image_url: width: 600 }}"
@@ -426,6 +426,10 @@
       "content": "Latest sets"
     },
     {
+      "type": "paragraph",
+      "content": "Add Set blocks below to choose which sets appear and upload a tile image for each. If every Set block has an empty set name, and auto-detect is on, the theme picks unique sets from products in the singles collection (first unique card_set values it finds)."
+    },
+    {
       "type": "text",
       "id": "sets_heading",
       "label": "Heading",
@@ -440,9 +444,9 @@
     {
       "type": "checkbox",
       "id": "auto_latest_sets",
-      "label": "Auto-detect sets from product metadata",
+      "label": "Auto-detect sets when none are listed",
       "default": true,
-      "info": "Used when Set blocks below have no set names. Reads card_set / set_name from products in the singles collection."
+      "info": "Only runs if no Set blocks have a set name filled in. Not used on the Pokémon page while Chaos Rising / Perfect Order / Ascended Heroes are listed."
     },
     {
       "type": "range",
@@ -487,9 +491,15 @@
   "blocks": [
     {
       "type": "set",
-      "name": "Set",
+      "name": "Set tile",
       "limit": 6,
       "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Tile image",
+          "info": "Upload a set logo or promo art. If blank, uses a card image from that set when available."
+        },
         {
           "type": "text",
           "id": "set_name",
@@ -506,11 +516,6 @@
           "type": "text",
           "id": "meta",
           "label": "Meta"
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Image override"
         }
       ]
     }
@@ -519,9 +524,9 @@
     {
       "name": "TCG landing",
       "blocks": [
-        { "type": "set" },
-        { "type": "set" },
-        { "type": "set" }
+        { "type": "set", "name": "Set tile" },
+        { "type": "set", "name": "Set tile" },
+        { "type": "set", "name": "Set tile" }
       ]
     }
   ]
