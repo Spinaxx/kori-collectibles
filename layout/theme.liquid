@@ -56,7 +56,7 @@
         --color-button: {{ settings.color_button | default: '#f2f0eb' }};
         --color-button-text: {{ settings.color_button_text | default: '#0c0e14' }};
         --page-width-setting: {{ settings.page_width | default: 1360 }}px;
-        --logo-width: {{ settings.logo_width | default: 140 }}px;
+        --logo-width: {{ settings.logo_width | default: 200 }}px;
       }
 
       /* Critical paint — visible even if theme.css is slow or blocked */
@@ -121,17 +121,23 @@
         <a class="header__logo" href="{{ routes.root_url }}">
           {%- if settings.logo != blank -%}
             <img
-              src="{{ settings.logo | image_url: width: 280 }}"
-              srcset="{{ settings.logo | image_url: width: 140 }} 140w, {{ settings.logo | image_url: width: 280 }} 280w, {{ settings.logo | image_url: width: 400 }} 400w"
-              sizes="(max-width: 749px) 140px, 180px"
+              src="{{ settings.logo | image_url: width: 400 }}"
+              srcset="{{ settings.logo | image_url: width: 200 }} 200w, {{ settings.logo | image_url: width: 400 }} 400w, {{ settings.logo | image_url: width: 600 }} 600w"
+              sizes="(max-width: 749px) 160px, {{ settings.logo_width | default: 200 }}px"
               alt="{{ shop.name | escape }}"
               width="{{ settings.logo.width }}"
               height="{{ settings.logo.height }}"
               loading="eager"
             >
           {%- else -%}
-            <span class="logo-mark" aria-hidden="true"></span>
-            <span>{{ settings.logo_text | default: shop.name }}</span>
+            <img
+              class="header__logo-img"
+              src="{{ 'kori-collectibles-logo.png' | asset_url }}"
+              alt="{{ shop.name | escape }}"
+              width="1024"
+              height="299"
+              loading="eager"
+            >
           {%- endif -%}
         </a>
 
