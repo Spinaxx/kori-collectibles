@@ -47,9 +47,9 @@
         "heading_after": ".",
         "text": "Singles and sealed from the UK — inspected under lamp, priced for collectors, with live inventory counts.",
         "primary_label": "Shop singles",
-        "primary_link": "shopify://collections/kori-pokemon-singles",
+        "primary_link": "/collections/kori-pokemon-singles",
         "secondary_label": "Browse sealed",
-        "secondary_link": "shopify://collections/kori-pokemon-sealed",
+        "secondary_link": "/collections/kori-pokemon-sealed",
         "source_collection": "",
         "min_price": 5,
         "pool_size": 50

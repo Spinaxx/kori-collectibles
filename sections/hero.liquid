@@ -78,7 +78,7 @@
         {%- if section.settings.primary_label != blank -%}
           <a
             class="button"
-            href="{% if section.settings.primary_link != blank %}{{ section.settings.primary_link }}{% else %}{{ routes.all_products_collection_url }}{% endif %}"
+            href="{% if section.settings.primary_link != blank %}{{ section.settings.primary_link }}{% else %}/collections/kori-pokemon-singles{% endif %}"
           >
             {{ section.settings.primary_label | escape }}
           </a>
