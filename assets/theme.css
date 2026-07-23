@@ -296,7 +296,7 @@ ul {
 .header__logo img {
   height: auto;
   width: var(--logo-width, 200px);
-  max-height: 52px;
+  max-height: 56px;
   object-fit: contain;
 }
 
