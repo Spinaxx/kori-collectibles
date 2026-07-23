@@ -508,7 +508,11 @@
     </div>
 
     <main id="MainContent" class="main-content" role="main">
-      {{ content_for_layout }}
+      {%- if request.path contains '/policies/shipping-policy' -%}
+        {% section 'shipping' %}
+      {%- else -%}
+        {{ content_for_layout }}
+      {%- endif -%}
     </main>
 
     {%- assign shop_menu = linklists[settings.footer_shop_menu] -%}
@@ -544,7 +548,7 @@
               {%- endfor -%}
             {%- else -%}
               <a href="/pages/contact">Contact</a>
-              <a href="/pages/shipping">Shipping</a>
+              <a href="{{ shop.shipping_policy.url | default: '/policies/shipping-policy' }}">Shipping</a>
               <a href="/policies/refund-policy">Returns</a>
             {%- endif -%}
           </div>
