@@ -1541,6 +1541,52 @@
     });
   };
 
+  const initTcgSetTileHeights = () => {
+    const grids = Array.from(document.querySelectorAll('.tcg-landing__sets'));
+    if (!grids.length) return;
+
+    const measure = (grid) => {
+      const medias = Array.from(grid.querySelectorAll('.tcg-landing__set-media'));
+      if (!medias.length) return;
+
+      grid.style.removeProperty('--tcg-set-media-h');
+
+      let maxH = 0;
+      medias.forEach((media) => {
+        const img = media.querySelector('img');
+        const style = window.getComputedStyle(media);
+        const padX = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
+        const padY = (parseFloat(style.paddingTop) || 0) + (parseFloat(style.paddingBottom) || 0);
+        const contentW = Math.max(0, media.clientWidth - padX);
+
+        if (img && img.naturalWidth > 0 && contentW > 0) {
+          const renderedH = (img.naturalHeight / img.naturalWidth) * contentW;
+          maxH = Math.max(maxH, renderedH + padY);
+          return;
+        }
+
+        maxH = Math.max(maxH, media.offsetHeight);
+      });
+
+      if (maxH > 0) {
+        grid.style.setProperty('--tcg-set-media-h', `${Math.ceil(maxH)}px`);
+      }
+    };
+
+    const syncAll = () => grids.forEach(measure);
+
+    grids.forEach((grid) => {
+      grid.querySelectorAll('img').forEach((img) => {
+        if (!img.complete) {
+          img.addEventListener('load', syncAll, { once: true });
+        }
+      });
+    });
+
+    syncAll();
+    window.addEventListener('resize', syncAll);
+  };
+
   const boot = () => {
     try {
       initLoyaltyRedeem();
@@ -1571,6 +1617,11 @@
       initMoreTcgsExpand();
     } catch (err) {
       console.error('initMoreTcgsExpand failed', err);
+    }
+    try {
+      initTcgSetTileHeights();
+    } catch (err) {
+      console.error('initTcgSetTileHeights failed', err);
     }
     try {
       initDrawers();
