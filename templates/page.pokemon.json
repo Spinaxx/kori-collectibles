@@ -15,6 +15,7 @@
         "set_1": {
           "type": "set",
           "settings": {
+            "image": "shopify://shop_images/me05-banner.png",
             "set_name": "Pitch Black",
             "title": "ME5 - Pitch Black",
             "meta": "Latest Mega Evolution set"
