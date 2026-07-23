@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "shipping": {
+      "type": "shipping",
+      "settings": {
+        "eyebrow": "Delivery",
+        "heading": "Shipping",
+        "intro": "We pack carefully and dispatch from the UK. Live stock means what you order is what leaves the bench.",
+        "free_threshold": "40",
+        "cutoff": "Before 2pm",
+        "origin": "United Kingdom",
+        "support_email": "support@koricollectibles.co.uk",
+        "uk_heading": "UK delivery",
+        "uk_body": "<p>Orders placed before 2pm on a working day are usually dispatched the same day where possible, otherwise the next working day.</p><p>Standard UK tracked delivery is available at checkout. Orders of £40 or more qualify for free UK delivery.</p><p>Singles and sealed are packed to protect corners and condition in transit.</p>",
+        "rates_heading": "Rates",
+        "rates_body": "<ul><li><strong>UK tracked</strong> — calculated at checkout</li><li><strong>Free UK delivery</strong> — orders £40+</li><li><strong>International</strong> — available where offered at checkout; duties/taxes may apply on arrival</li></ul><p>Final shipping options and prices are shown before you pay.</p>",
+        "timing_heading": "Timing & tracking",
+        "timing_body": "<p>You’ll get a confirmation email when your order is placed, then another when it ships with tracking where available.</p><p>Weekends and bank holidays can add a day. If tracking stalls or something looks off, email <a href=\"mailto:support@koricollectibles.co.uk\">support@koricollectibles.co.uk</a> and we’ll sort it.</p>",
+        "notes_heading": "Good to know",
+        "notes_body": "<ul><li>We only list live inventory — no ghost stock.</li><li>Cards are condition-checked before packing.</li><li>If an item is damaged in transit, contact us with photos within 48 hours of delivery.</li></ul>"
+      }
+    }
+  },
+  "order": ["shipping"]
+}

@@ -1,0 +1,216 @@
+{%- liquid
+  assign free_threshold = section.settings.free_threshold | default: settings.cart_free_shipping_threshold | default: 40
+-%}
+
+<section class="section shipping-page">
+  <div class="page-width">
+    <div class="shipping-page__hero">
+      <p class="shipping-page__eyebrow">{{ section.settings.eyebrow | default: 'Delivery' | escape }}</p>
+      <h1 class="shipping-page__title">{{ section.settings.heading | default: page.title | default: 'Shipping' | escape }}</h1>
+      {%- if section.settings.intro != blank -%}
+        <p class="shipping-page__intro">{{ section.settings.intro | escape }}</p>
+      {%- else -%}
+        <p class="shipping-page__intro">We pack carefully and dispatch from the UK. Live stock means what you order is what leaves the bench.</p>
+      {%- endif -%}
+    </div>
+
+    <div class="shipping-page__highlights">
+      <div class="shipping-page__highlight">
+        <span class="shipping-page__highlight-label">Free UK delivery</span>
+        <p class="shipping-page__highlight-value">Orders over £{{ free_threshold }}</p>
+      </div>
+      <div class="shipping-page__highlight">
+        <span class="shipping-page__highlight-label">Dispatch cut-off</span>
+        <p class="shipping-page__highlight-value">{{ section.settings.cutoff | default: 'Before 2pm' | escape }}</p>
+      </div>
+      <div class="shipping-page__highlight">
+        <span class="shipping-page__highlight-label">From</span>
+        <p class="shipping-page__highlight-value">{{ section.settings.origin | default: 'United Kingdom' | escape }}</p>
+      </div>
+    </div>
+
+    <div class="shipping-page__grid">
+      <section class="shipping-page__block">
+        <h2>{{ section.settings.uk_heading | default: 'UK delivery' | escape }}</h2>
+        <div class="shipping-page__copy">
+          {%- if section.settings.uk_body != blank -%}
+            {{ section.settings.uk_body }}
+          {%- else -%}
+            <p>Orders placed before {{ section.settings.cutoff | default: '2pm' | escape }} on a working day are usually dispatched the same day where possible, otherwise the next working day.</p>
+            <p>Standard UK tracked delivery is available at checkout. Orders of £{{ free_threshold }} or more qualify for free UK delivery.</p>
+            <p>Singles and sealed are packed to protect corners and condition in transit.</p>
+          {%- endif -%}
+        </div>
+      </section>
+
+      <section class="shipping-page__block">
+        <h2>{{ section.settings.rates_heading | default: 'Rates' | escape }}</h2>
+        <div class="shipping-page__copy">
+          {%- if section.settings.rates_body != blank -%}
+            {{ section.settings.rates_body }}
+          {%- else -%}
+            <ul>
+              <li><strong>UK tracked</strong> — calculated at checkout</li>
+              <li><strong>Free UK delivery</strong> — orders £{{ free_threshold }}+</li>
+              <li><strong>International</strong> — available where offered at checkout; duties/taxes may apply on arrival</li>
+            </ul>
+            <p>Final shipping options and prices are shown before you pay.</p>
+          {%- endif -%}
+        </div>
+      </section>
+
+      <section class="shipping-page__block">
+        <h2>{{ section.settings.timing_heading | default: 'Timing & tracking' | escape }}</h2>
+        <div class="shipping-page__copy">
+          {%- if section.settings.timing_body != blank -%}
+            {{ section.settings.timing_body }}
+          {%- else -%}
+            <p>You’ll get a confirmation email when your order is placed, then another when it ships with tracking where available.</p>
+            <p>Weekends and bank holidays can add a day. If tracking stalls or something looks off, email <a href="mailto:{{ section.settings.support_email | default: 'support@koricollectibles.co.uk' | escape }}">{{ section.settings.support_email | default: 'support@koricollectibles.co.uk' | escape }}</a> and we’ll sort it.</p>
+          {%- endif -%}
+        </div>
+      </section>
+
+      <section class="shipping-page__block">
+        <h2>{{ section.settings.notes_heading | default: 'Good to know' | escape }}</h2>
+        <div class="shipping-page__copy">
+          {%- if section.settings.notes_body != blank -%}
+            {{ section.settings.notes_body }}
+          {%- else -%}
+            <ul>
+              <li>We only list live inventory — no ghost stock.</li>
+              <li>Cards are condition-checked before packing.</li>
+              <li>If an item is damaged in transit, contact us with photos within 48 hours of delivery.</li>
+            </ul>
+          {%- endif -%}
+        </div>
+      </section>
+    </div>
+
+    <p class="shipping-page__cta">
+      Still unsure?
+      <a href="{{ pages.contact.url | default: '/pages/contact' }}">Contact support</a>
+    </p>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Shipping",
+  "tag": "section",
+  "class": "section-shipping",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Delivery"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shipping"
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro",
+      "default": "We pack carefully and dispatch from the UK. Live stock means what you order is what leaves the bench."
+    },
+    {
+      "type": "text",
+      "id": "free_threshold",
+      "label": "Free UK delivery threshold (GBP)",
+      "default": "40"
+    },
+    {
+      "type": "text",
+      "id": "cutoff",
+      "label": "Dispatch cut-off",
+      "default": "Before 2pm"
+    },
+    {
+      "type": "text",
+      "id": "origin",
+      "label": "Ships from",
+      "default": "United Kingdom"
+    },
+    {
+      "type": "text",
+      "id": "support_email",
+      "label": "Support email",
+      "default": "support@koricollectibles.co.uk"
+    },
+    {
+      "type": "header",
+      "content": "UK delivery"
+    },
+    {
+      "type": "text",
+      "id": "uk_heading",
+      "label": "Heading",
+      "default": "UK delivery"
+    },
+    {
+      "type": "richtext",
+      "id": "uk_body",
+      "label": "Body",
+      "default": "<p>Orders placed before 2pm on a working day are usually dispatched the same day where possible, otherwise the next working day.</p><p>Standard UK tracked delivery is available at checkout. Orders of £40 or more qualify for free UK delivery.</p><p>Singles and sealed are packed to protect corners and condition in transit.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Rates"
+    },
+    {
+      "type": "text",
+      "id": "rates_heading",
+      "label": "Heading",
+      "default": "Rates"
+    },
+    {
+      "type": "richtext",
+      "id": "rates_body",
+      "label": "Body",
+      "default": "<ul><li><strong>UK tracked</strong> — calculated at checkout</li><li><strong>Free UK delivery</strong> — orders £40+</li><li><strong>International</strong> — available where offered at checkout; duties/taxes may apply on arrival</li></ul><p>Final shipping options and prices are shown before you pay.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Timing"
+    },
+    {
+      "type": "text",
+      "id": "timing_heading",
+      "label": "Heading",
+      "default": "Timing & tracking"
+    },
+    {
+      "type": "richtext",
+      "id": "timing_body",
+      "label": "Body",
+      "default": "<p>You’ll get a confirmation email when your order is placed, then another when it ships with tracking where available.</p><p>Weekends and bank holidays can add a day. If tracking stalls or something looks off, email us and we’ll sort it.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Notes"
+    },
+    {
+      "type": "text",
+      "id": "notes_heading",
+      "label": "Heading",
+      "default": "Good to know"
+    },
+    {
+      "type": "richtext",
+      "id": "notes_body",
+      "label": "Body",
+      "default": "<ul><li>We only list live inventory — no ghost stock.</li><li>Cards are condition-checked before packing.</li><li>If an item is damaged in transit, contact us with photos within 48 hours of delivery.</li></ul>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shipping"
+    }
+  ]
+}
+{% endschema %}
