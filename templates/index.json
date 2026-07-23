@@ -16,7 +16,7 @@
           "type": "stat",
           "settings": {
             "label": "Free UK delivery",
-            "text": "Over GBP 40"
+            "text": "Over £40"
           }
         },
         "s2": {
@@ -40,12 +40,12 @@
         "s3"
       ],
       "settings": {
-        "eyebrow": "UK Pokemon & TCG shop",
-        "heading_line_1": "The hunt is",
-        "heading_line_2": "half the",
-        "heading_em": "foil",
+        "eyebrow": "Kori Collectibles",
+        "heading_line_1": "Real stock.",
+        "heading_line_2": "Honest ",
+        "heading_em": "condition",
         "heading_after": ".",
-        "text": "Singles and sealed, priced for collectors. Condition-checked under lamp - no mystery packs, no guesswork on stock.",
+        "text": "Singles and sealed from the UK — inspected under lamp, priced for collectors, with live inventory counts.",
         "primary_label": "Shop singles",
         "primary_link": "",
         "secondary_label": "Browse sealed",
