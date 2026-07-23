@@ -17,7 +17,7 @@
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Manrope', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --header-h: 68px;
+  --header-h: 72px;
   --border: rgba(242, 240, 235, 0.1);
   --shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.65);
 }
@@ -286,17 +286,15 @@ ul {
 .header__logo {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.15rem;
-  letter-spacing: -0.03em;
+  line-height: 0;
 }
 
-.header__logo img {
-  height: auto;
-  width: var(--logo-width, 200px);
-  max-height: 56px;
+.header__logo img,
+.header__logo-img {
+  display: block;
+  width: auto;
+  height: 48px;
+  max-width: min(var(--logo-width, 168px), 48vw);
   object-fit: contain;
 }
 
