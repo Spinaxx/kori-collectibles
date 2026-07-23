@@ -3567,18 +3567,21 @@ html.in-app-browser .search-modal {
   }
 }
 
-/* Shipping page */
+/* Shipping / returns policy pages */
 
-.shipping-page {
+.shipping-page,
+.returns-page {
   padding: 2rem 0 3.5rem;
 }
 
-.shipping-page__hero {
+.shipping-page__hero,
+.returns-page__hero {
   max-width: 40rem;
   margin-bottom: 1.75rem;
 }
 
-.shipping-page__eyebrow {
+.shipping-page__eyebrow,
+.returns-page__eyebrow {
   margin: 0 0 0.55rem;
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -3587,33 +3590,38 @@ html.in-app-browser .search-modal {
   color: var(--accent);
 }
 
-.shipping-page__title {
+.shipping-page__title,
+.returns-page__title {
   margin: 0 0 0.75rem;
   font-size: clamp(1.8rem, 3.4vw, 2.6rem);
 }
 
-.shipping-page__intro {
+.shipping-page__intro,
+.returns-page__intro {
   margin: 0;
   color: var(--muted);
   font-size: 1rem;
   line-height: 1.55;
 }
 
-.shipping-page__highlights {
+.shipping-page__highlights,
+.returns-page__highlights {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.85rem;
   margin-bottom: 2.25rem;
 }
 
-.shipping-page__highlight {
+.shipping-page__highlight,
+.returns-page__highlight {
   padding: 1rem 1.1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
 }
 
-.shipping-page__highlight-label {
+.shipping-page__highlight-label,
+.returns-page__highlight-label {
   display: block;
   margin-bottom: 0.3rem;
   font-family: var(--font-mono);
@@ -3623,7 +3631,8 @@ html.in-app-browser .search-modal {
   color: var(--muted);
 }
 
-.shipping-page__highlight-value {
+.shipping-page__highlight-value,
+.returns-page__highlight-value {
   margin: 0;
   font-family: var(--font-display);
   font-size: 1.1rem;
@@ -3631,69 +3640,92 @@ html.in-app-browser .search-modal {
   color: var(--accent-2);
 }
 
-.shipping-page__grid {
+.shipping-page__grid,
+.returns-page__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.25rem 1.5rem;
 }
 
-.shipping-page__block h2 {
+.shipping-page__block h2,
+.returns-page__block h2 {
   margin: 0 0 0.65rem;
   font-size: 1.15rem;
 }
 
-.shipping-page__copy {
+.shipping-page__copy,
+.returns-page__copy {
   color: var(--muted);
   font-size: 0.94rem;
   line-height: 1.55;
 }
 
-.shipping-page__copy p {
+.shipping-page__copy p,
+.returns-page__copy p {
   margin: 0 0 0.75rem;
 }
 
-.shipping-page__copy p:last-child {
+.shipping-page__copy p:last-child,
+.returns-page__copy p:last-child {
   margin-bottom: 0;
 }
 
-.shipping-page__copy ul {
+.shipping-page__copy ul,
+.returns-page__copy ul,
+.returns-page__copy ol {
   margin: 0 0 0.75rem;
   padding-left: 1.1rem;
+}
+
+.shipping-page__copy ul,
+.returns-page__copy ul {
   list-style: disc;
 }
 
-.shipping-page__copy li {
+.returns-page__copy ol {
+  list-style: decimal;
+}
+
+.shipping-page__copy li,
+.returns-page__copy li {
   margin-bottom: 0.4rem;
 }
 
-.shipping-page__copy li:last-child {
+.shipping-page__copy li:last-child,
+.returns-page__copy li:last-child {
   margin-bottom: 0;
 }
 
-.shipping-page__copy strong {
+.shipping-page__copy strong,
+.returns-page__copy strong {
   color: var(--text);
 }
 
-.shipping-page__copy a {
+.shipping-page__copy a,
+.returns-page__copy a {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 0.12em;
 }
 
-.shipping-page__cta {
+.shipping-page__cta,
+.returns-page__cta {
   margin: 2.25rem 0 0;
   color: var(--muted);
   font-size: 0.92rem;
 }
 
-.shipping-page__cta a {
+.shipping-page__cta a,
+.returns-page__cta a {
   color: var(--accent);
   margin-left: 0.25rem;
 }
 
 @media (max-width: 749px) {
   .shipping-page__highlights,
-  .shipping-page__grid {
+  .shipping-page__grid,
+  .returns-page__highlights,
+  .returns-page__grid {
     grid-template-columns: 1fr;
   }
 }

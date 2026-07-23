@@ -510,6 +510,8 @@
     <main id="MainContent" class="main-content" role="main">
       {%- if request.path contains '/policies/shipping-policy' -%}
         {% section 'shipping' %}
+      {%- elsif request.path contains '/policies/refund-policy' -%}
+        {% section 'returns' %}
       {%- else -%}
         {{ content_for_layout }}
       {%- endif -%}
@@ -549,7 +551,7 @@
             {%- else -%}
               <a href="/pages/contact">Contact</a>
               <a href="{{ shop.shipping_policy.url | default: '/policies/shipping-policy' }}">Shipping</a>
-              <a href="/policies/refund-policy">Returns</a>
+              <a href="{{ shop.refund_policy.url | default: '/policies/refund-policy' }}">Returns</a>
             {%- endif -%}
           </div>
 
