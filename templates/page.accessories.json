@@ -1,0 +1,29 @@
+{
+  "sections": {
+    "tcg_landing": {
+      "type": "tcg-landing",
+      "blocks": {},
+      "block_order": [],
+      "settings": {
+        "eyebrow": "Shop",
+        "heading": "Accessories",
+        "intro": "Sleeves, binders, deck boxes, and the extras that keep your collection protected.",
+        "logo_key": "accessories",
+        "categories_heading": "Shop by type",
+        "singles_label": "Sleeves",
+        "singles_meta": "Protect every card",
+        "sealed_label": "Binders",
+        "sealed_meta": "Pages and albums",
+        "graded_label": "Deck boxes",
+        "graded_meta": "Storage and travel",
+        "sets_heading": "Featured",
+        "sets_subheading": "",
+        "auto_latest_sets": false,
+        "latest_sets_count": 3,
+        "set_filter_param": "filter.p.m.app--373890449409.card_set",
+        "set_metafield": "app--373890449409.card_set"
+      }
+    }
+  },
+  "order": ["tcg_landing"]
+}
