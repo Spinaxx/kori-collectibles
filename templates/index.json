@@ -49,7 +49,7 @@
         "primary_label": "Shop singles",
         "primary_link": "",
         "secondary_label": "Browse sealed",
-        "secondary_link": "",
+        "secondary_link": "shopify://collections/kori-pokemon-sealed",
         "source_collection": "",
         "min_price": 5,
         "pool_size": 50
