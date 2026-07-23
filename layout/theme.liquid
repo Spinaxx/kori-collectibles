@@ -619,9 +619,6 @@
 
         <div class="footer__bottom">
           <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ settings.footer_disclaimer }}</span>
-          {%- if settings.currency_note != blank -%}
-            <span>{{ settings.currency_note }}</span>
-          {%- endif -%}
         </div>
       </div>
     </footer>

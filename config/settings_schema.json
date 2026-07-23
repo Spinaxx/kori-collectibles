@@ -170,12 +170,6 @@
         "id": "show_stock_count",
         "label": "Show stock counts on cards",
         "default": true
-      },
-      {
-        "type": "text",
-        "id": "currency_note",
-        "label": "Currency note",
-        "default": "Prices in GBP"
       }
     ]
   },
